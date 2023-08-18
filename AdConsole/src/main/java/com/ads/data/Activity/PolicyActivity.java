@@ -1,4 +1,4 @@
-package com.ads.data;
+package com.ads.data.Activity;
 
 import static com.ads.data.AdsControl.app_data;
 
@@ -14,6 +14,9 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.ads.data.Conts;
+import com.ads.data.R;
 
 public class PolicyActivity extends AppCompatActivity {
 
