@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-//apply plugin: 'maven-publish'
 android {
     namespace 'com.ads.data'
     compileSdk 33
@@ -71,17 +70,3 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
-
-/*
-afterEvaluate {
-    publishing {
-        publications {
-            maven(MavenPublication) {
-                groupId = 'com.allads'
-                artifactId = 'platform'
-                version = "1.0.0"
-                from components.release
-            }
-        }
-    }
-}*/
