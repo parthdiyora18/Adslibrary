@@ -58,8 +58,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
             android:padding="6dp"
-            android:src="@drawable/live_icon"
-            app:riv_corner_radius="5dp" />
+            android:src="@drawable/live_icon"/>
 
         <TextView
             android:layout_width="wrap_content"
