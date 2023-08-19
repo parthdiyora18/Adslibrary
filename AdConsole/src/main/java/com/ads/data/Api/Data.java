@@ -171,6 +171,15 @@ public class Data {
     @SerializedName("privacy_url")
     @Expose
     private String privacyUrl;
+    @SerializedName("qureka_inter")
+    @Expose
+    private String Qureka_Inter;
+    @SerializedName("qureka_url")
+    @Expose
+    private String Qureka_url;
+    @SerializedName("live_mode")
+    @Expose
+    private String live_mode;
     @SerializedName("redirect_app")
     @Expose
     private String redirectApp;
@@ -613,6 +622,30 @@ public class Data {
 
     public void setPrivacyUrl(String privacyUrl) {
         this.privacyUrl = privacyUrl;
+    }
+
+    public String getQureka_Inter() {
+        return Qureka_Inter;
+    }
+
+    public void setQureka_Inter(String qureka_Inter) {
+        Qureka_Inter = qureka_Inter;
+    }
+
+    public String getQureka_url() {
+        return Qureka_url;
+    }
+
+    public void setQureka_url(String qureka_url) {
+        Qureka_url = qureka_url;
+    }
+
+    public String getLive_mode() {
+        return live_mode;
+    }
+
+    public void setLive_mode(String live_mode) {
+        this.live_mode = live_mode;
     }
 
     public String getRedirectApp() {

@@ -24,6 +24,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.core.content.ContextCompat;
+
 import com.ads.data.Api.APIClient;
 import com.ads.data.Api.APIInterface;
 import com.ads.data.Api.Recover;
@@ -83,6 +86,7 @@ public class Conts {
             e.printStackTrace();
         }
     }
+
     public void showVpnDialog() {
         Dialog dialog = new Dialog(ctx);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -157,6 +161,20 @@ public class Conts {
         Dialog dialog = new Dialog(ctx);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.no_game);
+        dialog.setCancelable(false);
+        dialog.findViewById(R.id.iv_close).setOnClickListener(view -> dialog.dismiss());
+        dialog.findViewById(R.id.tv_submit).setOnClickListener(view -> dialog.dismiss());
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+        dialog.show();
+        Window window = dialog.getWindow();
+        window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+    }
+
+    public void show_No_Live_Match_Dialog() {
+        Dialog dialog = new Dialog(ctx);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.no_match);
         dialog.setCancelable(false);
         dialog.findViewById(R.id.iv_close).setOnClickListener(view -> dialog.dismiss());
         dialog.findViewById(R.id.tv_submit).setOnClickListener(view -> dialog.dismiss());
@@ -300,7 +318,7 @@ public class Conts {
             public void onResponse(@NotNull Call<Recover> call, @NotNull retrofit2.Response<Recover> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().getData() != null) {
-//                        app_data.clear();
+                        app_data.clear();
                         Log.d("Diyora", "Parth_Diyora " + response.body().getData());
                         app_data.addAll(response.body().getData());
                     } else {
@@ -316,13 +334,14 @@ public class Conts {
         });
     }
 
-   /* @SuppressLint("ObsoleteSdkInt")
-    public static void ifSupported(Activity mContext) {
+    // TODO: 8/19/2023  Qureka Mode
+    @SuppressLint("ObsoleteSdkInt")
+    public static void Qureka(Activity mContext) {
         if (app_data != null && app_data.size() > 0) {
-            if (app_data.get(0).getAdQurekaInter().equals("on")) {
+            if (app_data.get(0).getQureka_Inter().equals("on")) {
                 CustomTabsIntent.Builder customIntent = new CustomTabsIntent.Builder();
                 customIntent.setToolbarColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
-                openCustomTab(mContext, customIntent.build(), Uri.parse(app_data.get(0).getQurekaUrl()));
+                openCustomTab(mContext, customIntent.build(), Uri.parse(app_data.get(0).getQureka_url()));
             }
         }
     }
@@ -335,5 +354,5 @@ public class Conts {
         } else {
             activity.startActivity(new Intent(Intent.ACTION_VIEW, uri));
         }
-    }*/
+    }
 }
