@@ -22,7 +22,6 @@ import com.google.android.gms.ads.initialization.OnInitializationCompleteListene
 public class App extends Application {
     private static App _instance;
     AppOpen appOpenManager;
-
     public void onCreate() {
         super.onCreate();
         _instance = this;
