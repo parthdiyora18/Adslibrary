@@ -81,10 +81,12 @@ import java.util.ArrayList;
 import retrofit2.Call;
 
 public class AdsControl {
+    @SuppressLint("StaticFieldLeak")
     private static AdsControl mInstance;
+    @SuppressLint("StaticFieldLeak")
     static Context activity;
     static MyCallback myCallback;
-    public static String Mrec = "mrec";
+    private final String Mrec = "mrec";
 
     // Banner
     public static boolean isGoogleBannerLoaded;
@@ -97,6 +99,7 @@ public class AdsControl {
     public static AdView googleBannerAd;
     public static AdManagerAdView adxBannerAd;
     public static com.facebook.ads.AdView fbadView;
+    @SuppressLint("StaticFieldLeak")
     public static MaxAdView applovin_banner_ad;
     public static BannerAd wBannerAd;
 
@@ -110,6 +113,7 @@ public class AdsControl {
     public static AdView admobMediam_Ragtangal;
     public static AdManagerAdView adxMediam_Ragtangal;
     public static com.facebook.ads.AdView fb_Ragtangal_adView;
+    @SuppressLint("StaticFieldLeak")
     public static MaxAdView applovin_Medium_Ragtangal_adview;
     public static BannerAd w_medium_ragtangal;
 
@@ -125,8 +129,10 @@ public class AdsControl {
     public static NativeAd Adx_native_Ad;
     public static com.facebook.ads.NativeAd fb_native_Ad;
     public static MaxAd Applovin_native_ad;
+    @SuppressLint("StaticFieldLeak")
     public static MaxNativeAdView applovin_maxnativeadview;
     public static NativeAd wortise_native_Ad;
+    @SuppressLint("StaticFieldLeak")
     public static GoogleNativeAd wortise_google_native_Ad;
 
     // Small Native Ad
@@ -141,8 +147,10 @@ public class AdsControl {
     public static NativeAd Adx_small_native_Ad;
     public static NativeBannerAd fb_small_native_Ad;
     public static MaxAd Applovin_small_native_Ad;
+    @SuppressLint("StaticFieldLeak")
     public static MaxNativeAdView applovin_small_native_Ad;
     public static NativeAd wortise_small_native_Ad;
+    @SuppressLint("StaticFieldLeak")
     public static GoogleNativeAd wortise_google_small_native_Ad;
 
     // Small Naitive Banner Ad
@@ -163,22 +171,21 @@ public class AdsControl {
     public static GoogleNativeAd wortise_small_google_native_banner_Ad;
 
     // Inter
-    public static boolean isGoogleInterLoaded;
-    public static boolean isAdxInterLoaded;
-    public static boolean isFBInterLoaded;
-    public static boolean isApplovinInterLoaded;
+    private boolean isGoogleInterLoaded;
+    private boolean isAdxInterLoaded;
+    private boolean isFBInterLoaded;
+    private boolean isApplovinInterLoaded;
     private boolean isWortiseInterLoaded;
-
     private boolean isLocalInterLoaded;
-    public static InterstitialAd ADMOBInterstitialAd;
-    public static AdManagerInterstitialAd ADXInterstitialAd;
-    public static com.facebook.ads.InterstitialAd FB_interstitialAd;
-    public static MaxInterstitialAd Applovin_maxInterstitialAd;
-    public com.wortise.ads.interstitial.InterstitialAd Wortise_inter;
+    private InterstitialAd ADMOBInterstitialAd;
+    private AdManagerInterstitialAd ADXInterstitialAd;
+    private com.facebook.ads.InterstitialAd FB_interstitialAd;
+    private MaxInterstitialAd Applovin_maxInterstitialAd;
+    private com.wortise.ads.interstitial.InterstitialAd Wortise_inter;
 
     // Appopen
-    public static AppOpenAd admob_appOpenAd;
-    public static AppOpenAd adx_appOpenAd;
+    AppOpenAd admob_appOpenAd;
+    AppOpenAd adx_appOpenAd;
 
     private int adCounter;
     SharedPreferences prefs;
@@ -212,7 +219,7 @@ public class AdsControl {
     public static ArrayList<Data> app_data = new ArrayList<Data>();
 
     @SuppressLint("ObsoleteSdkInt")
-    public void ADSinit(final Activity activity, String packagename, String Service, getDataListner myCallback) {
+    public void ADSinit(final Activity activity, String packagename, String Service, getDataListner Callback) {
         boolean isAppInstalled1 = appInstalledOrNot("com.minhui.networkcapture");
         boolean isAppInstalled2 = appInstalledOrNot("com.minhui.networkcapture.pro");
         boolean isAppInstalled3 = appInstalledOrNot("jp.co.taosoftware.android.packetcapture");
@@ -274,14 +281,14 @@ public class AdsControl {
                                                 banner_Ads();
                                                 small_native_Ads();
                                                 small_native_banner_Ads();
-                                                With_out(myCallback);
+                                                With_out(Callback);
                                             } else {
-                                                With_out(myCallback);
+                                                With_out(Callback);
                                             }
                                         }
                                     }
                                 } else {
-                                    With_out(myCallback);
+                                    With_out(Callback);
                                     Toast.makeText(activity, "Server not Response", Toast.LENGTH_SHORT).show();
                                 }
                             }
@@ -290,7 +297,7 @@ public class AdsControl {
                         @Override
                         public void onFailure(Call<Recover> call, Throwable t) {
                             call.cancel();
-                            With_out(myCallback);
+                            With_out(Callback);
                         }
                     });
                 }
@@ -322,7 +329,7 @@ public class AdsControl {
     }
 
     // TODO: 7/17/2023 Call Intent
-    public void With_out(getDataListner myCallback) {
+    private void With_out(getDataListner myCallback) {
         try {
             if (app_data != null && app_data.size() > 0) {
                 if (app_data.get(0).isAds_show()) {
@@ -411,7 +418,7 @@ public class AdsControl {
     // TODO: 7/17/2023  Open Native Dialog Ads
     Dialog ad_dialog;
 
-    public void open_native(getDataListner myCallback) {
+    public void open_native(getDataListner callback) {
         Dialog dialog = new Dialog(activity);
         ad_dialog = dialog;
         dialog.requestWindowFeature(1);
@@ -427,7 +434,7 @@ public class AdsControl {
                     @Override
                     public void onClick(View v) {
                         ad_dialog.dismiss();
-                        secound_splash_Ads(myCallback);
+                        secound_splash_Ads(callback);
                     }
                 });
             }
@@ -440,7 +447,7 @@ public class AdsControl {
         this.ad_dialog.show();
     }
 
-    public void secound_splash_Ads(getDataListner myCallback) {
+    private void secound_splash_Ads(getDataListner callback) {
         try {
             if (app_data != null && app_data.size() > 0) {
                 if (app_data.get(0).isAds_show()) {
@@ -450,7 +457,7 @@ public class AdsControl {
                             AdsControl.getInstance(activity).show_Interstitial(new MyCallback() {
                                 @Override
                                 public void OnCall() {
-                                    Next_Call(myCallback);
+                                    Next_Call(callback);
                                 }
                             });
                             break;
@@ -458,7 +465,7 @@ public class AdsControl {
                             AdsControl.getInstance(activity).show_Admob_Appopen(new MyCallback() {
                                 @Override
                                 public void OnCall() {
-                                    Next_Call(myCallback);
+                                    Next_Call(callback);
                                 }
                             });
                             break;
@@ -466,7 +473,7 @@ public class AdsControl {
                             AdsControl.getInstance(activity).show_Adx_Appopen(new MyCallback() {
                                 @Override
                                 public void OnCall() {
-                                    Next_Call(myCallback);
+                                    Next_Call(callback);
                                 }
                             });
                             break;
@@ -474,7 +481,7 @@ public class AdsControl {
                             AdsControl.getInstance(activity).show_Applovin_Appopen(new MyCallback() {
                                 @Override
                                 public void OnCall() {
-                                    Next_Call(myCallback);
+                                    Next_Call(callback);
                                 }
                             });
                             break;
@@ -482,7 +489,7 @@ public class AdsControl {
                             AdsControl.getInstance(activity).show_Wortise_Appopen(new MyCallback() {
                                 @Override
                                 public void OnCall() {
-                                    Next_Call(myCallback);
+                                    Next_Call(callback);
                                 }
                             });
                             break;
@@ -490,17 +497,17 @@ public class AdsControl {
                             AdsControl.getInstance(activity).show_local_Appopen(new MyCallback() {
                                 @Override
                                 public void OnCall() {
-                                    Next_Call(myCallback);
+                                    Next_Call(callback);
                                 }
                             });
                             break;
                         case "off":
-                            Next_Call(myCallback);
+                            Next_Call(callback);
                             break;
                         default:
                     }
                 } else {
-                    Next_Call(myCallback);
+                    Next_Call(callback);
                 }
             }
         } catch (Exception e) {
@@ -515,7 +522,7 @@ public class AdsControl {
     //-------------------------------------------------------- Banner Ads -------------------------------------------------------
 
     // TODO: 7/31/2023  Preload Banner Ads
-    public static int ad_banner_network = 0;
+    private int ad_banner_network = 0;
 
     public void banner_Ads() {
         try {
@@ -834,7 +841,7 @@ public class AdsControl {
     //---------------------------------------------Small Native banner type Ads ----------------------------------------------
 
     // TODO: 7/17/2023  Preload Small NAtive Banner Ads
-    public static int ad_small_native_banner_network = 0;
+    private int ad_small_native_banner_network = 0;
 
     public void small_native_banner_Ads() {
         try {
@@ -1123,7 +1130,7 @@ public class AdsControl {
 
     //--------------------------------------------- Small Native Ads --------------------------------------------------------------------------
 // TODO: 7/17/2023  Preload Small Native Ads
-    public static int ad_small_native_network = 0;
+    private int ad_small_native_network = 0;
 
     public void small_native_Ads() {
         try {
@@ -1414,7 +1421,7 @@ public class AdsControl {
     //--------------------------------------------- Native Ads --------------------------------------------------------------------------
 
     // TODO: 7/17/2023  Preload Native Ads
-    public static int ad_native_network = 0;
+    private int ad_native_network = 0;
 
     public void native_Ads() {
         try {
@@ -1677,7 +1684,7 @@ public class AdsControl {
     }
 
     // TODO: 8/3/2023  Medium Rect Ad
-    public static int ad_medium_network = 0;
+    private int ad_medium_network = 0;
 
     public void medium_rect_Ads() {
         try {
@@ -1743,7 +1750,9 @@ public class AdsControl {
     @SuppressLint("MissingPermission")
     public void preload_medium_rectAd_Admob() {
         if (app_data != null && app_data.size() > 0) {
-            if (isAdmob_Mediam_Ragtangal_Loaded) return;
+            if (isAdmob_Mediam_Ragtangal_Loaded) {
+                return;
+            }
             final AdView admob_Mediam_Ragtangal = new AdView(activity);
             admob_Mediam_Ragtangal.setAdSize(AdSize.MEDIUM_RECTANGLE);
             admob_Mediam_Ragtangal.setAdUnitId(app_data.get(0).getAdmobMediumRectangleid().get(current_admob_medium_rectId));
@@ -2008,7 +2017,7 @@ public class AdsControl {
     }
 
     //-------------------------------------------- Inter Ads ----------------------------------------------------------------------------
-    static int ad_inter_network = 0;
+    private int ad_inter_network = 0;
 
     // TODO: 7/31/2023  Preload Inter Ads
     public void inter_Ads() {
@@ -2072,7 +2081,7 @@ public class AdsControl {
 
     // TODO: 7/17/2023  Preload Inter Ads
     // Admob Mode
-    public void Load_interAds_Admob() {
+    private void Load_interAds_Admob() {
         if (app_data != null && app_data.size() > 0) {
             if (isGoogleInterLoaded) {
                 return;
@@ -2102,6 +2111,7 @@ public class AdsControl {
 
                         @Override
                         public void onAdShowedFullScreenContent() {
+
                         }
                     });
                 }
@@ -2120,7 +2130,7 @@ public class AdsControl {
     }
 
     // Adx Mode
-    public void Load_interAds_Adx() {
+    private void Load_interAds_Adx() {
         if (app_data != null && app_data.size() > 0) {
             if (isAdxInterLoaded) {
                 return;
@@ -2168,7 +2178,7 @@ public class AdsControl {
     }
 
     // FB Mode
-    public void Load_interAds_FB() {
+    private void Load_interAds_FB() {
         if (app_data != null && app_data.size() > 0) {
             if (isFBInterLoaded) {
                 return;
@@ -2221,7 +2231,7 @@ public class AdsControl {
     }
 
     // Applovin Mode
-    public void Load_interAds_Applovin() {
+    private void Load_interAds_Applovin() {
         if (app_data != null && app_data.size() > 0) {
             if (isApplovinInterLoaded) {
                 return;
@@ -2271,7 +2281,7 @@ public class AdsControl {
     }
 
     // Wortise Mode
-    public void Load_interAds_Wortise() {
+    private void Load_interAds_Wortise() {
         if (app_data != null && app_data.size() > 0) {
             if (isWortiseInterLoaded) {
                 return;
@@ -2317,7 +2327,7 @@ public class AdsControl {
     }
 
     // Local Mode
-    public void Load_interAds_Local() {
+    private void Load_interAds_Local() {
         if (isLocalInterLoaded) {
             return;
         }
@@ -2843,8 +2853,8 @@ public class AdsControl {
 
     // TODO: 7/17/2023  Appopen Ads
     // Admob
-    public void show_Admob_Appopen(MyCallback myCallback2) {
-        myCallback = myCallback2;
+    public void show_Admob_Appopen(MyCallback callback) {
+        myCallback = callback;
         if (app_data != null && app_data.size() > 0) {
             FullScreenContentCallback fullScreenContentCallback_admob = new FullScreenContentCallback() {
                 @Override
@@ -2887,8 +2897,8 @@ public class AdsControl {
     }
 
     // Adx
-    public void show_Adx_Appopen(MyCallback myCallback2) {
-        myCallback = myCallback2;
+    public void show_Adx_Appopen(MyCallback callback) {
+        myCallback = callback;
         if (app_data != null && app_data.size() > 0) {
             FullScreenContentCallback fullScreenContentCallback_adx = new FullScreenContentCallback() {
                 @Override
@@ -2931,8 +2941,8 @@ public class AdsControl {
     }
 
     // Wortise
-    public void show_Wortise_Appopen(MyCallback myCallback2) {
-        myCallback = myCallback2;
+    public void show_Wortise_Appopen(MyCallback callback) {
+        myCallback = callback;
         if (app_data != null && app_data.size() > 0) {
             final com.wortise.ads.appopen.AppOpenAd wortise_open_ad = new com.wortise.ads.appopen.AppOpenAd(activity, app_data.get(0).getWortiseAppopenId());
             wortise_open_ad.loadAd();
@@ -2974,8 +2984,8 @@ public class AdsControl {
     }
 
     // Applovin
-    public void show_Applovin_Appopen(MyCallback myCallback2) {
-        myCallback = myCallback2;
+    public void show_Applovin_Appopen(MyCallback callback) {
+        myCallback = callback;
         if (app_data != null && app_data.size() > 0) {
             final MaxAppOpenAd applovin_appOpenAd = new MaxAppOpenAd(app_data.get(0).getApplovin_appopen_id(), activity);
             applovin_appOpenAd.loadAd();
@@ -3023,8 +3033,8 @@ public class AdsControl {
     }
 
     // Local
-    public void show_local_Appopen(MyCallback mCallback) {
-        myCallback = mCallback;
+    public void show_local_Appopen(MyCallback callback) {
+        myCallback = callback;
         if (app_data != null && app_data.size() > 0) {
             Dialog dialog = new Dialog(activity, android.R.style.Theme_Translucent_NoTitleBar);
             View view = LayoutInflater.from(activity).inflate(R.layout.local_appopen, null);
@@ -3110,8 +3120,8 @@ public class AdsControl {
     }
 
     // TODO: 8/10/2023  Splash Inter Ads
-    public void show_splash_inter(MyCallback myCallback2) {
-        myCallback = myCallback2;
+    public void show_splash_inter(MyCallback callback) {
+        myCallback = callback;
         if (app_data != null && app_data.size() > 0) {
             // Admob
             String placementId = app_data.get(0).getAdmob_splash_interid();

@@ -64,7 +64,7 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="Install Our App For social Use"
-                android:textColor="#c7c5c5"
+                android:textColor="#918F8F"
                 android:textSize="10sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/ad_app_icon"
