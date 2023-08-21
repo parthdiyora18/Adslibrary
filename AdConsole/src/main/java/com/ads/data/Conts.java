@@ -5,6 +5,7 @@ import static com.ads.data.AdsControl.app_data;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -336,12 +337,12 @@ public class Conts {
 
     // TODO: 8/19/2023  Qureka Mode
     @SuppressLint("ObsoleteSdkInt")
-    public static void Qureka(Activity mContext) {
+    public static void Qureka(Activity activity) {
         if (app_data != null && app_data.size() > 0) {
             if (app_data.get(0).getQureka_Inter().equals("on")) {
                 CustomTabsIntent.Builder customIntent = new CustomTabsIntent.Builder();
-                customIntent.setToolbarColor(ContextCompat.getColor(mContext, R.color.colorPrimary));
-                openCustomTab(mContext, customIntent.build(), Uri.parse(app_data.get(0).getQureka_url()));
+                customIntent.setToolbarColor(ContextCompat.getColor(activity, R.color.colorPrimary));
+                openCustomTab(activity, customIntent.build(), Uri.parse(app_data.get(0).getQureka_url()));
             }
         }
     }
@@ -353,6 +354,32 @@ public class Conts {
             customTabsIntent.launchUrl(activity, uri);
         } else {
             activity.startActivity(new Intent(Intent.ACTION_VIEW, uri));
+        }
+    }
+
+    // TODO: 8/21/2023 Share App
+    public static void Share_App(Activity activity) {
+        final String appPackageName = activity.getPackageName();
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=" + appPackageName);
+        sendIntent.setType("text/plain");
+        activity.startActivity(Intent.createChooser(sendIntent, "Share app via"));
+    }
+
+    // TODO: 8/21/2023 Rate App
+    public static void Rate_App(Activity activity) {
+        final String appPackageName = activity.getPackageName();
+        Uri uri = Uri.parse("market://details?id=" + appPackageName);
+        Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        try {
+            activity.startActivity(goToMarket);
+        } catch (ActivityNotFoundException e) {
+            activity.startActivity(new Intent(Intent.ACTION_VIEW,
+                    Uri.parse("http://play.google.com/store/apps/details?id=" + appPackageName)));
         }
     }
 }
