@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.ads.data.AdsControl;
 import com.ads.data.Conts;
+import com.ads.data.getDataListner;
 
 public class Secound_Activity extends AppCompatActivity {
 
@@ -23,9 +24,9 @@ public class Secound_Activity extends AppCompatActivity {
         findViewById(R.id.btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AdsControl.getInstance(Secound_Activity.this).show_Interstitial(new AdsControl.MyCallback() {
+                AdsControl.getInstance(Secound_Activity.this).show_Interstitial(new getDataListner() {
                     @Override
-                    public void OnCall() {
+                    public void onSuccess() {
                         Toast.makeText(Secound_Activity.this, "Show Inter", Toast.LENGTH_SHORT).show();
                     }
                 });

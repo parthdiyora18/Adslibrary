@@ -1,21 +1,55 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+-keep class androidx.appcompat.widget.** { *; }
+-keep class androidx.fragment.app.Fragment { *; }
+-keep class io.plaidapp.data.api.dribbble.model.** { *; }
+-repackageclasses ''
+-allowaccessmodification
+-adaptresourcefilenames    **.properties,**.gif,**.jpg
+-adaptresourcefilecontents **.properties,META-INF/MANIFEST.MF
+-adaptresourcefilenames **.xsd,**.wsdl,**.xml,**.properties,**.gif,**.jpg,**.png
+-adaptresourcefilecontents **.xml
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+-dontwarn com.alexvasilkov.**
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn rx.**
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+-assumenosideeffects class android.util.Log {
+    public static *** e(...);
+    public static *** w(...);
+    public static *** wtf(...);
+    public static *** d(...);
+    public static *** v(...);
+}
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keep public class * extends android.app.Activity
+-keep public class * extends android.app.Application
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+-keepclassmembers class * {
+    public void *ButtonClicked(android.view.View);
+}
+-keepclassmembers class * extends android.app.Activity {
+   public void *(android.view.View);
+}
+-keepattributes LocalVariableTable, LocalVariableTypeTable
+
+-keepattributes *Annotation*, Signature, Exception
+
+ #### -- OkHttp --
+ -dontwarn com.squareup.okhttp.internal.**
+
+ #### -- Apache Commons --
+ -dontwarn org.apache.commons.logging.**
+ -dontwarn org.apache.**
+ -dontwarn com.itextpdf**
+
+# startapp rule
+-keep class org.apache.commons.logging.**
+-keep class com.truenet.** {
+      *;
+}
+-keepattributes Exceptions, InnerClasses, Signature, Deprecated, SourceFile,LineNumberTable, *Annotation*, EnclosingMethod
+-dontwarn android.webkit.JavascriptInterface
+-keep class com.google.android.gms.internal.** { *; }
+-ignorewarnings

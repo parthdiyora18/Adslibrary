@@ -85,7 +85,6 @@ public class AdsControl {
     private static AdsControl mInstance;
     @SuppressLint("StaticFieldLeak")
     static Context activity;
-    static MyCallback myCallback;
     private final String Mrec = "mrec";
 
     // Banner
@@ -189,10 +188,6 @@ public class AdsControl {
 
     private int adCounter;
     SharedPreferences prefs;
-
-    public interface MyCallback {
-        void OnCall();
-    }
 
     public AdsControl(Context context) {
         activity = context;
@@ -344,49 +339,49 @@ public class AdsControl {
                             }, 2500);
                             break;
                         case "inter":
-                            AdsControl.getInstance(activity).show_splash_inter(new MyCallback() {
+                            AdsControl.getInstance(activity).show_splash_inter(new getDataListner() {
                                 @Override
-                                public void OnCall() {
+                                public void onSuccess() {
                                     Next_Call(myCallback);
                                 }
                             });
                             break;
                         case "admob":
-                            AdsControl.getInstance(activity).show_Admob_Appopen(new MyCallback() {
+                            AdsControl.getInstance(activity).show_Admob_Appopen(new getDataListner() {
                                 @Override
-                                public void OnCall() {
+                                public void onSuccess() {
                                     Next_Call(myCallback);
                                 }
                             });
                             break;
                         case "adx":
-                            AdsControl.getInstance(activity).show_Adx_Appopen(new MyCallback() {
+                            AdsControl.getInstance(activity).show_Adx_Appopen(new getDataListner() {
                                 @Override
-                                public void OnCall() {
+                                public void onSuccess() {
                                     Next_Call(myCallback);
                                 }
                             });
                             break;
                         case "applovin":
-                            AdsControl.getInstance(activity).show_Applovin_Appopen(new MyCallback() {
+                            AdsControl.getInstance(activity).show_Applovin_Appopen(new getDataListner() {
                                 @Override
-                                public void OnCall() {
+                                public void onSuccess() {
                                     Next_Call(myCallback);
                                 }
                             });
                             break;
                         case "wortise":
-                            AdsControl.getInstance(activity).show_Wortise_Appopen(new MyCallback() {
+                            AdsControl.getInstance(activity).show_Wortise_Appopen(new getDataListner() {
                                 @Override
-                                public void OnCall() {
+                                public void onSuccess() {
                                     Next_Call(myCallback);
                                 }
                             });
                             break;
                         case "local":
-                            AdsControl.getInstance(activity).show_local_Appopen(new MyCallback() {
+                            AdsControl.getInstance(activity).show_local_Appopen(new getDataListner() {
                                 @Override
-                                public void OnCall() {
+                                public void onSuccess() {
                                     Next_Call(myCallback);
                                 }
                             });
@@ -447,67 +442,73 @@ public class AdsControl {
         this.ad_dialog.show();
     }
 
-    private void secound_splash_Ads(getDataListner callback) {
+    private void secound_splash_Ads(getDataListner callback2) {
         try {
             if (app_data != null && app_data.size() > 0) {
                 if (app_data.get(0).isAds_show()) {
                     String adnetwork = app_data.get(0).getAd_secound_splash();
                     switch (adnetwork) {
                         case "inter":
-                            AdsControl.getInstance(activity).show_Interstitial(new MyCallback() {
+                            AdsControl.getInstance(activity).show_Interstitial(new getDataListner() {
+                                @Override
+                                public void onSuccess() {
+                                    Next_Call(callback2);
+                                }
+                            });
+                          /*  AdsControl.getInstance(activity).show_Interstitial(new MyCallback() {
                                 @Override
                                 public void OnCall() {
                                     Next_Call(callback);
                                 }
-                            });
+                            });*/
                             break;
                         case "admob":
-                            AdsControl.getInstance(activity).show_Admob_Appopen(new MyCallback() {
+                            AdsControl.getInstance(activity).show_Admob_Appopen(new getDataListner() {
                                 @Override
-                                public void OnCall() {
-                                    Next_Call(callback);
+                                public void onSuccess() {
+                                    Next_Call(callback2);
                                 }
                             });
                             break;
                         case "adx":
-                            AdsControl.getInstance(activity).show_Adx_Appopen(new MyCallback() {
+                            AdsControl.getInstance(activity).show_Adx_Appopen(new getDataListner() {
                                 @Override
-                                public void OnCall() {
-                                    Next_Call(callback);
+                                public void onSuccess() {
+                                    Next_Call(callback2);
                                 }
                             });
                             break;
                         case "applovin":
-                            AdsControl.getInstance(activity).show_Applovin_Appopen(new MyCallback() {
+                            AdsControl.getInstance(activity).show_Applovin_Appopen(new getDataListner() {
                                 @Override
-                                public void OnCall() {
-                                    Next_Call(callback);
+                                public void onSuccess() {
+                                    Next_Call(callback2);
                                 }
                             });
                             break;
                         case "wortise":
-                            AdsControl.getInstance(activity).show_Wortise_Appopen(new MyCallback() {
+                            AdsControl.getInstance(activity).show_Wortise_Appopen(new getDataListner() {
                                 @Override
-                                public void OnCall() {
-                                    Next_Call(callback);
+                                public void onSuccess() {
+                                    Next_Call(callback2);
                                 }
                             });
                             break;
                         case "local":
-                            AdsControl.getInstance(activity).show_local_Appopen(new MyCallback() {
+                            AdsControl.getInstance(activity).show_local_Appopen(new getDataListner() {
                                 @Override
-                                public void OnCall() {
-                                    Next_Call(callback);
+                                public void onSuccess() {
+                                    Next_Call(callback2);
                                 }
                             });
                             break;
                         case "off":
-                            Next_Call(callback);
+                            Next_Call(callback2);
                             break;
                         default:
                     }
                 } else {
-                    Next_Call(callback);
+                    Next_Call(callback2);
                 }
             }
         } catch (Exception e) {
@@ -2017,6 +2018,7 @@ public class AdsControl {
     }
 
     //-------------------------------------------- Inter Ads ----------------------------------------------------------------------------
+    static getDataListner callback;
     private int ad_inter_network = 0;
 
     // TODO: 7/31/2023  Preload Inter Ads
@@ -2098,9 +2100,10 @@ public class AdsControl {
                         @Override
                         public void onAdDismissedFullScreenContent() {
                             Log.d("Parth", "Admob Inter Close");
-                            if (myCallback != null) {
-                                myCallback.OnCall();
-                                myCallback = null;
+//                            callback2.onSuccess();
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
                             }
                         }
 
@@ -2148,9 +2151,9 @@ public class AdsControl {
                         @Override
                         public void onAdDismissedFullScreenContent() {
                             Log.d("Parth", "Adx Inter Close");
-                            if (myCallback != null) {
-                                myCallback.OnCall();
-                                myCallback = null;
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
                             }
                         }
 
@@ -2193,9 +2196,9 @@ public class AdsControl {
                 @Override
                 public void onInterstitialDismissed(Ad ad) {
                     Log.d("Parth", "FB Inter ad Close.");
-                    if (myCallback != null) {
-                        myCallback.OnCall();
-                        myCallback = null;
+                    if (callback != null) {
+                        callback.onSuccess();
+                        callback = null;
                     }
                 }
 
@@ -2252,9 +2255,9 @@ public class AdsControl {
                 @Override
                 public void onAdHidden(MaxAd ad) {
                     Log.d("Parth", "Applovin Inter Close");
-                    if (myCallback != null) {
-                        myCallback.OnCall();
-                        myCallback = null;
+                    if (callback != null) {
+                        callback.onSuccess();
+                        callback = null;
                     }
                 }
 
@@ -2296,9 +2299,9 @@ public class AdsControl {
                 @Override
                 public void onInterstitialDismissed(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
                     Log.d("Parth", "Wortise Inter ad Close.");
-                    if (myCallback != null) {
-                        myCallback.OnCall();
-                        myCallback = null;
+                    if (callback != null) {
+                        callback.onSuccess();
+                        callback = null;
                     }
                 }
 
@@ -2335,51 +2338,51 @@ public class AdsControl {
     }
 
     // TODO: 7/17/2023 Show Inter Ads
-    public void show_Interstitial(MyCallback myCallback2) {
-        myCallback = myCallback2;
+    public void show_Interstitial(getDataListner callback2) {
+        callback = callback2;
         if (app_data != null && app_data.size() > 0) {
             if (app_data.get(0).isAds_show()) {
                 if (isGoogleInterLoaded) {
-                    show_Interstitial_Admob(myCallback2);
+                    show_Interstitial_Admob(callback2);
                 } else if (isAdxInterLoaded) {
-                    show_Interstitial_Adx(myCallback2);
+                    show_Interstitial_Adx(callback2);
                 } else if (isFBInterLoaded) {
-                    show_Interstitial_FB(myCallback2);
+                    show_Interstitial_FB(callback2);
                 } else if (isApplovinInterLoaded) {
-                    show_Interstitial_Applovin(myCallback2);
+                    show_Interstitial_Applovin(callback2);
                 } else if (isWortiseInterLoaded) {
-                    show_Interstitial_Wortise(myCallback2);
+                    show_Interstitial_Wortise(callback2);
                 } else if (isLocalInterLoaded) {
                     adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
                     if (adCounter == app_data.get(0).getInterCount()) {
                         Inter_Count.getInstance(activity).storeClicks(1);
-                        show_Interstitial_local(myCallback2);
+                        show_Interstitial_local(callback2);
                     } else {
                         adCounter = adCounter + 1;
                         Inter_Count.getInstance(activity).storeClicks(adCounter);
-                        if (myCallback != null) {
-                            myCallback.OnCall();
-                            myCallback = null;
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
                         }
                     }
                 } else {
-                    if (myCallback != null) {
-                        myCallback.OnCall();
-                        myCallback = null;
+                    if (callback != null) {
+                        callback.onSuccess();
+                        callback = null;
                     }
                 }
             } else {
-                if (myCallback != null) {
-                    myCallback.OnCall();
-                    myCallback = null;
+                if (callback != null) {
+                    callback.onSuccess();
+                    callback = null;
                 }
             }
         }
     }
 
     // Admob Mode
-    private void show_Interstitial_Admob(MyCallback myCallback2) {
-        myCallback = myCallback2;
+    private void show_Interstitial_Admob(getDataListner Callback2) {
+        callback = Callback2;
         if (isGoogleInterLoaded) {
             adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
             if (adCounter == app_data.get(0).getInterCount() && ADMOBInterstitialAd != null) {
@@ -2390,9 +2393,9 @@ public class AdsControl {
             } else {
                 adCounter = adCounter + 1;
                 Inter_Count.getInstance(activity).storeClicks(adCounter);
-                if (myCallback != null) {
-                    myCallback.OnCall();
-                    myCallback = null;
+                if (callback != null) {
+                    callback.onSuccess();
+                    callback = null;
                 }
             }
         } else {
@@ -2412,18 +2415,18 @@ public class AdsControl {
                         } else {
                             adCounter = adCounter + 1;
                             Inter_Count.getInstance(activity).storeClicks(adCounter);
-                            if (myCallback != null) {
-                                myCallback.OnCall();
-                                myCallback = null;
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
                             }
                         }
                         interstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
                             @Override
                             public void onAdDismissedFullScreenContent() {
                                 Log.d("Parth", "Admob Inter Close");
-                                if (myCallback != null) {
-                                    myCallback.OnCall();
-                                    myCallback = null;
+                                if (callback != null) {
+                                    callback.onSuccess();
+                                    callback = null;
                                 }
                             }
 
@@ -2454,8 +2457,8 @@ public class AdsControl {
     }
 
     // Adx Mode
-    private void show_Interstitial_Adx(MyCallback myCallback2) {
-        myCallback = myCallback2;
+    private void show_Interstitial_Adx(getDataListner myCallback2) {
+        callback = myCallback2;
         if (isAdxInterLoaded) {
             adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
             if (adCounter == app_data.get(0).getInterCount() && ADXInterstitialAd != null) {
@@ -2466,9 +2469,9 @@ public class AdsControl {
             } else {
                 adCounter = adCounter + 1;
                 Inter_Count.getInstance(activity).storeClicks(adCounter);
-                if (myCallback != null) {
-                    myCallback.OnCall();
-                    myCallback = null;
+                if (callback != null) {
+                    callback.onSuccess();
+                    callback = null;
                 }
             }
         } else {
@@ -2489,18 +2492,18 @@ public class AdsControl {
                         } else {
                             adCounter = adCounter + 1;
                             Inter_Count.getInstance(activity).storeClicks(adCounter);
-                            if (myCallback != null) {
-                                myCallback.OnCall();
-                                myCallback = null;
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
                             }
                         }
                         interstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
                             @Override
                             public void onAdDismissedFullScreenContent() {
                                 Log.d("Parth", "Adx Inter Close");
-                                if (myCallback != null) {
-                                    myCallback.OnCall();
-                                    myCallback = null;
+                                if (callback != null) {
+                                    callback.onSuccess();
+                                    callback = null;
                                 }
                             }
 
@@ -2530,8 +2533,8 @@ public class AdsControl {
     }
 
     // FB Mode
-    private void show_Interstitial_FB(MyCallback myCallback2) {
-        myCallback = myCallback2;
+    private void show_Interstitial_FB(getDataListner myCallback2) {
+        callback = myCallback2;
         if (isFBInterLoaded) {
             adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
             if (adCounter == app_data.get(0).getInterCount() && FB_interstitialAd != null) {
@@ -2542,9 +2545,9 @@ public class AdsControl {
             } else {
                 adCounter = adCounter + 1;
                 Inter_Count.getInstance(activity).storeClicks(adCounter);
-                if (myCallback != null) {
-                    myCallback.OnCall();
-                    myCallback = null;
+                if (callback != null) {
+                    callback.onSuccess();
+                    callback = null;
                 }
             }
         } else {
@@ -2559,9 +2562,9 @@ public class AdsControl {
                     @Override
                     public void onInterstitialDismissed(Ad ad) {
                         Log.d("Parth", "FB Inter ad Close.");
-                        if (myCallback != null) {
-                            myCallback.OnCall();
-                            myCallback = null;
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
                         }
                     }
 
@@ -2584,9 +2587,9 @@ public class AdsControl {
                         } else {
                             adCounter = adCounter + 1;
                             Inter_Count.getInstance(activity).storeClicks(adCounter);
-                            if (myCallback != null) {
-                                myCallback.OnCall();
-                                myCallback = null;
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
                             }
                         }
                     }
@@ -2611,8 +2614,8 @@ public class AdsControl {
     }
 
     // Applovin Mode
-    private void show_Interstitial_Applovin(MyCallback myCallback2) {
-        myCallback = myCallback2;
+    private void show_Interstitial_Applovin(getDataListner myCallback2) {
+        callback = myCallback2;
         if (isApplovinInterLoaded) {
             adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
             if (adCounter == app_data.get(0).getInterCount() && Applovin_maxInterstitialAd != null) {
@@ -2623,9 +2626,9 @@ public class AdsControl {
             } else {
                 adCounter = adCounter + 1;
                 Inter_Count.getInstance(activity).storeClicks(adCounter);
-                if (myCallback != null) {
-                    myCallback.OnCall();
-                    myCallback = null;
+                if (callback != null) {
+                    callback.onSuccess();
+                    callback = null;
                 }
             }
         } else {
@@ -2644,9 +2647,9 @@ public class AdsControl {
                         } else {
                             adCounter = adCounter + 1;
                             Inter_Count.getInstance(activity).storeClicks(adCounter);
-                            if (myCallback != null) {
-                                myCallback.OnCall();
-                                myCallback = null;
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
                             }
                         }
                     }
@@ -2658,9 +2661,9 @@ public class AdsControl {
                     @Override
                     public void onAdHidden(MaxAd ad) {
                         Log.d("Parth", "Applovin Inter Close");
-                        if (myCallback != null) {
-                            myCallback.OnCall();
-                            myCallback = null;
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
                         }
                     }
 
@@ -2689,8 +2692,8 @@ public class AdsControl {
     }
 
     // Wortise Mode
-    private void show_Interstitial_Wortise(MyCallback myCallback2) {
-        myCallback = myCallback2;
+    private void show_Interstitial_Wortise(getDataListner myCallback2) {
+        callback = myCallback2;
         if (isWortiseInterLoaded) {
             adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
             if (adCounter == app_data.get(0).getInterCount() && Wortise_inter != null) {
@@ -2701,9 +2704,9 @@ public class AdsControl {
             } else {
                 adCounter = adCounter + 1;
                 Inter_Count.getInstance(activity).storeClicks(adCounter);
-                if (myCallback != null) {
-                    myCallback.OnCall();
-                    myCallback = null;
+                if (callback != null) {
+                    callback.onSuccess();
+                    callback = null;
                 }
             }
         } else {
@@ -2718,9 +2721,9 @@ public class AdsControl {
                     @Override
                     public void onInterstitialDismissed(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
                         Log.d("Parth", "Wortise Inter ad Close.");
-                        if (myCallback != null) {
-                            myCallback.OnCall();
-                            myCallback = null;
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
                         }
                     }
 
@@ -2743,9 +2746,9 @@ public class AdsControl {
                         } else {
                             adCounter = adCounter + 1;
                             Inter_Count.getInstance(activity).storeClicks(adCounter);
-                            if (myCallback != null) {
-                                myCallback.OnCall();
-                                myCallback = null;
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
                             }
                         }
                     }
@@ -2765,8 +2768,8 @@ public class AdsControl {
     // Local Mode
     static Animation animZoomIn;
 
-    private void show_Interstitial_local(MyCallback myCallback2) {
-        myCallback = myCallback2;
+    private void show_Interstitial_local(getDataListner myCallback2) {
+        callback = myCallback2;
         if (app_data != null && app_data.size() > 0) {
             Dialog dialog = new Dialog(activity, R.style.FullWidth_Dialog);
             View view = LayoutInflater.from(activity).inflate(R.layout.local_inter_ad, null);
@@ -2836,9 +2839,9 @@ public class AdsControl {
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
-                    if (myCallback != null) {
-                        myCallback.OnCall();
-                        myCallback = null;
+                    if (callback != null) {
+                        callback.onSuccess();
+                        callback = null;
                     }
                 }
             });
@@ -2853,24 +2856,24 @@ public class AdsControl {
 
     // TODO: 7/17/2023  Appopen Ads
     // Admob
-    public void show_Admob_Appopen(MyCallback callback) {
-        myCallback = callback;
+    public void show_Admob_Appopen(getDataListner callback2) {
+        callback = callback2;
         if (app_data != null && app_data.size() > 0) {
             FullScreenContentCallback fullScreenContentCallback_admob = new FullScreenContentCallback() {
                 @Override
                 public void onAdDismissedFullScreenContent() {
                     admob_appOpenAd = null;
-                    if (myCallback != null) {
-                        myCallback.OnCall();
-                        myCallback = null;
+                    if (callback != null) {
+                        callback.onSuccess();
+                        callback = null;
                     }
                 }
 
                 @Override
                 public void onAdFailedToShowFullScreenContent(com.google.android.gms.ads.AdError adError) {
-                    if (myCallback != null) {
-                        myCallback.OnCall();
-                        myCallback = null;
+                    if (callback != null) {
+                        callback.onSuccess();
+                        callback = null;
                     }
                 }
 
@@ -2897,24 +2900,24 @@ public class AdsControl {
     }
 
     // Adx
-    public void show_Adx_Appopen(MyCallback callback) {
-        myCallback = callback;
+    public void show_Adx_Appopen(getDataListner callback2) {
+        callback = callback2;
         if (app_data != null && app_data.size() > 0) {
             FullScreenContentCallback fullScreenContentCallback_adx = new FullScreenContentCallback() {
                 @Override
                 public void onAdDismissedFullScreenContent() {
                     adx_appOpenAd = null;
-                    if (myCallback != null) {
-                        myCallback.OnCall();
-                        myCallback = null;
+                    if (callback != null) {
+                        callback.onSuccess();
+                        callback = null;
                     }
                 }
 
                 @Override
                 public void onAdFailedToShowFullScreenContent(com.google.android.gms.ads.AdError adError) {
-                    if (myCallback != null) {
-                        myCallback.OnCall();
-                        myCallback = null;
+                    if (callback != null) {
+                        callback.onSuccess();
+                        callback = null;
                     }
                 }
 
@@ -2941,8 +2944,8 @@ public class AdsControl {
     }
 
     // Wortise
-    public void show_Wortise_Appopen(MyCallback callback) {
-        myCallback = callback;
+    public void show_Wortise_Appopen(getDataListner callback2) {
+        callback = callback2;
         if (app_data != null && app_data.size() > 0) {
             final com.wortise.ads.appopen.AppOpenAd wortise_open_ad = new com.wortise.ads.appopen.AppOpenAd(activity, app_data.get(0).getWortiseAppopenId());
             wortise_open_ad.loadAd();
@@ -2961,18 +2964,18 @@ public class AdsControl {
 
                 @Override
                 public void onAppOpenFailed(@NonNull com.wortise.ads.appopen.AppOpenAd appOpenAd, @NonNull com.wortise.ads.AdError adError) {
-                    if (myCallback != null) {
-                        myCallback.OnCall();
-                        myCallback = null;
+                    if (callback != null) {
+                        callback.onSuccess();
+                        callback = null;
                     }
                 }
 
                 @Override
                 public void onAppOpenDismissed(@NonNull com.wortise.ads.appopen.AppOpenAd appOpenAd) {
                     Log.d("Parth", "Wortise Open Ad Close");
-                    if (myCallback != null) {
-                        myCallback.OnCall();
-                        myCallback = null;
+                    if (callback != null) {
+                        callback.onSuccess();
+                        callback = null;
                     }
                 }
 
@@ -2984,8 +2987,8 @@ public class AdsControl {
     }
 
     // Applovin
-    public void show_Applovin_Appopen(MyCallback callback) {
-        myCallback = callback;
+    public void show_Applovin_Appopen(getDataListner dataListner) {
+        callback = dataListner;
         if (app_data != null && app_data.size() > 0) {
             final MaxAppOpenAd applovin_appOpenAd = new MaxAppOpenAd(app_data.get(0).getApplovin_appopen_id(), activity);
             applovin_appOpenAd.loadAd();
@@ -3006,9 +3009,9 @@ public class AdsControl {
                 @Override
                 public void onAdHidden(MaxAd maxAd) {
                     Log.d("Parth", "Applovin Splash Close Open Ad");
-                    if (myCallback != null) {
-                        myCallback.OnCall();
-                        myCallback = null;
+                    if (callback != null) {
+                        callback.onSuccess();
+                        callback = null;
                     }
                 }
 
@@ -3019,9 +3022,9 @@ public class AdsControl {
                 @Override
                 public void onAdLoadFailed(String s, MaxError maxError) {
                     Log.e("Parth", "Applovin Failed Open Ad" + maxError.getMessage());
-                    if (myCallback != null) {
-                        myCallback.OnCall();
-                        myCallback = null;
+                    if (callback != null) {
+                        callback.onSuccess();
+                        callback = null;
                     }
                 }
 
@@ -3033,8 +3036,8 @@ public class AdsControl {
     }
 
     // Local
-    public void show_local_Appopen(MyCallback callback) {
-        myCallback = callback;
+    public void show_local_Appopen(getDataListner callback2) {
+        callback = callback2;
         if (app_data != null && app_data.size() > 0) {
             Dialog dialog = new Dialog(activity, android.R.style.Theme_Translucent_NoTitleBar);
             View view = LayoutInflater.from(activity).inflate(R.layout.local_appopen, null);
@@ -3100,9 +3103,9 @@ public class AdsControl {
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
-                    if (myCallback != null) {
-                        myCallback.OnCall();
-                        myCallback = null;
+                    if (callback != null) {
+                        callback.onSuccess();
+                        callback = null;
                     }
                 }
             });
@@ -3120,8 +3123,8 @@ public class AdsControl {
     }
 
     // TODO: 8/10/2023  Splash Inter Ads
-    public void show_splash_inter(MyCallback callback) {
-        myCallback = callback;
+    public void show_splash_inter(getDataListner callback3) {
+        callback = callback3;
         if (app_data != null && app_data.size() > 0) {
             // Admob
             String placementId = app_data.get(0).getAdmob_splash_interid();
@@ -3135,18 +3138,18 @@ public class AdsControl {
                         @Override
                         public void onAdDismissedFullScreenContent() {
                             Log.d("Parth", "Admob Inter Close");
-                            if (myCallback != null) {
-                                myCallback.OnCall();
-                                myCallback = null;
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
                             }
                         }
 
                         @Override
                         public void onAdFailedToShowFullScreenContent(com.google.android.gms.ads.AdError adError) {
                             Log.d("Parth", "Admob Inter failed to show" + adError.getMessage());
-                            if (myCallback != null) {
-                                myCallback.OnCall();
-                                myCallback = null;
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
                             }
                         }
 
@@ -3171,18 +3174,18 @@ public class AdsControl {
                                 @Override
                                 public void onAdDismissedFullScreenContent() {
                                     Log.d("Parth", "Admob Inter Close");
-                                    if (myCallback != null) {
-                                        myCallback.OnCall();
-                                        myCallback = null;
+                                    if (callback != null) {
+                                        callback.onSuccess();
+                                        callback = null;
                                     }
                                 }
 
                                 @Override
                                 public void onAdFailedToShowFullScreenContent(com.google.android.gms.ads.AdError adError) {
                                     Log.d("Parth", "Admob Inter failed to show" + adError.getMessage());
-                                    if (myCallback != null) {
-                                        myCallback.OnCall();
-                                        myCallback = null;
+                                    if (callback != null) {
+                                        callback.onSuccess();
+                                        callback = null;
                                     }
                                 }
 
@@ -3204,9 +3207,9 @@ public class AdsControl {
 
                                 @Override
                                 public void onInterstitialDismissed(Ad ad) {
-                                    if (myCallback != null) {
-                                        myCallback.OnCall();
-                                        myCallback = null;
+                                    if (callback != null) {
+                                        callback.onSuccess();
+                                        callback = null;
                                     }
                                 }
 
@@ -3228,9 +3231,9 @@ public class AdsControl {
                                         @Override
                                         public void onAdHidden(MaxAd ad) {
                                             Log.d("Parth", "Applovin Inter Close");
-                                            if (myCallback != null) {
-                                                myCallback.OnCall();
-                                                myCallback = null;
+                                            if (callback != null) {
+                                                callback.onSuccess();
+                                                callback = null;
                                             }
                                         }
 
@@ -3252,18 +3255,18 @@ public class AdsControl {
 
                                                 @Override
                                                 public void onInterstitialDismissed(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
-                                                    if (myCallback != null) {
-                                                        myCallback.OnCall();
-                                                        myCallback = null;
+                                                    if (callback != null) {
+                                                        callback.onSuccess();
+                                                        callback = null;
                                                     }
                                                 }
 
                                                 @Override
                                                 public void onInterstitialFailed(@NonNull com.wortise.ads.interstitial.InterstitialAd ad, @NonNull com.wortise.ads.AdError error) {
                                                     Log.d("Parth", "Wortise Inter Failed to Load: " + error);
-                                                    if (myCallback != null) {
-                                                        myCallback.OnCall();
-                                                        myCallback = null;
+                                                    if (callback != null) {
+                                                        callback.onSuccess();
+                                                        callback = null;
                                                     }
                                                 }
 

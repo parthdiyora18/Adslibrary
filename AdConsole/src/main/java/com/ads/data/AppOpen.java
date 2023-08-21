@@ -97,54 +97,54 @@ public class AppOpen implements LifecycleObserver, Application.ActivityLifecycle
                                 ad_openad_network++;
                                 break;
                             case "inter":
-                                AdsControl.getInstance(currentActivity).show_splash_inter(new AdsControl.MyCallback() {
+                                AdsControl.getInstance(currentActivity).show_splash_inter(new getDataListner() {
                                     @Override
-                                    public void OnCall() {
+                                    public void onSuccess() {
                                         currentActivity = null;
                                     }
                                 });
                                 ad_openad_network++;
                                 break;
                             case "admob":
-                                AdsControl.getInstance(currentActivity).show_Admob_Appopen(new AdsControl.MyCallback() {
+                                AdsControl.getInstance(currentActivity).show_Admob_Appopen(new getDataListner() {
                                     @Override
-                                    public void OnCall() {
+                                    public void onSuccess() {
                                         currentActivity = null;
                                     }
                                 });
                                 ad_openad_network++;
                                 break;
                             case "adx":
-                                AdsControl.getInstance(currentActivity).show_Adx_Appopen(new AdsControl.MyCallback() {
+                                AdsControl.getInstance(currentActivity).show_Adx_Appopen(new getDataListner() {
                                     @Override
-                                    public void OnCall() {
+                                    public void onSuccess() {
                                         currentActivity = null;
                                     }
                                 });
                                 ad_openad_network++;
                                 break;
                             case "wortise":
-                                AdsControl.getInstance(currentActivity).show_Wortise_Appopen(new AdsControl.MyCallback() {
+                                AdsControl.getInstance(currentActivity).show_Wortise_Appopen(new getDataListner() {
                                     @Override
-                                    public void OnCall() {
+                                    public void onSuccess() {
                                         currentActivity = null;
                                     }
                                 });
                                 ad_openad_network++;
                                 break;
                             case "applovin":
-                                AdsControl.getInstance(currentActivity).show_Applovin_Appopen(new AdsControl.MyCallback() {
+                                AdsControl.getInstance(currentActivity).show_Applovin_Appopen(new getDataListner() {
                                     @Override
-                                    public void OnCall() {
+                                    public void onSuccess() {
                                         currentActivity = null;
                                     }
                                 });
                                 ad_openad_network++;
                                 break;
                             case "local":
-                                AdsControl.getInstance(currentActivity).show_local_Appopen(new AdsControl.MyCallback() {
+                                AdsControl.getInstance(currentActivity).show_local_Appopen(new getDataListner() {
                                     @Override
-                                    public void OnCall() {
+                                    public void onSuccess() {
                                         currentActivity = null;
                                     }
                                 });
