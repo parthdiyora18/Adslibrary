@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
+
 public class Data {
     @SerializedName("admob_splash_interid")
     @Expose
@@ -140,6 +141,9 @@ public class Data {
     @SerializedName("ad_splash")
     @Expose
     private String adSplash;
+    @SerializedName("ad_inter_type")
+    @Expose
+    private String ad_inter_type;
     @SerializedName("ad_secound_splash")
     @Expose
     private String ad_secound_splash;
@@ -149,6 +153,9 @@ public class Data {
     @SerializedName("ad_inter")
     @Expose
     private String adInter;
+    @SerializedName("ad_open_inter")
+    @Expose
+    private String ad_open_inter;
     @SerializedName("ad_small_native_banner")
     @Expose
     private String adSmallNativeBanner;
@@ -182,6 +189,22 @@ public class Data {
     @SerializedName("redirect_app")
     @Expose
     private String redirectApp;
+
+    public String getAd_open_inter() {
+        return ad_open_inter;
+    }
+
+    public void setAd_open_inter(String ad_open_inter) {
+        this.ad_open_inter = ad_open_inter;
+    }
+
+    public String getAd_inter_type() {
+        return ad_inter_type;
+    }
+
+    public void setAd_inter_type(String ad_inter_type) {
+        this.ad_inter_type = ad_inter_type;
+    }
 
     public String getAdmob_splash_interid() {
         return admob_splash_interid;
