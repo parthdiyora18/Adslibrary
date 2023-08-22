@@ -58,7 +58,6 @@ public class PolicyActivity extends AppCompatActivity {
             webPrivacyPolicy.loadUrl(app_data.get(0).getPrivacyUrl());
         }
     }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return super.onCreateOptionsMenu(menu);

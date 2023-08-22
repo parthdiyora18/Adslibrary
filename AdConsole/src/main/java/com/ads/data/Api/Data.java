@@ -190,22 +190,6 @@ public class Data {
     @Expose
     private String redirectApp;
 
-    public String getAd_open_inter() {
-        return ad_open_inter;
-    }
-
-    public void setAd_open_inter(String ad_open_inter) {
-        this.ad_open_inter = ad_open_inter;
-    }
-
-    public String getAd_inter_type() {
-        return ad_inter_type;
-    }
-
-    public void setAd_inter_type(String ad_inter_type) {
-        this.ad_inter_type = ad_inter_type;
-    }
-
     public String getAdmob_splash_interid() {
         return admob_splash_interid;
     }
@@ -566,6 +550,14 @@ public class Data {
         this.adSplash = adSplash;
     }
 
+    public String getAd_inter_type() {
+        return ad_inter_type;
+    }
+
+    public void setAd_inter_type(String ad_inter_type) {
+        this.ad_inter_type = ad_inter_type;
+    }
+
     public String getAd_secound_splash() {
         return ad_secound_splash;
     }
@@ -588,6 +580,14 @@ public class Data {
 
     public void setAdInter(String adInter) {
         this.adInter = adInter;
+    }
+
+    public String getAd_open_inter() {
+        return ad_open_inter;
+    }
+
+    public void setAd_open_inter(String ad_open_inter) {
+        this.ad_open_inter = ad_open_inter;
     }
 
     public String getAdSmallNativeBanner() {
