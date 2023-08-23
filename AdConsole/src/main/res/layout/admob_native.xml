@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/native_ad_view"
     android:layout_width="match_parent"
-    android:layout_height="310dp"
+    android:layout_height="wrap_content"
     android:background="@drawable/round_bg"
     android:orientation="vertical">
 
@@ -123,6 +123,7 @@
             android:text="Provided by Google"
             android:textColor="@android:color/darker_gray"
             android:textSize="10sp"
+            android:visibility="visible"
             tools:ignore="SmallSp" />
 
         <TextView

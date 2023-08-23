@@ -11,11 +11,13 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <queries>
+<!--        VPN Detect-->
         <package android:name="com.minhui.networkcapture" />
         <package android:name="com.minhui.networkcapture.pro" />
         <package android:name="jp.co.taosoftware.android.packetcapture" />
         <package android:name="app.greyshirts.sslcapture" />
         <package android:name="com.emanuelef.remote_capture" />
+        <package android:name="eu.faircode.netguard" />
         <package android:name="eu.faircode.netguard" />
         <package android:name="tech.httptoolkit.android.v1" />
     </queries>

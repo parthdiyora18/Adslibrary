@@ -26,6 +26,7 @@
             android:layout_width="12dp"
             android:layout_height="12dp"
             android:layout_alignParentEnd="true"
+            android:layout_marginTop="2dp"
             android:src="@drawable/g_ad_icon"
             tools:ignore="RtlCompat" />
     </RelativeLayout>

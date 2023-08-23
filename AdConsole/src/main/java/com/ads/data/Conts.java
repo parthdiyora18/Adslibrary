@@ -31,6 +31,9 @@ import androidx.core.content.ContextCompat;
 import com.ads.data.Api.APIClient;
 import com.ads.data.Api.APIInterface;
 import com.ads.data.Api.Recover;
+import com.ads.data.VPN_Block.Vpn_Block_Detector;
+import com.ads.data.VPN_Block.vpn_Block;
+import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
@@ -91,8 +94,12 @@ public class Conts {
     public void showVpnDialog() {
         Dialog dialog = new Dialog(ctx);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_app_vpn);
+        dialog.setContentView(R.layout.all_app_dailog);
         dialog.setCancelable(false);
+        LottieAnimationView lotti = dialog.findViewById(R.id.icon);
+        lotti.setAnimation(R.raw.warning);
+        lotti.loop(true);
+        lotti.playAnimation();
         dialog.findViewById(R.id.iv_vpn_close).setOnClickListener(view -> finishActivity((Activity) ctx));
         dialog.findViewById(R.id.tv_vpn_submit).setOnClickListener(view -> finishActivity((Activity) ctx));
         dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
@@ -229,17 +236,21 @@ public class Conts {
 
     // TODO: 7/24/2023  Debuug Mode
     @SuppressLint("UseCompatLoadingForDrawables")
-    public void Debugging() {
+    public void Debugging(getDataListner callback) {
         if (Settings.Secure.getInt(ctx.getContentResolver(), Settings.Global.ADB_ENABLED, 0) == 1) {
             // debugging enabled
             Dialog dialog = new Dialog(ctx);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-            dialog.setContentView(R.layout.dialog_app_vpn);
+            dialog.setContentView(R.layout.all_app_dailog);
             dialog.setCancelable(false);
+            LottieAnimationView lotti = dialog.findViewById(R.id.icon);
             TextView tital = dialog.findViewById(R.id.tital);
             TextView sub_tital = dialog.findViewById(R.id.sub_tital);
             TextView detail = dialog.findViewById(R.id.detail);
             TextView tv_vpn_submit = dialog.findViewById(R.id.tv_vpn_submit);
+            lotti.setAnimation(R.raw.warning);
+            lotti.loop(true);
+            lotti.playAnimation();
             tital.setText("Devloper Option Mode");
             sub_tital.setText("Error!");
             detail.setText("Please Disable USB Debugging from your phone to use the app!");
@@ -257,7 +268,36 @@ public class Conts {
             dialog.show();
             Window window = dialog.getWindow();
             window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        } else {
+            callback.onSuccess();
         }
+    }
+
+    public void check_VPN_App(Activity activity, getDataListner callbak) {
+        new Vpn_Block_Detector(activity).detectvpnBlockers(new vpn_Block.VPNBlockerCallback() {
+            @Override
+            public void onResult(boolean vpnFound, vpn_Block.Info info) {
+                if (vpnFound) {
+                    Dialog dialog = new Dialog(ctx);
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(R.layout.all_app_dailog);
+                    dialog.setCancelable(false);
+                    LottieAnimationView lotti = dialog.findViewById(R.id.icon);
+                    lotti.setAnimation(R.raw.warning);
+                    lotti.loop(true);
+                    lotti.playAnimation();
+                    dialog.findViewById(R.id.iv_vpn_close).setOnClickListener(view -> finishActivity((Activity) ctx));
+                    dialog.findViewById(R.id.tv_vpn_submit).setOnClickListener(view -> finishActivity((Activity) ctx));
+                    dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                    dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+                    dialog.show();
+                    Window window = dialog.getWindow();
+                    window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+                } else {
+                    callbak.onSuccess();
+                }
+            }
+        });
     }
 
     // TODO: 8/17/2023  StatusBar
@@ -372,14 +412,11 @@ public class Conts {
         final String appPackageName = activity.getPackageName();
         Uri uri = Uri.parse("market://details?id=" + appPackageName);
         Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
-        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
-                Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
-                Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_NEW_DOCUMENT | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
         try {
             activity.startActivity(goToMarket);
         } catch (ActivityNotFoundException e) {
-            activity.startActivity(new Intent(Intent.ACTION_VIEW,
-                    Uri.parse("http://play.google.com/store/apps/details?id=" + appPackageName)));
+            activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=" + appPackageName)));
         }
     }
 }

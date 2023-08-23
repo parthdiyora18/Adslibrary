@@ -42,7 +42,7 @@
                     android:layout_gravity="center"
                     android:text="Continue to this App"
                     android:textColor="#171616"
-                    android:textSize="@dimen/_16sdp"
+                    android:textSize="@dimen/_14sdp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -265,7 +265,7 @@
                                             android:textSize="12sp" />
 
                                         <ImageView
-                                            android:layout_width="10dp"
+                                            android:layout_width="12dp"
                                             android:layout_height="12dp"
                                             android:layout_gravity="center"
                                             android:layout_marginLeft="@dimen/_3sdp"

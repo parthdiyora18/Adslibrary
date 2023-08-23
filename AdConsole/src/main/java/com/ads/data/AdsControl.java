@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -225,13 +224,6 @@ public class AdsControl {
 
     @SuppressLint("ObsoleteSdkInt")
     public void ADSinit(final Activity activity, String packagename, String Service, getDataListner Callback) {
-        boolean isAppInstalled1 = appInstalledOrNot("com.minhui.networkcapture");
-        boolean isAppInstalled2 = appInstalledOrNot("com.minhui.networkcapture.pro");
-        boolean isAppInstalled3 = appInstalledOrNot("jp.co.taosoftware.android.packetcapture");
-        boolean isAppInstalled4 = appInstalledOrNot("app.greyshirts.sslcapture");
-        boolean isAppInstalled5 = appInstalledOrNot("com.emanuelef.remote_capture");
-        boolean isAppInstalled6 = appInstalledOrNot("eu.faircode.netguard");
-        boolean isAppInstalled7 = appInstalledOrNot("tech.httptoolkit.android.v1");
         boolean isBeingDebugged = Settings.Secure.getInt(activity.getContentResolver(), Settings.Global.ADB_ENABLED, 0) == 1;
         if (isNetworkAvailable()) {
             try {
@@ -251,49 +243,26 @@ public class AdsControl {
                                     if (!ridirect_app.equalsIgnoreCase("")) {
                                         activity.startActivity(new Intent("android.intent.action.VIEW").setData(Uri.parse("https://play.google.com/store/apps/details?id=" + ridirect_app)));
                                     } else {
-                                        if (isAppInstalled1 && app_data.get(0).isVpn_option()) {
+                                        if (app_data.get(0).isVpn_option()) {
                                             Conts conts = new Conts(activity);
-                                            conts.showVpnDialog();
-                                        } else if (isAppInstalled2 && app_data.get(0).isVpn_option()) {
-                                            Conts conts = new Conts(activity);
-                                            conts.showVpnDialog();
-                                        } else if (isAppInstalled3 && app_data.get(0).isVpn_option()) {
-                                            Conts conts = new Conts(activity);
-                                            conts.showVpnDialog();
-                                        } else if (isAppInstalled4 && app_data.get(0).isVpn_option()) {
-                                            Conts conts = new Conts(activity);
-                                            conts.showVpnDialog();
-                                        } else if (isAppInstalled5 && app_data.get(0).isVpn_option()) {
-                                            Conts conts = new Conts(activity);
-                                            conts.showVpnDialog();
-                                        } else if (isAppInstalled6 && app_data.get(0).isVpn_option()) {
-                                            Conts conts = new Conts(activity);
-                                            conts.showVpnDialog();
-                                        } else if (isAppInstalled7 && app_data.get(0).isVpn_option()) {
-                                            Conts conts = new Conts(activity);
-                                            conts.showVpnDialog();
-                                        } else if (isBeingDebugged && app_data.get(0).isDev_option()) {
-                                            Conts conts = new Conts(activity);
-                                            conts.Debugging();
+                                            conts.check_VPN_App(activity, new getDataListner() {
+                                                @Override
+                                                public void onSuccess() {
+                                                    if (isBeingDebugged && app_data.get(0).isDev_option()) {
+                                                        Conts conts = new Conts(activity);
+                                                        conts.Debugging(new getDataListner() {
+                                                            @Override
+                                                            public void onSuccess() {
+                                                                call(Callback);
+                                                            }
+                                                        });
+                                                    } else {
+                                                        call(Callback);
+                                                    }
+                                                }
+                                            });
                                         } else {
-                                            if (app_data.get(0).isAds_show()) {
-                                                if (app_data.get(0).getAd_native_type().equalsIgnoreCase(Mrec)) {
-                                                    medium_rect_Ads();
-                                                } else {
-                                                    native_Ads();
-                                                }
-                                                if (app_data.get(0).getAd_inter_type().equalsIgnoreCase("appopen")) {
-                                                    appopen_Ads();
-                                                } else {
-                                                    inter_Ads();
-                                                }
-                                                banner_Ads();
-                                                small_native_Ads();
-                                                small_native_banner_Ads();
-                                                With_out(Callback);
-                                            } else {
-                                                With_out(Callback);
-                                            }
+                                            call(Callback);
                                         }
                                     }
                                 } else {
@@ -327,13 +296,24 @@ public class AdsControl {
         return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
 
-    private boolean appInstalledOrNot(String uri) {
-        PackageManager pm = activity.getPackageManager();
-        try {
-            pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
-            return true;
-        } catch (PackageManager.NameNotFoundException e) {
-            return false;
+    private void call(getDataListner Callback) {
+        if (app_data.get(0).isAds_show()) {
+            if (app_data.get(0).getAd_native_type().equalsIgnoreCase(Mrec)) {
+                medium_rect_Ads();
+            } else {
+                native_Ads();
+            }
+            if (app_data.get(0).getAd_inter_type().equalsIgnoreCase("appopen")) {
+                appopen_Ads();
+            } else {
+                inter_Ads();
+            }
+            banner_Ads();
+            small_native_Ads();
+            small_native_banner_Ads();
+            With_out(Callback);
+        } else {
+            With_out(Callback);
         }
     }
 
@@ -463,7 +443,7 @@ public class AdsControl {
                     String adnetwork = app_data.get(0).getAd_secound_splash();
                     switch (adnetwork) {
                         case "inter":
-                            AdsControl.getInstance(activity).show_Interstitial(new getDataListner() {
+                            AdsControl.getInstance(activity).show_splash_inter(new getDataListner() {
                                 @Override
                                 public void onSuccess() {
                                     Next_Call(callback2);

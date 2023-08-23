@@ -48,15 +48,14 @@ public class NativeAds {
         } else {
             ((TextView) adView.getPriceView()).setText(nativeAd.getPrice());
         }
-
         if (nativeAd.getBody() == null) {
-            adView.getBodyView().setVisibility(View.INVISIBLE);
+            adView.getBodyView().setVisibility(View.GONE);
         } else {
             adView.getBodyView().setVisibility(View.VISIBLE);
             ((TextView) adView.getBodyView()).setText(nativeAd.getBody());
         }
         if (nativeAd.getCallToAction() == null) {
-            adView.getCallToActionView().setVisibility(View.INVISIBLE);
+            adView.getCallToActionView().setVisibility(View.GONE);
         } else {
             adView.getCallToActionView().setVisibility(View.VISIBLE);
             ((TextView) adView.getCallToActionView()).setText(nativeAd.getCallToAction());
