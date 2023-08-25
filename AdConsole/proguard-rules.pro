@@ -44,12 +44,32 @@
  -dontwarn org.apache.**
  -dontwarn com.itextpdf**
 
-# startapp rule
--keep class org.apache.commons.logging.**
--keep class com.truenet.** {
-      *;
+
+-keep class com.facebook.infer.** { *; }
+-dontwarn com.facebook.infer.**
+
+-keep class com.facebook.internal.** { *; }
+-dontwarn com.facebook.internal.**
+
+# Facebook
+-dontwarn com.facebook.**
+-keep public class com.facebook.** { public *; }
+-keepclasseswithmembers class * {
+    *** *onError(...);
 }
--keepattributes Exceptions, InnerClasses, Signature, Deprecated, SourceFile,LineNumberTable, *Annotation*, EnclosingMethod
--dontwarn android.webkit.JavascriptInterface
--keep class com.google.android.gms.internal.** { *; }
--ignorewarnings
+-keepclasseswithmembers class * {
+    *** *onAdLoaded(...);
+}
+-keepclasseswithmembers class * {
+    *** *onAdClicked(...);
+}
+# Inmobi
+-keep class com.inmobi.** { *; }
+
+# Applovin
+-keep class com.applovin.** { *; }
+-dontwarn com.applovin.**
+
+# Admob
+-keep class com.google.android.gms.ads.** { *; }
+-keep public class com.google.ads.mediation.* { public *; }

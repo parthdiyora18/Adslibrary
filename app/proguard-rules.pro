@@ -42,13 +42,9 @@
  #### -- Apache Commons --
  -dontwarn org.apache.commons.logging.**
  -dontwarn org.apache.**
- -dontwarn com.itextpdf**
 
 # startapp rule
 -keep class org.apache.commons.logging.**
--keep class com.truenet.** {
-      *;
-}
 -keepattributes Exceptions, InnerClasses, Signature, Deprecated, SourceFile,LineNumberTable, *Annotation*, EnclosingMethod
 -dontwarn android.webkit.JavascriptInterface
 -keep class com.google.android.gms.internal.** { *; }

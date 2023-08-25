@@ -18,7 +18,7 @@
         <package android:name="app.greyshirts.sslcapture" />
         <package android:name="com.emanuelef.remote_capture" />
         <package android:name="eu.faircode.netguard" />
-        <package android:name="eu.faircode.netguard" />
+        <package android:name="com.fulldive.extension.tordnscrypt" />
         <package android:name="tech.httptoolkit.android.v1" />
     </queries>
 

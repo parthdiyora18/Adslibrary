@@ -9,35 +9,49 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.util.Log;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.applovin.sdk.AppLovinSdk;
-import com.applovin.sdk.AppLovinSdkConfiguration;
 import com.facebook.ads.AudienceNetworkAds;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.inmobi.sdk.InMobiSdk;
+import com.inmobi.sdk.SdkInitializationListener;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class App extends Application {
     private static App _instance;
     AppOpen appOpenManager;
+
     public void onCreate() {
         super.onCreate();
         _instance = this;
-        MobileAds.initialize(this, new OnInitializationCompleteListener() {
-            @Override
-            public void onInitializationComplete(@NonNull InitializationStatus initializationStatus) {
-            }
+        MobileAds.initialize(this, initializationStatus -> {
         });
-//        AdSettings.setDataProcessingOptions( new String[] {"LDU"}, 1, 1000 );
         AudienceNetworkAds.initialize(this);
         AppLovinSdk.getInstance(_instance).isInitialized();
         AppLovinSdk.getInstance(_instance).setMediationProvider("max");
-        AppLovinSdk.initializeSdk(_instance, new AppLovinSdk.SdkInitializationListener() {
+        AppLovinSdk.initializeSdk(_instance, configuration -> {
+        });
+        JSONObject consentObject = new JSONObject();
+        try {
+            consentObject.put(InMobiSdk.IM_GDPR_CONSENT_AVAILABLE, true);
+            consentObject.put("gdpr", "0");
+            consentObject.put(InMobiSdk.IM_GDPR_CONSENT_IAB, false);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        InMobiSdk.init(this, "b4994419ed5a4683b08df417a0062a0a", consentObject, new SdkInitializationListener() {
             @Override
-            public void onSdkInitialized(final AppLovinSdkConfiguration configuration) {
-                // AppLovin SDK is initialized, start loading ads
+            public void onInitializationComplete(@Nullable Error error) {
+                if (null != error) {
+                    Log.e("Parth", "InMobi Init failed -" + error.getMessage());
+                } else {
+                    Log.d("Parth", "InMobi Init Successful");
+                }
             }
         });
         appOpenManager = new AppOpen(this);
@@ -54,7 +68,7 @@ public class App extends Application {
         return app;
     }
 
-    private NetworkChangeReceiver brd;
+    NetworkChangeReceiver brd;
 
     public void brodCarst(final Context ctx) {
         try {
@@ -63,7 +77,7 @@ public class App extends Application {
             filter.addAction("android.net.wifi.WIFI_STATE_CHANGED");
             filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
             ctx.registerReceiver(brd, filter);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 

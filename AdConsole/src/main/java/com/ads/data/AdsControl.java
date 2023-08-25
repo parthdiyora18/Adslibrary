@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
@@ -69,6 +68,12 @@ import com.google.android.gms.ads.appopen.AppOpenAd;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.gms.ads.nativead.NativeAd;
+import com.inmobi.ads.AdMetaInfo;
+import com.inmobi.ads.InMobiAdRequestStatus;
+import com.inmobi.ads.InMobiBanner;
+import com.inmobi.ads.InMobiInterstitial;
+import com.inmobi.ads.listeners.BannerAdEventListener;
+import com.inmobi.ads.listeners.InterstitialAdEventListener;
 import com.wortise.ads.WortiseSdk;
 import com.wortise.ads.banner.BannerAd;
 import com.wortise.ads.natives.GoogleNativeAd;
@@ -76,6 +81,7 @@ import com.wortise.ads.natives.GoogleNativeAd;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import retrofit2.Call;
 
@@ -84,15 +90,13 @@ public class AdsControl {
     private static AdsControl mInstance;
     @SuppressLint("StaticFieldLeak")
     static Context activity;
-    private final String Mrec = "mrec";
-
     // Banner
     public static boolean isGoogleBannerLoaded;
     public static boolean isAdxBannerLoaded;
     public static boolean isFBBannerLoaded;
     public static boolean isApplovinBannerLoaded;
     public static boolean isWortiseBannerLoaded;
-
+    public static boolean isInmobiBannerLoaded;
     public static boolean isLocal_BannerLoaded;
     public static AdView googleBannerAd;
     public static AdManagerAdView adxBannerAd;
@@ -100,6 +104,7 @@ public class AdsControl {
     @SuppressLint("StaticFieldLeak")
     public static MaxAdView applovin_banner_ad;
     public static BannerAd wBannerAd;
+    public static InMobiBanner InmobiBannerAd;
 
     // Mediam Ragtangal
     public static boolean isAdmob_Mediam_Ragtangal_Loaded;
@@ -121,7 +126,6 @@ public class AdsControl {
     public static boolean isFB_Native_Loaded;
     public static boolean isApplovin_Native_Loaded;
     public static boolean isWortise_Native_Loaded;
-
     public static boolean isLocal_Native_Loaded;
     public static NativeAd Admob_native_Ad;
     public static NativeAd Adx_native_Ad;
@@ -139,7 +143,6 @@ public class AdsControl {
     public static boolean isFb_small_native_Loaded;
     public static boolean isapplovin_small_native_Loaded;
     public static boolean isWortise_small_Native_Loaded;
-
     public static boolean isLocal_small_Native_Loaded;
     public static NativeAd Admob_small_native_Ad;
     public static NativeAd Adx_small_native_Ad;
@@ -174,12 +177,14 @@ public class AdsControl {
     private boolean isFBInterLoaded;
     private boolean isApplovinInterLoaded;
     private boolean isWortiseInterLoaded;
+    private boolean isInmobiInterLoaded;
     private boolean isLocalInterLoaded;
-    private InterstitialAd ADMOBInterstitialAd;
-    private AdManagerInterstitialAd ADXInterstitialAd;
-    private com.facebook.ads.InterstitialAd FB_interstitialAd;
-    private MaxInterstitialAd Applovin_maxInterstitialAd;
-    private com.wortise.ads.interstitial.InterstitialAd Wortise_inter;
+    InterstitialAd ADMOBInterstitialAd;
+    AdManagerInterstitialAd ADXInterstitialAd;
+    com.facebook.ads.InterstitialAd FB_interstitialAd;
+    MaxInterstitialAd Applovin_maxInterstitialAd;
+    com.wortise.ads.interstitial.InterstitialAd Wortise_inter;
+    InMobiInterstitial Inmobi_inter;
 
     // Appopen
     public static boolean isadmob_appopen_Loaded;
@@ -191,7 +196,6 @@ public class AdsControl {
     MaxAppOpenAd applovin_appopen;
     AppOpenAd admob_appOpenAd_inter;
     AppOpenAd adx_appOpenAd_inter;
-
     AppOpenAd admob_appOpenAd;
     AppOpenAd adx_appOpenAd;
 
@@ -220,7 +224,7 @@ public class AdsControl {
     // --------------------------------------------------- Service -----------------------------------------------------------
 
     // TODO: 7/17/2023 Main Service Call
-    public static ArrayList<Data> app_data = new ArrayList<Data>();
+    public static ArrayList<Data> app_data = new ArrayList<>();
 
     @SuppressLint("ObsoleteSdkInt")
     public void ADSinit(final Activity activity, String packagename, String Service, getDataListner Callback) {
@@ -230,7 +234,7 @@ public class AdsControl {
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
                     APIInterface apiInterface = APIClient.getClient().create(APIInterface.class);
                     Call<Recover> call1 = apiInterface.getadsdetail(packagename, Service);
-                    call1.enqueue(new retrofit2.Callback<Recover>() {
+                    call1.enqueue(new retrofit2.Callback<>() {
                         @Override
                         public void onResponse(@NotNull Call<Recover> call, @NotNull retrofit2.Response<Recover> response) {
                             if (response.isSuccessful() && response.body() != null) {
@@ -245,24 +249,21 @@ public class AdsControl {
                                     } else {
                                         if (app_data.get(0).isVpn_option()) {
                                             Conts conts = new Conts(activity);
-                                            conts.check_VPN_App(activity, new getDataListner() {
-                                                @Override
-                                                public void onSuccess() {
-                                                    if (isBeingDebugged && app_data.get(0).isDev_option()) {
-                                                        Conts conts = new Conts(activity);
-                                                        conts.Debugging(new getDataListner() {
-                                                            @Override
-                                                            public void onSuccess() {
-                                                                call(Callback);
-                                                            }
-                                                        });
-                                                    } else {
-                                                        call(Callback);
-                                                    }
+                                            conts.check_VPN_App(activity, () -> {
+                                                if (isBeingDebugged && app_data.get(0).isDev_option()) {
+                                                    Conts conts1 = new Conts(activity);
+                                                    conts1.Debugging(() -> call(Callback));
+                                                } else {
+                                                    call(Callback);
                                                 }
                                             });
                                         } else {
-                                            call(Callback);
+                                            if (isBeingDebugged && app_data.get(0).isDev_option()) {
+                                                Conts conts1 = new Conts(activity);
+                                                conts1.Debugging(() -> call(Callback));
+                                            } else {
+                                                call(Callback);
+                                            }
                                         }
                                     }
                                 } else {
@@ -273,7 +274,7 @@ public class AdsControl {
                         }
 
                         @Override
-                        public void onFailure(Call<Recover> call, Throwable t) {
+                        public void onFailure(@NonNull Call<Recover> call, @NonNull Throwable t) {
                             call.cancel();
                             With_out(Callback);
                         }
@@ -298,7 +299,7 @@ public class AdsControl {
 
     private void call(getDataListner Callback) {
         if (app_data.get(0).isAds_show()) {
-            if (app_data.get(0).getAd_native_type().equalsIgnoreCase(Mrec)) {
+            if (app_data.get(0).getAd_native_type().equalsIgnoreCase("mrec")) {
                 medium_rect_Ads();
             } else {
                 native_Ads();
@@ -325,78 +326,33 @@ public class AdsControl {
                     String adnetwork = app_data.get(0).getAdSplash();
                     switch (adnetwork) {
                         case "native":
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    open_native(myCallback);
-                                }
-                            }, 2500);
+                            new Handler().postDelayed(() -> open_native(myCallback), 2500);
                             break;
                         case "inter":
-                            AdsControl.getInstance(activity).show_splash_inter(new getDataListner() {
-                                @Override
-                                public void onSuccess() {
-                                    Next_Call(myCallback);
-                                }
-                            });
+                            AdsControl.getInstance(activity).show_splash_inter(() -> Next_Call(myCallback));
                             break;
                         case "admob":
-                            AdsControl.getInstance(activity).show_Admob_Appopen(new getDataListner() {
-                                @Override
-                                public void onSuccess() {
-                                    Next_Call(myCallback);
-                                }
-                            });
+                            AdsControl.getInstance(activity).show_Admob_Appopen(() -> Next_Call(myCallback));
                             break;
                         case "adx":
-                            AdsControl.getInstance(activity).show_Adx_Appopen(new getDataListner() {
-                                @Override
-                                public void onSuccess() {
-                                    Next_Call(myCallback);
-                                }
-                            });
+                            AdsControl.getInstance(activity).show_Adx_Appopen(() -> Next_Call(myCallback));
                             break;
                         case "applovin":
-                            AdsControl.getInstance(activity).show_Applovin_Appopen(new getDataListner() {
-                                @Override
-                                public void onSuccess() {
-                                    Next_Call(myCallback);
-                                }
-                            });
+                            AdsControl.getInstance(activity).show_Applovin_Appopen(() -> Next_Call(myCallback));
                             break;
                         case "wortise":
-                            AdsControl.getInstance(activity).show_Wortise_Appopen(new getDataListner() {
-                                @Override
-                                public void onSuccess() {
-                                    Next_Call(myCallback);
-                                }
-                            });
+                            AdsControl.getInstance(activity).show_Wortise_Appopen(() -> Next_Call(myCallback));
                             break;
                         case "local":
-                            AdsControl.getInstance(activity).show_local_Appopen(new getDataListner() {
-                                @Override
-                                public void onSuccess() {
-                                    Next_Call(myCallback);
-                                }
-                            });
+                            AdsControl.getInstance(activity).show_local_Appopen(() -> Next_Call(myCallback));
                             break;
                         case "off":
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Next_Call(myCallback);
-                                }
-                            }, 2500);
+                            new Handler().postDelayed(() -> Next_Call(myCallback), 2500);
                             break;
                         default:
                     }
                 } else {
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            Next_Call(myCallback);
-                        }
-                    }, 2500);
+                    new Handler().postDelayed(() -> Next_Call(myCallback), 2500);
                 }
             }
         } catch (Exception e) {
@@ -407,7 +363,7 @@ public class AdsControl {
     // TODO: 7/17/2023  Open Native Dialog Ads
     Dialog ad_dialog;
 
-    public void open_native(getDataListner callback) {
+    private void open_native(getDataListner callback) {
         Dialog dialog = new Dialog(activity);
         ad_dialog = dialog;
         dialog.requestWindowFeature(1);
@@ -415,22 +371,16 @@ public class AdsControl {
         this.ad_dialog.setContentView(R.layout.open_native);
         AdsControl.getInstance(activity).show_native_ad(dialog.findViewById(R.id.ad_native));
         ImageView continuee = ad_dialog.findViewById(R.id.continuee);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                continuee.setVisibility(View.VISIBLE);
-                continuee.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ad_dialog.dismiss();
-                        secound_splash_Ads(callback);
-                    }
-                });
-            }
+        new Handler().postDelayed(() -> {
+            continuee.setVisibility(View.VISIBLE);
+            continuee.setOnClickListener(v -> {
+                ad_dialog.dismiss();
+                secound_splash_Ads(callback);
+            });
         }, 2500);
         this.ad_dialog.setCanceledOnTouchOutside(false);
         this.ad_dialog.setCancelable(false);
-        this.ad_dialog.getWindow().setSoftInputMode(3);
+        Objects.requireNonNull(this.ad_dialog.getWindow()).setSoftInputMode(3);
         this.ad_dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
         this.ad_dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
         this.ad_dialog.show();
@@ -443,52 +393,22 @@ public class AdsControl {
                     String adnetwork = app_data.get(0).getAd_secound_splash();
                     switch (adnetwork) {
                         case "inter":
-                            AdsControl.getInstance(activity).show_splash_inter(new getDataListner() {
-                                @Override
-                                public void onSuccess() {
-                                    Next_Call(callback2);
-                                }
-                            });
+                            AdsControl.getInstance(activity).show_splash_inter(() -> Next_Call(callback2));
                             break;
                         case "admob":
-                            AdsControl.getInstance(activity).show_Admob_Appopen(new getDataListner() {
-                                @Override
-                                public void onSuccess() {
-                                    Next_Call(callback2);
-                                }
-                            });
+                            AdsControl.getInstance(activity).show_Admob_Appopen(() -> Next_Call(callback2));
                             break;
                         case "adx":
-                            AdsControl.getInstance(activity).show_Adx_Appopen(new getDataListner() {
-                                @Override
-                                public void onSuccess() {
-                                    Next_Call(callback2);
-                                }
-                            });
+                            AdsControl.getInstance(activity).show_Adx_Appopen(() -> Next_Call(callback2));
                             break;
                         case "applovin":
-                            AdsControl.getInstance(activity).show_Applovin_Appopen(new getDataListner() {
-                                @Override
-                                public void onSuccess() {
-                                    Next_Call(callback2);
-                                }
-                            });
+                            AdsControl.getInstance(activity).show_Applovin_Appopen(() -> Next_Call(callback2));
                             break;
                         case "wortise":
-                            AdsControl.getInstance(activity).show_Wortise_Appopen(new getDataListner() {
-                                @Override
-                                public void onSuccess() {
-                                    Next_Call(callback2);
-                                }
-                            });
+                            AdsControl.getInstance(activity).show_Wortise_Appopen(() -> Next_Call(callback2));
                             break;
                         case "local":
-                            AdsControl.getInstance(activity).show_local_Appopen(new getDataListner() {
-                                @Override
-                                public void onSuccess() {
-                                    Next_Call(callback2);
-                                }
-                            });
+                            AdsControl.getInstance(activity).show_local_Appopen(() -> Next_Call(callback2));
                             break;
                         case "off":
                             Next_Call(callback2);
@@ -511,7 +431,7 @@ public class AdsControl {
     //-------------------------------------------------------- Banner Ads -------------------------------------------------------
 
     // TODO: 7/31/2023  Preload Banner Ads
-    private int ad_banner_network = 0;
+    int ad_banner_network = 0;
 
     public void banner_Ads() {
         try {
@@ -550,6 +470,12 @@ public class AdsControl {
                                 }
                                 ad_banner_network++;
                                 break;
+                            case "inmobi":
+                                if (app_data.get(0).getInmobi_banner_id().size() > 0) {
+                                    preloadBannerAd_Inmobi();
+                                }
+                                ad_banner_network++;
+                                break;
                             case "local":
                                 preload_local_Banner_ad();
                                 ad_banner_network++;
@@ -567,15 +493,16 @@ public class AdsControl {
         }
     }
 
-    public static int current_admob_BannerId = 0;
-    public static int current_adx_BannerId = 0;
-    public static int current_fb_BannerId = 0;
-    public static int current_applovin_BannerId = 0;
-    public static int current_wortise_BannerId = 0;
+    int current_admob_BannerId = 0;
+    int current_adx_BannerId = 0;
+    int current_fb_BannerId = 0;
+    int current_applovin_BannerId = 0;
+    int current_wortise_BannerId = 0;
+    int current_inmobi_BannerId = 0;
 
     // Admob Mode
     @SuppressLint("MissingPermission")
-    public void preloadBannerAd_Admob() {
+    void preloadBannerAd_Admob() {
         if (app_data != null && app_data.size() > 0) {
             if (isGoogleBannerLoaded) {
                 return;
@@ -609,7 +536,7 @@ public class AdsControl {
 
     // Adx Mode
     @SuppressLint("MissingPermission")
-    public void preloadBannerAd_Adx() {
+    void preloadBannerAd_Adx() {
         if (app_data != null && app_data.size() > 0) {
             if (isAdxBannerLoaded) {
                 return;
@@ -631,6 +558,7 @@ public class AdsControl {
                 @Override
                 public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                     super.onAdFailedToLoad(loadAdError);
+                    Log.d("Parth", "Adx Banner Failed");
                     banner_Ads();
                 }
 
@@ -643,7 +571,7 @@ public class AdsControl {
     }
 
     // FB Mode
-    public void preloadBannerAd_FB() {
+    void preloadBannerAd_FB() {
         if (app_data != null && app_data.size() > 0) {
             if (isFBBannerLoaded) {
                 return;
@@ -681,7 +609,7 @@ public class AdsControl {
     }
 
     // Applovin Mode
-    public void preloadBannerAd_Applovin() {
+    void preloadBannerAd_Applovin() {
         if (app_data != null && app_data.size() > 0) {
             if (isApplovinBannerLoaded) {
                 return;
@@ -735,7 +663,7 @@ public class AdsControl {
     }
 
     // Wortise Mode
-    public void preloadBannerAd_Wortise() {
+    void preloadBannerAd_Wortise() {
         if (app_data != null && app_data.size() > 0) {
             if (isWortiseBannerLoaded) {
                 return;
@@ -769,32 +697,64 @@ public class AdsControl {
         }
     }
 
+    // Inmobi Mode
+    void preloadBannerAd_Inmobi() {
+        if (app_data != null && app_data.size() > 0) {
+            if (isInmobiBannerLoaded) {
+                return;
+            }
+            final InMobiBanner inMobiBanner = new InMobiBanner(activity, current_inmobi_BannerId);
+            inMobiBanner.setBannerSize(320, 50);
+            inMobiBanner.load();
+            inMobiBanner.setListener(new BannerAdEventListener() {
+                @Override
+                public void onAdFetchFailed(@NonNull InMobiBanner inMobiBanner, @NonNull InMobiAdRequestStatus inMobiAdRequestStatus) {
+                    super.onAdFetchFailed(inMobiBanner, inMobiAdRequestStatus);
+                    Log.d("Parth", "Inmobi banner onError: " + inMobiAdRequestStatus);
+                    banner_Ads();
+                }
+
+                @Override
+                public void onAdFetchSuccessful(@NonNull InMobiBanner inMobiBanner, @NonNull AdMetaInfo adMetaInfo) {
+                    super.onAdFetchSuccessful(inMobiBanner, adMetaInfo);
+                }
+
+                @Override
+                public void onAdLoadSucceeded(@NonNull InMobiBanner inMobiBanner, @NonNull AdMetaInfo adMetaInfo) {
+                    super.onAdLoadSucceeded(inMobiBanner, adMetaInfo);
+                    InmobiBannerAd = inMobiBanner;
+                    isInmobiBannerLoaded = true;
+                }
+            });
+            current_inmobi_BannerId++;
+            if (current_inmobi_BannerId == app_data.get(0).getInmobi_banner_id().size()) {
+                current_inmobi_BannerId = 0;
+            }
+        }
+    }
+
     // Local Mode
-    public void preload_local_Banner_ad() {
+    void preload_local_Banner_ad() {
         if (isLocal_BannerLoaded) {
             return;
         }
         isLocal_BannerLoaded = true;
     }
 
-    public void local_banner(ViewGroup local_banner) {
+    void local_banner(ViewGroup local_banner) {
         if (app_data != null && app_data.size() > 0) {
-            RelativeLayout local_banner_ad = (RelativeLayout) local_banner.findViewById(R.id.local_banner_ads);
-            ImageView app_banner = (ImageView) local_banner.findViewById(R.id.app_banner);
+            RelativeLayout local_banner_ad = local_banner.findViewById(R.id.local_banner_ads);
+            ImageView app_banner = local_banner.findViewById(R.id.app_banner);
             try {
                 Glide.with(activity).load(app_data.get(0).getNew_app_banner_ad()).into(app_banner);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
-            local_banner_ad.setOnClickListener(new View.OnClickListener() {
-                @SuppressLint("WrongConstant")
-                @Override
-                public void onClick(View view) {
-                    try {
-                        Intent intent = new Intent("android.intent.action.VIEW").setData(Uri.parse(app_data.get(0).getNew_app_link()));
-                        activity.startActivity(intent);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+            local_banner_ad.setOnClickListener(view -> {
+                try {
+                    Intent intent = new Intent("android.intent.action.VIEW").setData(Uri.parse(app_data.get(0).getNew_app_link()));
+                    activity.startActivity(intent);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
             isLocal_BannerLoaded = false;
@@ -817,6 +777,8 @@ public class AdsControl {
                     new All_Type_Ads(activity).show_banner_ad_Applovin(banner_container);
                 } else if (isWortiseBannerLoaded) {
                     new All_Type_Ads(activity).show_banner_ad_Wortise(banner_container);
+                } else if (isInmobiBannerLoaded) {
+                    new All_Type_Ads(activity).show_banner_ad_Inmobi(banner_container);
                 } else if (isLocal_BannerLoaded) {
                     @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_banner_ad, null);
                     local_banner(viewGroup);
@@ -830,7 +792,7 @@ public class AdsControl {
     //---------------------------------------------Small Native banner type Ads ----------------------------------------------
 
     // TODO: 7/17/2023  Preload Small NAtive Banner Ads
-    private int ad_small_native_banner_network = 0;
+    int ad_small_native_banner_network = 0;
 
     public void small_native_banner_Ads() {
         try {
@@ -886,11 +848,11 @@ public class AdsControl {
         }
     }
 
-    public static int current_admob_small_native_BannerId = 0;
-    public static int current_adx_small_native_BannerId = 0;
-    public static int current_fb_small_native_BannerId = 0;
-    public static int current_applovin_small_native_BannerId = 0;
-    public static int current_wortise_small_native_BannerId = 0;
+    int current_admob_small_native_BannerId = 0;
+    int current_adx_small_native_BannerId = 0;
+    int current_fb_small_native_BannerId = 0;
+    int current_applovin_small_native_BannerId = 0;
+    int current_wortise_small_native_BannerId = 0;
 
     // Admob Mode
     void preload_Admob_Native_Banner_Ad() {
@@ -899,20 +861,17 @@ public class AdsControl {
                 return;
             }
             final AdLoader.Builder builder = new AdLoader.Builder(activity, app_data.get(0).getAdmobNativeid().get(current_admob_small_native_BannerId));
-            builder.forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
-                @Override
-                public void onNativeAdLoaded(@NonNull NativeAd nativeAd) {
-                    Admob_small_native_banner_Ad = nativeAd;
-                    isadmob_small_native_banner_Loaded = true;
-                    Log.d("Parth", "Admob Small Native Banner Ad Loaded");
-                }
+            builder.forNativeAd(nativeAd -> {
+                Admob_small_native_banner_Ad = nativeAd;
+                isadmob_small_native_banner_Loaded = true;
+                Log.d("Parth", "Admob Small Native Banner Ad Loaded");
             });
             builder.withAdListener(new AdListener() {
                 @Override
                 public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                     super.onAdFailedToLoad(loadAdError);
                     Log.d("Parth", "Admob Small Native Banner Ad Failed");
-                    small_native_banner_Ads();
+                    preload_Admob_Native_Banner_Ad();
                 }
 
                 public void onAdLoaded() {
@@ -934,14 +893,11 @@ public class AdsControl {
                 return;
             }
             final AdLoader.Builder builder = new AdLoader.Builder(activity, app_data.get(0).getAdxNativeId().get(current_adx_small_native_BannerId));
-            builder.forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
-                @Override
-                public void onNativeAdLoaded(@NonNull NativeAd nativeAd) {
-                    Log.d("Parth", "Adx Small Native Banner Ad Loaded");
-                    Adx_small_native_banner_Ad = nativeAd;
-                    isadx_small_native_banner_Loaded = true;
+            builder.forNativeAd(nativeAd -> {
+                Log.d("Parth", "Adx Small Native Banner Ad Loaded");
+                Adx_small_native_banner_Ad = nativeAd;
+                isadx_small_native_banner_Loaded = true;
 
-                }
             });
             builder.withAdListener(new AdListener() {
                 @SuppressLint("MissingPermission")
@@ -1010,7 +966,7 @@ public class AdsControl {
     }
 
     // Applovin Mode
-    public void preload_Applovin_Native_BannerAd() {
+    void preload_Applovin_Native_BannerAd() {
         if (app_data != null && app_data.size() > 0) {
             if (isApplovin_small_native_banner_Loaded) {
                 return;
@@ -1054,7 +1010,6 @@ public class AdsControl {
             final GoogleNativeAd wortise_google_native_banner = new GoogleNativeAd(activity, app_data.get(0).getWortiseNativeId().get(current_wortise_small_native_BannerId), new GoogleNativeAd.Listener() {
                 @Override
                 public void onNativeClicked(@NonNull GoogleNativeAd googleNativeAd) {
-
                 }
 
                 @Override
@@ -1065,7 +1020,6 @@ public class AdsControl {
 
                 @Override
                 public void onNativeImpression(@NonNull GoogleNativeAd googleNativeAd) {
-
                 }
 
                 @Override
@@ -1086,7 +1040,7 @@ public class AdsControl {
     }
 
     // Local Mode
-    public void preload_Local_Native_BannerAd() {
+    void preload_Local_Native_BannerAd() {
         if (isLocal_small_Native_banner_Loaded) {
             return;
         }
@@ -1119,7 +1073,7 @@ public class AdsControl {
 
     //--------------------------------------------- Small Native Ads --------------------------------------------------------------------------
 // TODO: 7/17/2023  Preload Small Native Ads
-    private int ad_small_native_network = 0;
+    int ad_small_native_network = 0;
 
     public void small_native_Ads() {
         try {
@@ -1175,26 +1129,23 @@ public class AdsControl {
         }
     }
 
-    public static int current_admob_small_native_Id = 0;
-    public static int current_adx_small_native_Id = 0;
-    public static int current_fb_small_native_Id = 0;
-    public static int current_applovin_small_native_Id = 0;
-    public static int current_wortise_small_native_Id = 0;
+    int current_admob_small_native_Id = 0;
+    int current_adx_small_native_Id = 0;
+    int current_fb_small_native_Id = 0;
+    int current_applovin_small_native_Id = 0;
+    int current_wortise_small_native_Id = 0;
 
     // Admob Mode
-    public void preload_Admob_Small_Native_Ad() {
+    void preload_Admob_Small_Native_Ad() {
         if (app_data != null && app_data.size() > 0) {
             if (isAdmob_small_native_Loaded) {
                 return;
             }
             final AdLoader.Builder builder = new AdLoader.Builder(activity, app_data.get(0).getAdmobNativeid().get(current_admob_small_native_Id));
-            builder.forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
-                @Override
-                public void onNativeAdLoaded(@NonNull NativeAd nativeAd) {
-                    Log.d("Parth", "Admob Small Native Ad Loaded");
-                    Admob_small_native_Ad = nativeAd;
-                    isAdmob_small_native_Loaded = true;
-                }
+            builder.forNativeAd(nativeAd -> {
+                Log.d("Parth", "Admob Small Native Ad Loaded");
+                Admob_small_native_Ad = nativeAd;
+                isAdmob_small_native_Loaded = true;
             });
             builder.withAdListener(new AdListener() {
                 @SuppressLint("MissingPermission")
@@ -1217,19 +1168,16 @@ public class AdsControl {
     }
 
     // Adx Mode
-    public void preload_Adx_Small_Native_Ad() {
+    void preload_Adx_Small_Native_Ad() {
         if (app_data != null && app_data.size() > 0) {
             if (isadx_small_native_Loaded) {
                 return;
             }
             final AdLoader.Builder builder = new AdLoader.Builder(activity, app_data.get(0).getAdxNativeId().get(current_adx_small_native_Id));
-            builder.forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
-                @Override
-                public void onNativeAdLoaded(@NonNull NativeAd nativeAd) {
-                    Log.d("Parth", "Adx Small Native Ad Loaded");
-                    Adx_small_native_Ad = nativeAd;
-                    isadx_small_native_Loaded = true;
-                }
+            builder.forNativeAd(nativeAd -> {
+                Log.d("Parth", "Adx Small Native Ad Loaded");
+                Adx_small_native_Ad = nativeAd;
+                isadx_small_native_Loaded = true;
             });
             builder.withAdListener(new AdListener() {
                 @SuppressLint("MissingPermission")
@@ -1252,7 +1200,7 @@ public class AdsControl {
     }
 
     // FB Mode
-    public void preload_Fb_Small_Native_Ad() {
+    void preload_Fb_Small_Native_Ad() {
         if (app_data != null && app_data.size() > 0) {
             if (isFb_small_native_Loaded) {
                 return;
@@ -1301,7 +1249,7 @@ public class AdsControl {
     }
 
     // Applovin Mode
-    public void preload_Applovin_Small_NativeAd() {
+    void preload_Applovin_Small_NativeAd() {
         if (app_data != null && app_data.size() > 0) {
             if (isapplovin_small_native_Loaded) {
                 return;
@@ -1337,7 +1285,7 @@ public class AdsControl {
     }
 
     // Wortise Mode
-    public void preload_Wortise_Small_Native_Ad() {
+    void preload_Wortise_Small_Native_Ad() {
         if (app_data != null && app_data.size() > 0) {
             if (isWortise_small_Native_Loaded) {
                 return;
@@ -1375,7 +1323,7 @@ public class AdsControl {
     }
 
     // Local Mode
-    public void preload_Local_Small_Native_Ad() {
+    void preload_Local_Small_Native_Ad() {
         if (isLocal_small_Native_Loaded) {
             return;
         }
@@ -1410,7 +1358,7 @@ public class AdsControl {
     //--------------------------------------------- Native Ads --------------------------------------------------------------------------
 
     // TODO: 7/17/2023  Preload Native Ads
-    private int ad_native_network = 0;
+    int ad_native_network = 0;
 
     public void native_Ads() {
         try {
@@ -1466,33 +1414,30 @@ public class AdsControl {
         }
     }
 
-    public static int current_admob_native_Id = 0;
-    public static int current_adx_native_Id = 0;
-    public static int current_fb_native_Id = 0;
-    public static int current_applovin_native_Id = 0;
-    public static int current_wortise_native_Id = 0;
+    int current_admob_native_Id = 0;
+    int current_adx_native_Id = 0;
+    int current_fb_native_Id = 0;
+    int current_applovin_native_Id = 0;
+    int current_wortise_native_Id = 0;
 
     // Admob Mode
     @SuppressLint("MissingPermission")
-    public void preload_Admob_Native_Ad() {
+    void preload_Admob_Native_Ad() {
         if (app_data != null && app_data.size() > 0) {
             if (isadmob_native_Loaded) {
                 return;
             }
             final AdLoader.Builder builder = new AdLoader.Builder(activity, app_data.get(0).getAdmobNativeid().get(current_admob_native_Id));
-            builder.forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
-                @Override
-                public void onNativeAdLoaded(@NonNull NativeAd nativeAd) {
-                    Admob_native_Ad = nativeAd;
-                    isadmob_native_Loaded = true;
-                    Log.d("Parth", "Admob Native Ad Loaded");
-                }
+            builder.forNativeAd(nativeAd -> {
+                Log.d("Parth", "Admob Native Ad Loaded");
+                Admob_native_Ad = nativeAd;
+                isadmob_native_Loaded = true;
             });
             builder.withAdListener(new AdListener() {
                 @Override
                 public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                     super.onAdFailedToLoad(loadAdError);
-                    Log.d("Parth", "Admob Native Ad Failed");
+                    Log.d("Parth", "Admob Native Ad Failed" + loadAdError);
                     native_Ads();
                 }
 
@@ -1509,25 +1454,22 @@ public class AdsControl {
 
     // Adx Mode
     @SuppressLint("MissingPermission")
-    public void preload_Adx_Native_Ad() {
+    void preload_Adx_Native_Ad() {
         if (app_data != null && app_data.size() > 0) {
             if (isadx_native_Loaded) {
                 return;
             }
             final AdLoader.Builder builder = new AdLoader.Builder(activity, app_data.get(0).getAdxNativeId().get(current_adx_native_Id));
-            builder.forNativeAd(new NativeAd.OnNativeAdLoadedListener() {
-                @Override
-                public void onNativeAdLoaded(@NonNull NativeAd nativeAd) {
-                    Log.d("Parth", "Adx Native Ad Loaded");
-                    Adx_native_Ad = nativeAd;
-                    isadx_native_Loaded = true;
-                }
+            builder.forNativeAd(nativeAd -> {
+                Log.d("Parth", "Adx Native Ad Loaded");
+                Adx_native_Ad = nativeAd;
+                isadx_native_Loaded = true;
             });
             builder.withAdListener(new AdListener() {
                 @Override
                 public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                     super.onAdFailedToLoad(loadAdError);
-                    Log.d("Parth", "Adx Native Ad Failed");
+                    Log.d("Parth", "Adx Native Ad Failed" + loadAdError);
                     native_Ads();
                 }
 
@@ -1543,7 +1485,7 @@ public class AdsControl {
     }
 
     // FB Mode
-    public void preloadFbNativeAd() {
+    void preloadFbNativeAd() {
         if (app_data != null && app_data.size() > 0) {
             if (isFB_Native_Loaded) {
                 return;
@@ -1552,35 +1494,34 @@ public class AdsControl {
             NativeAdListener nativeAdListener = new NativeAdListener() {
                 @Override
                 public void onMediaDownloaded(Ad ad) {
-                    Log.d("Parth", "Native ad finished downloading all assets.");
+                    Log.d("Parth", "FB Native ad finished downloading all assets.");
                 }
 
                 @SuppressLint("MissingPermission")
                 @Override
                 public void onError(Ad ad, AdError adError) {
-                    Log.d("Parth", "Native ad Failed " + adError.getErrorMessage());
+                    Log.d("Parth", "FB Native ad Failed " + adError.getErrorMessage());
                     native_Ads();
                 }
 
                 @Override
                 public void onAdLoaded(Ad ad) {
-                    Log.d("Parth", "Native ad is loaded and ready to be displayed!");
+                    Log.d("Parth", " FB Native ad is loaded");
                     fb_native_Ad = fbnative_Ad;
                     isFB_Native_Loaded = true;
                 }
 
                 @Override
                 public void onAdClicked(Ad ad) {
-                    Log.d("Parth", "Native ad clicked!");
+                    Log.d("Parth", "FB Native ad clicked!");
                 }
 
                 @Override
                 public void onLoggingImpression(Ad ad) {
-                    Log.d("Parth", "Native ad impression logged!");
+                    Log.d("Parth", "FB Native ad impression");
                 }
             };
             // Request an ad
-//            fbnative_Ad.loadAd(fbnative_Ad.buildLoadAdConfig().withAdListener(nativeAdListener).build());
             fbnative_Ad.loadAd(fbnative_Ad.buildLoadAdConfig().withAdListener(nativeAdListener).withMediaCacheFlag(NativeAdBase.MediaCacheFlag.ALL).build());
             current_fb_native_Id++;
             if (current_fb_native_Id == app_data.get(0).getFbNativeId().size()) {
@@ -1590,7 +1531,7 @@ public class AdsControl {
     }
 
     // Applovin Mode
-    public void preload_Applovin_NativeAd() {
+    void preload_Applovin_NativeAd() {
         if (app_data != null && app_data.size() > 0) {
             if (isApplovin_Native_Loaded) {
                 return;
@@ -1626,7 +1567,7 @@ public class AdsControl {
     }
 
     // Wortise Mode
-    public void preload_Wortise_Native_Ad() {
+    void preload_Wortise_Native_Ad() {
         if (app_data != null && app_data.size() > 0) {
             if (isWortise_Native_Loaded) {
                 return;
@@ -1634,13 +1575,12 @@ public class AdsControl {
             final GoogleNativeAd wortise_google_native = new GoogleNativeAd(activity, app_data.get(0).getWortiseNativeId().get(current_wortise_native_Id), new GoogleNativeAd.Listener() {
                 @Override
                 public void onNativeClicked(@NonNull GoogleNativeAd googleNativeAd) {
-
                 }
 
                 @SuppressLint("MissingPermission")
                 @Override
                 public void onNativeFailed(@NonNull GoogleNativeAd googleNativeAd, @NonNull com.wortise.ads.AdError adError) {
-                    Log.d("Parth", "Wortise Native ad Failed");
+                    Log.d("Parth", "Wortise Native ad Failed" + adError);
                     native_Ads();
                 }
 
@@ -1650,7 +1590,7 @@ public class AdsControl {
 
                 @Override
                 public void onNativeLoaded(@NonNull GoogleNativeAd googleNativeAd, @NonNull NativeAd nativeAd) {
-                    Log.d("Parth", "Wortise Naive Loaded");
+                    Log.d("Parth", "Wortise Naive ad Loaded");
                     wortise_google_native_Ad = googleNativeAd;
                     wortise_native_Ad = nativeAd;
                     isWortise_Native_Loaded = true;
@@ -1665,7 +1605,7 @@ public class AdsControl {
     }
 
     // Local Mode
-    public void preload_local_Native_ad() {
+    void preload_local_Native_ad() {
         if (isLocal_Native_Loaded) {
             return;
         }
@@ -1673,7 +1613,7 @@ public class AdsControl {
     }
 
     // TODO: 8/3/2023  Medium Rect Ad
-    private int ad_medium_network = 0;
+    int ad_medium_network = 0;
 
     public void medium_rect_Ads() {
         try {
@@ -1729,15 +1669,15 @@ public class AdsControl {
         }
     }
 
-    public static int current_admob_medium_rectId = 0;
-    public static int current_adx_medium_rectId = 0;
-    public static int current_fb_medium_rectId = 0;
-    public static int current_applovin_medium_rectId = 0;
-    public static int current_wortise_medium_rectId = 0;
+    int current_admob_medium_rectId = 0;
+    int current_adx_medium_rectId = 0;
+    int current_fb_medium_rectId = 0;
+    int current_applovin_medium_rectId = 0;
+    int current_wortise_medium_rectId = 0;
 
     // Admob Mode
     @SuppressLint("MissingPermission")
-    public void preload_medium_rectAd_Admob() {
+    void preload_medium_rectAd_Admob() {
         if (app_data != null && app_data.size() > 0) {
             if (isAdmob_Mediam_Ragtangal_Loaded) {
                 return;
@@ -1758,7 +1698,7 @@ public class AdsControl {
                 @Override
                 public void onAdFailedToLoad(@NonNull LoadAdError adError) {
                     super.onAdFailedToLoad(adError);
-                    Log.d("Parth", "admob mediam ragtangal failed");
+                    Log.d("Parth", "admob mediam ragtangal failed" + adError);
                     medium_rect_Ads();
                 }
             });
@@ -1771,7 +1711,7 @@ public class AdsControl {
 
     // Adx Mode
     @SuppressLint("MissingPermission")
-    public void preload_medium_rect_Adx() {
+    void preload_medium_rect_Adx() {
         if (app_data != null && app_data.size() > 0) {
             if (isAdx_Mediam_Ragtangal_Loaded) {
                 return;
@@ -1793,6 +1733,7 @@ public class AdsControl {
                 @Override
                 public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                     super.onAdFailedToLoad(loadAdError);
+                    Log.d("Parth", "adx mediam ragtangal failed" + loadAdError);
                     medium_rect_Ads();
                 }
 
@@ -1805,7 +1746,7 @@ public class AdsControl {
     }
 
     // FB Mode
-    public void preload_medium_rect_FB() {
+    void preload_medium_rect_FB() {
         if (app_data != null && app_data.size() > 0) {
             if (isFB_Mediam_Ragtangal_Loaded) {
                 return;
@@ -1821,7 +1762,7 @@ public class AdsControl {
 
                 @Override
                 public void onError(Ad ad, AdError adError) {
-                    Log.d("Parth", "FB mediam ragtangal Failed");
+                    Log.d("Parth", "FB mediam ragtangal Failed" + adError);
                     medium_rect_Ads();
                 }
 
@@ -1842,7 +1783,7 @@ public class AdsControl {
     }
 
     // Applovin Mode
-    public void preload_medium_rect_Applovin() {
+    void preload_medium_rect_Applovin() {
         if (app_data != null && app_data.size() > 0) {
             if (isApplovin_Mediam_Ragtangal_Loaded) {
                 return;
@@ -1863,7 +1804,7 @@ public class AdsControl {
 
                 @Override
                 public void onAdLoaded(MaxAd maxAd) {
-                    Log.d("Parth", "Applovin mediam ragtangal Loadedd ");
+                    Log.d("Parth", "Applovin mediam ragtangal Loaded");
                     applovin_Medium_Ragtangal_adview = applovin_medium_rect;
                     isApplovin_Mediam_Ragtangal_Loaded = true;
                 }
@@ -1882,7 +1823,7 @@ public class AdsControl {
 
                 @Override
                 public void onAdLoadFailed(String s, MaxError maxError) {
-                    Log.d("Parth", "Applovin mediam ragtangal Failed");
+                    Log.d("Parth", "Applovin mediam ragtangal Failed " + maxError);
                     medium_rect_Ads();
                 }
 
@@ -1898,7 +1839,7 @@ public class AdsControl {
     }
 
     // Wortise Mode
-    public void preloadmedium_rect_Wortise() {
+    void preloadmedium_rect_Wortise() {
         if (app_data != null && app_data.size() > 0) {
             if (isWortise_medium_ragtangal_Loaded) {
                 return;
@@ -1921,7 +1862,7 @@ public class AdsControl {
 
                 @Override
                 public void onBannerFailed(@NonNull BannerAd bannerAd, @NonNull com.wortise.ads.AdError adError) {
-                    Log.d("Parth", "Wortise Medium Ragtangal onError: " + adError);
+                    Log.d("Parth", "Wortise Medium Ragtangal failed " + adError);
                     medium_rect_Ads();
                 }
             });
@@ -1933,33 +1874,30 @@ public class AdsControl {
     }
 
     // Local Mode
-    public void preloadmedium_rect_Local() {
+    void preloadmedium_rect_Local() {
         if (isLocal_medium_ragtangal_Loaded) {
             return;
         }
         isLocal_medium_ragtangal_Loaded = true;
     }
 
-    public void local_medium(ViewGroup local_medium) {
+    void local_medium(ViewGroup local_medium) {
         if (app_data != null && app_data.size() > 0) {
-            RelativeLayout local_banner_ad = (RelativeLayout) local_medium.findViewById(R.id.local_medium_ads);
-            ImageView app_banner = (ImageView) local_medium.findViewById(R.id.app_medium_banner);
+            RelativeLayout local_banner_ad = local_medium.findViewById(R.id.local_medium_ads);
+            ImageView app_banner = local_medium.findViewById(R.id.app_medium_banner);
             try {
                 Glide.with(activity).load(app_data.get(0).getNew_app_banner()).into(app_banner);
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
-            local_banner_ad.setOnClickListener(new View.OnClickListener() {
-                @SuppressLint("WrongConstant")
-                @Override
-                public void onClick(View view) {
-                    try {
-                        Intent intent = new Intent("android.intent.action.VIEW").setData(Uri.parse(app_data.get(0).getNew_app_link()));
-                        activity.startActivity(intent);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+            local_banner_ad.setOnClickListener(view -> {
+                try {
+                    Intent intent = new Intent("android.intent.action.VIEW").setData(Uri.parse(app_data.get(0).getNew_app_link()));
+                    activity.startActivity(intent);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
+            Log.d("Parth", "Local Medium Ragtangal Show ");
             isLocal_medium_ragtangal_Loaded = false;
             medium_rect_Ads();
         }
@@ -2007,7 +1945,7 @@ public class AdsControl {
 
     //-------------------------------------------- Inter Ads ----------------------------------------------------------------------------
     static getDataListner callback;
-    private int ad_inter_network = 0;
+    int ad_inter_network = 0;
 
     // TODO: 7/31/2023  Preload Inter Ads
     public void inter_Ads() {
@@ -2047,6 +1985,12 @@ public class AdsControl {
                                 }
                                 ad_inter_network++;
                                 break;
+                            case "inmobi":
+                                if (app_data.get(0).getInmobi_inter_id().size() > 0) {
+                                    Load_interAds_Inmobi();
+                                }
+                                ad_inter_network++;
+                                break;
                             case "local":
                                 Load_interAds_Local();
                                 ad_inter_network++;
@@ -2063,15 +2007,16 @@ public class AdsControl {
         }
     }
 
-    public static int current_admob_IntrId = 0;
-    public static int current_adx_IntrId = 0;
-    public static int current_fb_IntrId = 0;
-    public static int current_applovin_IntrId = 0;
-    public static int current_wortise_IntrId = 0;
+    int current_admob_IntrId = 0;
+    int current_adx_IntrId = 0;
+    int current_fb_IntrId = 0;
+    int current_applovin_IntrId = 0;
+    int current_wortise_IntrId = 0;
+    int current_inmobi_IntrId = 0;
 
     // TODO: 7/17/2023  Preload Inter Ads
     // Admob Mode
-    private void Load_interAds_Admob() {
+    void Load_interAds_Admob() {
         if (app_data != null && app_data.size() > 0) {
             if (isGoogleInterLoaded) {
                 return;
@@ -2088,7 +2033,6 @@ public class AdsControl {
                         @Override
                         public void onAdDismissedFullScreenContent() {
                             Log.d("Parth", "Admob Inter Close");
-//                            callback2.onSuccess();
                             if (callback != null) {
                                 callback.onSuccess();
                                 callback = null;
@@ -2096,7 +2040,7 @@ public class AdsControl {
                         }
 
                         @Override
-                        public void onAdFailedToShowFullScreenContent(com.google.android.gms.ads.AdError adError) {
+                        public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
                             Log.d("Parth", "Admob Inter failed to show" + adError.getMessage());
                         }
 
@@ -2121,7 +2065,7 @@ public class AdsControl {
     }
 
     // Adx Mode
-    private void Load_interAds_Adx() {
+    void Load_interAds_Adx() {
         if (app_data != null && app_data.size() > 0) {
             if (isAdxInterLoaded) {
                 return;
@@ -2146,7 +2090,7 @@ public class AdsControl {
                         }
 
                         @Override
-                        public void onAdFailedToShowFullScreenContent(com.google.android.gms.ads.AdError adError) {
+                        public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
                         }
 
                         @Override
@@ -2169,7 +2113,7 @@ public class AdsControl {
     }
 
     // FB Mode
-    private void Load_interAds_FB() {
+    void Load_interAds_FB() {
         if (app_data != null && app_data.size() > 0) {
             if (isFBInterLoaded) {
                 return;
@@ -2222,7 +2166,7 @@ public class AdsControl {
     }
 
     // Applovin Mode
-    private void Load_interAds_Applovin() {
+    void Load_interAds_Applovin() {
         if (app_data != null && app_data.size() > 0) {
             if (isApplovinInterLoaded) {
                 return;
@@ -2272,7 +2216,7 @@ public class AdsControl {
     }
 
     // Wortise Mode
-    private void Load_interAds_Wortise() {
+    void Load_interAds_Wortise() {
         if (app_data != null && app_data.size() > 0) {
             if (isWortiseInterLoaded) {
                 return;
@@ -2317,8 +2261,56 @@ public class AdsControl {
         }
     }
 
+    void Load_interAds_Inmobi() {
+        if (app_data != null && app_data.size() > 0) {
+            if (isInmobiInterLoaded) {
+                return;
+            }
+            final InMobiInterstitial inMobiInterstitial = new InMobiInterstitial(activity, current_inmobi_IntrId, new
+                    InterstitialAdEventListener() {
+                        @Override
+                        public void onAdFetchFailed(@NonNull InMobiInterstitial inMobiInterstitial, @NonNull InMobiAdRequestStatus inMobiAdRequestStatus) {
+                            super.onAdFetchFailed(inMobiInterstitial, inMobiAdRequestStatus);
+                        }
+
+                        @Override
+                        public void onAdFetchSuccessful(@NonNull InMobiInterstitial inMobiInterstitial, @NonNull AdMetaInfo adMetaInfo) {
+                            super.onAdFetchSuccessful(inMobiInterstitial, adMetaInfo);
+                        }
+
+                        public void onAdDismissed(@NonNull InMobiInterstitial ad) {
+                            Log.d("Parth", "Inmobi Inter ad Close.");
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
+                            }
+                        }
+
+                        @Override
+                        public void onAdLoadSucceeded(@NonNull InMobiInterstitial inMobiInterstitial, @NonNull AdMetaInfo adMetaInfo) {
+                            super.onAdLoadSucceeded(inMobiInterstitial, adMetaInfo);
+                            Log.d("Parth", "inmobi Inter ad Loaded.");
+                            Inmobi_inter = inMobiInterstitial;
+                            isInmobiInterLoaded = true;
+                        }
+
+                        @Override
+                        public void onAdLoadFailed(@NonNull InMobiInterstitial inMobiInterstitial, @NonNull InMobiAdRequestStatus inMobiAdRequestStatus) {
+                            super.onAdLoadFailed(inMobiInterstitial, inMobiAdRequestStatus);
+                            Log.d("Parth", "inmobi Inter ad Failed" + inMobiAdRequestStatus);
+                            inter_Ads();
+                        }
+                    });
+            inMobiInterstitial.load();
+            current_inmobi_IntrId++;
+            if (current_inmobi_IntrId == app_data.get(0).getInmobi_inter_id().size()) {
+                current_inmobi_IntrId = 0;
+            }
+        }
+    }
+
     // Local Mode
-    private void Load_interAds_Local() {
+    void Load_interAds_Local() {
         if (isLocalInterLoaded) {
             return;
         }
@@ -2340,6 +2332,8 @@ public class AdsControl {
                     show_Interstitial_Applovin(callback2);
                 } else if (isWortiseInterLoaded) {
                     show_Interstitial_Wortise(callback2);
+                } else if (isInmobiInterLoaded) {
+                    show_Interstitial_Inmobi(callback2);
                 } else if (isLocalInterLoaded) {
                     adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
                     if (adCounter == app_data.get(0).getInterCount()) {
@@ -2366,7 +2360,7 @@ public class AdsControl {
                         }
 
                         @Override
-                        public void onAdFailedToShowFullScreenContent(com.google.android.gms.ads.AdError adError) {
+                        public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
                             appopen_Ads();
                         }
 
@@ -2401,7 +2395,7 @@ public class AdsControl {
                         }
 
                         @Override
-                        public void onAdFailedToShowFullScreenContent(com.google.android.gms.ads.AdError adError) {
+                        public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
                             appopen_Ads();
                         }
 
@@ -2485,7 +2479,7 @@ public class AdsControl {
     }
 
     // Admob Mode
-    private void show_Interstitial_Admob(getDataListner Callback2) {
+    void show_Interstitial_Admob(getDataListner Callback2) {
         callback = Callback2;
         if (isGoogleInterLoaded) {
             adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
@@ -2503,65 +2497,15 @@ public class AdsControl {
                 }
             }
         } else {
-            if (app_data != null && app_data.size() > 0) {
-                String placementId = app_data.get(0).getAdmobInterid().get(current_admob_IntrId);
-                final AdRequest adRequest = new AdRequest.Builder().build();
-                InterstitialAd.load(activity, placementId, adRequest, new InterstitialAdLoadCallback() {
-                    @Override
-                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                        Log.d("Parth", "Admob Inter Loaded");
-                        adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
-                        if (adCounter == app_data.get(0).getInterCount() && interstitialAd != null) {
-                            Inter_Count.getInstance(activity).storeClicks(1);
-                            interstitialAd.show((Activity) activity);
-                            isGoogleInterLoaded = false;
-                            inter_Ads();
-                        } else {
-                            adCounter = adCounter + 1;
-                            Inter_Count.getInstance(activity).storeClicks(adCounter);
-                            if (callback != null) {
-                                callback.onSuccess();
-                                callback = null;
-                            }
-                        }
-                        interstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
-                            @Override
-                            public void onAdDismissedFullScreenContent() {
-                                Log.d("Parth", "Admob Inter Close");
-                                if (callback != null) {
-                                    callback.onSuccess();
-                                    callback = null;
-                                }
-                            }
-
-                            @Override
-                            public void onAdFailedToShowFullScreenContent(com.google.android.gms.ads.AdError adError) {
-                                Log.d("Parth", "Admob Inter failed to show" + adError.getMessage());
-                            }
-
-                            @Override
-                            public void onAdShowedFullScreenContent() {
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        Log.d("Parth", "Admob Inter Failed");
-                        isGoogleInterLoaded = false;
-                        inter_Ads();
-                    }
-                });
-                current_admob_IntrId++;
-                if (current_admob_IntrId == app_data.get(0).getAdmobInterid().size()) {
-                    current_admob_IntrId = 0;
-                }
+            if (callback != null) {
+                callback.onSuccess();
+                callback = null;
             }
         }
     }
 
     // Adx Mode
-    private void show_Interstitial_Adx(getDataListner myCallback2) {
+    void show_Interstitial_Adx(getDataListner myCallback2) {
         callback = myCallback2;
         if (isAdxInterLoaded) {
             adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
@@ -2579,65 +2523,15 @@ public class AdsControl {
                 }
             }
         } else {
-            if (app_data != null && app_data.size() > 0) {
-                String placementId = app_data.get(0).getAdxInterId().get(current_adx_IntrId);
-                final AdManagerAdRequest adRequest = new AdManagerAdRequest.Builder().build();
-                AdManagerInterstitialAd.load(activity, placementId, adRequest, new AdManagerInterstitialAdLoadCallback() {
-                    @Override
-                    public void onAdLoaded(@NonNull AdManagerInterstitialAd interstitialAd) {
-                        super.onAdLoaded(interstitialAd);
-                        Log.d("Parth", "Adx Inter Loaded");
-                        adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
-                        if (adCounter == app_data.get(0).getInterCount() && interstitialAd != null) {
-                            Inter_Count.getInstance(activity).storeClicks(1);
-                            interstitialAd.show((Activity) activity);
-                            isAdxInterLoaded = false;
-                            inter_Ads();
-                        } else {
-                            adCounter = adCounter + 1;
-                            Inter_Count.getInstance(activity).storeClicks(adCounter);
-                            if (callback != null) {
-                                callback.onSuccess();
-                                callback = null;
-                            }
-                        }
-                        interstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
-                            @Override
-                            public void onAdDismissedFullScreenContent() {
-                                Log.d("Parth", "Adx Inter Close");
-                                if (callback != null) {
-                                    callback.onSuccess();
-                                    callback = null;
-                                }
-                            }
-
-                            @Override
-                            public void onAdFailedToShowFullScreenContent(com.google.android.gms.ads.AdError adError) {
-                            }
-
-                            @Override
-                            public void onAdShowedFullScreenContent() {
-                            }
-                        });
-                    }
-
-                    @Override
-                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                        Log.d("Parth", "Adx Inter Failed");
-                        isAdxInterLoaded = false;
-                        inter_Ads();
-                    }
-                });
-                current_adx_IntrId++;
-                if (current_adx_IntrId == app_data.get(0).getAdxInterId().size()) {
-                    current_adx_IntrId = 0;
-                }
+            if (callback != null) {
+                callback.onSuccess();
+                callback = null;
             }
         }
     }
 
     // FB Mode
-    private void show_Interstitial_FB(getDataListner myCallback2) {
+    void show_Interstitial_FB(getDataListner myCallback2) {
         callback = myCallback2;
         if (isFBInterLoaded) {
             adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
@@ -2655,70 +2549,15 @@ public class AdsControl {
                 }
             }
         } else {
-            if (app_data != null && app_data.size() > 0) {
-                final com.facebook.ads.InterstitialAd FB_interstitial = new com.facebook.ads.InterstitialAd(activity, app_data.get(0).getFbInterId().get(current_fb_IntrId));
-                InterstitialAdListener interstitialAdListener = new InterstitialAdListener() {
-                    @Override
-                    public void onInterstitialDisplayed(Ad ad) {
-                        Log.d("Parth", "FB Interstitial ad displayed.");
-                    }
-
-                    @Override
-                    public void onInterstitialDismissed(Ad ad) {
-                        Log.d("Parth", "FB Inter ad Close.");
-                        if (callback != null) {
-                            callback.onSuccess();
-                            callback = null;
-                        }
-                    }
-
-                    @Override
-                    public void onError(Ad ad, AdError adError) {
-                        Log.d("Parth", "FB Inter Failed");
-                        isFBInterLoaded = false;
-                        inter_Ads();
-                    }
-
-                    @Override
-                    public void onAdLoaded(Ad ad) {
-                        Log.d("Parth", "FB Inter ad Loaded");
-                        adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
-                        if (adCounter == app_data.get(0).getInterCount() && FB_interstitial != null) {
-                            Inter_Count.getInstance(activity).storeClicks(1);
-                            FB_interstitial.show();
-                            isFBInterLoaded = false;
-                            inter_Ads();
-                        } else {
-                            adCounter = adCounter + 1;
-                            Inter_Count.getInstance(activity).storeClicks(adCounter);
-                            if (callback != null) {
-                                callback.onSuccess();
-                                callback = null;
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onAdClicked(Ad ad) {
-                        Log.d("Parth", "FB Interstitial ad clicked!");
-                    }
-
-                    @Override
-                    public void onLoggingImpression(Ad ad) {
-                        Log.d("Parth", "FB Interstitial ad impression logged!");
-                    }
-                };
-                FB_interstitial.loadAd(FB_interstitial.buildLoadAdConfig().withAdListener(interstitialAdListener).build());
-                current_fb_IntrId++;
-                if (current_fb_IntrId == app_data.get(0).getFbInterId().size()) {
-                    current_fb_IntrId = 0;
-                }
+            if (callback != null) {
+                callback.onSuccess();
+                callback = null;
             }
         }
     }
 
     // Applovin Mode
-    private void show_Interstitial_Applovin(getDataListner myCallback2) {
+    void show_Interstitial_Applovin(getDataListner myCallback2) {
         callback = myCallback2;
         if (isApplovinInterLoaded) {
             adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
@@ -2736,67 +2575,15 @@ public class AdsControl {
                 }
             }
         } else {
-            if (app_data != null && app_data.size() > 0) {
-                MaxInterstitialAd interstitialAdmax = new MaxInterstitialAd(app_data.get(0).getApplovin_interid().get(current_applovin_IntrId), (Activity) activity);
-                interstitialAdmax.setListener(new MaxAdListener() {
-                    @Override
-                    public void onAdLoaded(MaxAd ad) {
-                        Log.d("Parth", "Applovin Inter Loaded");
-                        adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
-                        if (adCounter == app_data.get(0).getInterCount() && interstitialAdmax != null) {
-                            Inter_Count.getInstance(activity).storeClicks(1);
-                            interstitialAdmax.showAd();
-                            isApplovinInterLoaded = false;
-                            inter_Ads();
-                        } else {
-                            adCounter = adCounter + 1;
-                            Inter_Count.getInstance(activity).storeClicks(adCounter);
-                            if (callback != null) {
-                                callback.onSuccess();
-                                callback = null;
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onAdDisplayed(MaxAd ad) {
-                    }
-
-                    @Override
-                    public void onAdHidden(MaxAd ad) {
-                        Log.d("Parth", "Applovin Inter Close");
-                        if (callback != null) {
-                            callback.onSuccess();
-                            callback = null;
-                        }
-                    }
-
-                    @Override
-                    public void onAdClicked(MaxAd ad) {
-                    }
-
-                    @Override
-                    public void onAdLoadFailed(String adUnitId, MaxError error) {
-                        Log.d("Parth", "Applovin Inter Failed");
-                        isApplovinInterLoaded = false;
-                        inter_Ads();
-                    }
-
-                    @Override
-                    public void onAdDisplayFailed(MaxAd ad, MaxError error) {
-                    }
-                });
-                interstitialAdmax.loadAd();
-                current_applovin_IntrId++;
-                if (current_applovin_IntrId == app_data.get(0).getApplovin_interid().size()) {
-                    current_applovin_IntrId = 0;
-                }
+            if (callback != null) {
+                callback.onSuccess();
+                callback = null;
             }
         }
     }
 
     // Wortise Mode
-    private void show_Interstitial_Wortise(getDataListner myCallback2) {
+    void show_Interstitial_Wortise(getDataListner myCallback2) {
         callback = myCallback2;
         if (isWortiseInterLoaded) {
             adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
@@ -2814,57 +2601,35 @@ public class AdsControl {
                 }
             }
         } else {
-            if (app_data != null && app_data.size() > 0) {
-                final com.wortise.ads.interstitial.InterstitialAd Wortise_inter_ad = new com.wortise.ads.interstitial.InterstitialAd(activity, app_data.get(0).getWortiseInterId().get(current_wortise_IntrId));
-                Wortise_inter_ad.loadAd();
-                Wortise_inter_ad.setListener(new com.wortise.ads.interstitial.InterstitialAd.Listener() {
-                    @Override
-                    public void onInterstitialClicked(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
-                    }
+            if (callback != null) {
+                callback.onSuccess();
+                callback = null;
+            }
+        }
+    }
 
-                    @Override
-                    public void onInterstitialDismissed(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
-                        Log.d("Parth", "Wortise Inter ad Close.");
-                        if (callback != null) {
-                            callback.onSuccess();
-                            callback = null;
-                        }
-                    }
-
-                    @Override
-                    public void onInterstitialFailed(@NonNull com.wortise.ads.interstitial.InterstitialAd ad, @NonNull com.wortise.ads.AdError error) {
-                        Log.d("Parth", "Wortise Inter Failed");
-                        isWortiseInterLoaded = false;
-                        inter_Ads();
-                    }
-
-                    @Override
-                    public void onInterstitialLoaded(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
-                        Log.d("Parth", "Wortise Inter ad Loaded.");
-                        adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
-                        if (adCounter == app_data.get(0).getInterCount() && Wortise_inter_ad != null) {
-                            Inter_Count.getInstance(activity).storeClicks(1);
-                            Wortise_inter_ad.showAd();
-                            isWortiseInterLoaded = false;
-                            inter_Ads();
-                        } else {
-                            adCounter = adCounter + 1;
-                            Inter_Count.getInstance(activity).storeClicks(adCounter);
-                            if (callback != null) {
-                                callback.onSuccess();
-                                callback = null;
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onInterstitialShown(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
-                    }
-                });
-                current_wortise_IntrId++;
-                if (current_wortise_IntrId == app_data.get(0).getWortiseInterId().size()) {
-                    current_wortise_IntrId = 0;
+    // Inmobi Mode
+    void show_Interstitial_Inmobi(getDataListner myCallback2) {
+        callback = myCallback2;
+        if (isInmobiInterLoaded) {
+            adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
+            if (adCounter == app_data.get(0).getInterCount() && Inmobi_inter != null) {
+                Inter_Count.getInstance(activity).storeClicks(1);
+                Inmobi_inter.show();
+                isInmobiInterLoaded = false;
+                inter_Ads();
+            } else {
+                adCounter = adCounter + 1;
+                Inter_Count.getInstance(activity).storeClicks(adCounter);
+                if (callback != null) {
+                    callback.onSuccess();
+                    callback = null;
                 }
+            }
+        } else {
+            if (callback != null) {
+                callback.onSuccess();
+                callback = null;
             }
         }
     }
@@ -2872,6 +2637,7 @@ public class AdsControl {
     // Local Mode
     static Animation animZoomIn;
 
+    @SuppressLint("SetTextI18n")
     private void show_Interstitial_local(getDataListner myCallback2) {
         callback = myCallback2;
         if (app_data != null && app_data.size() > 0) {
@@ -2880,17 +2646,17 @@ public class AdsControl {
             dialog.setContentView(view);
             dialog.setCancelable(false);
             Window window = dialog.getWindow();
-            window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+            Objects.requireNonNull(window).setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
             animZoomIn = AnimationUtils.loadAnimation(activity, R.anim.slide_in_bottom);
-            CardView cvTopAd = (CardView) dialog.findViewById(R.id.cvTopAd);
-            RelativeLayout lat1 = (RelativeLayout) dialog.findViewById(R.id.lat1);
-            TextView install = (TextView) dialog.findViewById(R.id.install);
-            LinearLayout ad_close = (LinearLayout) dialog.findViewById(R.id.ad_close);
-            TextView App_name = (TextView) dialog.findViewById(R.id.appname);
-            ImageView appicon = (ImageView) dialog.findViewById(R.id.app_icon);
-            ImageView ad_banner = (ImageView) dialog.findViewById(R.id.ad_banner);
-            TextView app_ad_body = (TextView) dialog.findViewById(R.id.ad_body);
+            CardView cvTopAd = dialog.findViewById(R.id.cvTopAd);
+            RelativeLayout lat1 = dialog.findViewById(R.id.lat1);
+            TextView install = dialog.findViewById(R.id.install);
+            LinearLayout ad_close = dialog.findViewById(R.id.ad_close);
+            TextView App_name = dialog.findViewById(R.id.appname);
+            ImageView appicon = dialog.findViewById(R.id.app_icon);
+            ImageView ad_banner = dialog.findViewById(R.id.ad_banner);
+            TextView app_ad_body = dialog.findViewById(R.id.ad_body);
             cvTopAd.startAnimation(animZoomIn);
             try {
                 Glide.with(activity).load(app_data.get(0).getNew_app_icon()).into(appicon);
@@ -2901,53 +2667,36 @@ public class AdsControl {
                 app_ad_body.setSelected(true);
                 install.setText("Install");
             } catch (Exception ignored) {
-                throw new RuntimeException(ignored);
             }
-            install.setOnClickListener(new View.OnClickListener() {
-                @SuppressLint("WrongConstant")
-                @Override
-                public void onClick(View v) {
-                    try {
-                        Intent intent = new Intent("android.intent.action.VIEW").setData(Uri.parse(app_data.get(0).getNew_app_link()));
-                        activity.startActivity(intent);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    dialog.dismiss();
+            install.setOnClickListener(v -> {
+                try {
+                    Intent intent = new Intent("android.intent.action.VIEW").setData(Uri.parse(app_data.get(0).getNew_app_link()));
+                    activity.startActivity(intent);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+                dialog.dismiss();
             });
 
-            lat1.setOnClickListener(new View.OnClickListener() {
-                @SuppressLint("WrongConstant")
-                @Override
-                public void onClick(View v) {
-                    try {
-                        Intent intent = new Intent("android.intent.action.VIEW");
-                        intent.setData(Uri.parse(app_data.get(0).getNew_app_link()));
-                        intent.addFlags(268435456);
-                        activity.startActivity(intent);
+            lat1.setOnClickListener(v -> {
+                try {
+                    Intent intent = new Intent("android.intent.action.VIEW");
+                    intent.setData(Uri.parse(app_data.get(0).getNew_app_link()));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    activity.startActivity(intent);
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    dialog.dismiss();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+                dialog.dismiss();
             });
 
-            ad_close.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dialog.dismiss();
-                }
-            });
+            ad_close.setOnClickListener(v -> dialog.dismiss());
 
-            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    if (callback != null) {
-                        callback.onSuccess();
-                        callback = null;
-                    }
+            dialog.setOnDismissListener(dialog1 -> {
+                if (callback != null) {
+                    callback.onSuccess();
+                    callback = null;
                 }
             });
             dialog.show();
@@ -2991,6 +2740,7 @@ public class AdsControl {
                     Log.d("Parth", "Admob Open Ad loaded");
                     admob_appOpenAd = appOpenAd;
                     appOpenAd.setFullScreenContentCallback(fullScreenContentCallback_admob);
+                    Log.d("Parth", "Admob Open Ad show");
                     appOpenAd.show((Activity) activity);
                 }
 
@@ -2999,7 +2749,7 @@ public class AdsControl {
                     Log.e("Parth", "Admob Open Failed" + loadAdError.getMessage());
                 }
             };
-            AppOpenAd.load(activity, app_data.get(0).getAdmobAppopenid(), getAdRequest(), 1, loadCallback);
+            AppOpenAd.load(activity, app_data.get(0).getAdmobAppopenid(), getAdRequest(), loadCallback);
         }
     }
 
@@ -3035,6 +2785,7 @@ public class AdsControl {
                     Log.d("Parth", "Adx Open Ad loaded");
                     adx_appOpenAd = appOpenAd;
                     appOpenAd.setFullScreenContentCallback(fullScreenContentCallback_adx);
+                    Log.d("Parth", "Adx Open Ad show");
                     appOpenAd.show((Activity) activity);
                 }
 
@@ -3043,7 +2794,7 @@ public class AdsControl {
                     Log.e("Parth", "Admob Open Failed" + loadAdError.getMessage());
                 }
             };
-            AppOpenAd.load(activity, app_data.get(0).getAdxAppopenId(), adManagerAdRequest(), 1, loadCallback);
+            AppOpenAd.load(activity, app_data.get(0).getAdxAppopenId(), adManagerAdRequest(), loadCallback);
         }
     }
 
@@ -3063,6 +2814,7 @@ public class AdsControl {
                     Log.d("Parth", "Wortise Open Ad loaded");
                     if (appOpenAd.isAvailable()) {
                         appOpenAd.showAd((Activity) activity);
+                        Log.d("Parth", "Wortise Open Ad show");
                     }
                 }
 
@@ -3090,7 +2842,7 @@ public class AdsControl {
         }
     }
 
-    // Applovin
+    // Applovin Appopen
     public void show_Applovin_Appopen(getDataListner dataListner) {
         callback = dataListner;
         if (app_data != null && app_data.size() > 0) {
@@ -3099,8 +2851,10 @@ public class AdsControl {
             applovin_appOpenAd.setListener(new MaxAdListener() {
                 @Override
                 public void onAdLoaded(MaxAd maxAd) {
+                    Log.d("Parth", "Applovin Open Ad loaded");
                     if (applovin_appOpenAd.isReady()) {
                         applovin_appOpenAd.showAd();
+                        Log.d("Parth", "Applovin Open Ad show");
                     } else {
                         applovin_appOpenAd.loadAd();
                     }
@@ -3112,7 +2866,7 @@ public class AdsControl {
 
                 @Override
                 public void onAdHidden(MaxAd maxAd) {
-                    Log.d("Parth", "Applovin Splash Close Open Ad");
+                    Log.d("Parth", "Applovin Close Open Ad");
                     if (callback != null) {
                         callback.onSuccess();
                         callback = null;
@@ -3139,7 +2893,8 @@ public class AdsControl {
         }
     }
 
-    // Local
+    // Local Appopen
+    @SuppressLint("SetTextI18n")
     public void show_local_Appopen(getDataListner callback2) {
         callback = callback2;
         if (app_data != null && app_data.size() > 0) {
@@ -3148,15 +2903,15 @@ public class AdsControl {
             dialog.setContentView(view);
             dialog.setCancelable(false);
             Window window = dialog.getWindow();
-            window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+            Objects.requireNonNull(window).setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-            RelativeLayout lay1 = (RelativeLayout) dialog.findViewById(R.id.llPersonalAd);
-            TextView install = (TextView) dialog.findViewById(R.id.install);
-            LinearLayout linearLayout = (LinearLayout) dialog.findViewById(R.id.ll_continue_app);
-            TextView App_name = (TextView) dialog.findViewById(R.id.txt_appname);
-            ImageView appicon = (ImageView) dialog.findViewById(R.id.app_icon);
-            ImageView ad_banner = (ImageView) dialog.findViewById(R.id.ad_banner);
-            TextView app_ad_body = (TextView) dialog.findViewById(R.id.ad_body);
+            RelativeLayout lay1 = dialog.findViewById(R.id.llPersonalAd);
+            TextView install = dialog.findViewById(R.id.install);
+            LinearLayout linearLayout = dialog.findViewById(R.id.ll_continue_app);
+            TextView App_name = dialog.findViewById(R.id.txt_appname);
+            ImageView appicon = dialog.findViewById(R.id.app_icon);
+            ImageView ad_banner = dialog.findViewById(R.id.ad_banner);
+            TextView app_ad_body = dialog.findViewById(R.id.ad_body);
             try {
                 Glide.with(activity).load(app_data.get(0).getNew_app_icon()).into(appicon);
                 Glide.with(activity).load(app_data.get(0).getNew_app_banner()).into(ad_banner);
@@ -3165,55 +2920,40 @@ public class AdsControl {
                 app_ad_body.setText(app_data.get(0).getNew_app_body());
                 app_ad_body.setSelected(true);
                 install.setText("Install");
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
-            install.setOnClickListener(new View.OnClickListener() {
-                @SuppressLint("WrongConstant")
-                @Override
-                public void onClick(View v) {
-                    try {
-                        Intent intent = new Intent("android.intent.action.VIEW");
-                        intent.setData(Uri.parse(app_data.get(0).getNew_app_link()));
-                        intent.addFlags(268435456);
-                        activity.startActivity(intent);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+            install.setOnClickListener(v -> {
+                try {
+                    Intent intent = new Intent("android.intent.action.VIEW");
+                    intent.setData(Uri.parse(app_data.get(0).getNew_app_link()));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    activity.startActivity(intent);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
 
-            lay1.setOnClickListener(new View.OnClickListener() {
-                @SuppressLint("WrongConstant")
-                @Override
-                public void onClick(View v) {
-                    try {
-                        Intent intent = new Intent("android.intent.action.VIEW");
-                        intent.setData(Uri.parse(app_data.get(0).getNew_app_link()));
-                        intent.addFlags(268435456);
-                        activity.startActivity(intent);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+            lay1.setOnClickListener(v -> {
+                try {
+                    Intent intent = new Intent("android.intent.action.VIEW");
+                    intent.setData(Uri.parse(app_data.get(0).getNew_app_link()));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    activity.startActivity(intent);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
 
-            linearLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dialog.dismiss();
-                }
-            });
+            linearLayout.setOnClickListener(v -> dialog.dismiss());
 
-            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    if (callback != null) {
-                        callback.onSuccess();
-                        callback = null;
-                    }
+            dialog.setOnDismissListener(dialog1 -> {
+                if (callback != null) {
+                    callback.onSuccess();
+                    callback = null;
                 }
             });
             dialog.show();
+            Log.d("Parth", "Local Open Ad show");
         }
     }
 
@@ -3227,7 +2967,7 @@ public class AdsControl {
     }
 
     // TODO: 8/22/2023  Appopen Inter Ads
-    private int ad_appopen_inter_network = 0;
+    int ad_appopen_inter_network = 0;
 
     private void appopen_Ads() {
         try {
@@ -3269,9 +3009,8 @@ public class AdsControl {
     }
 
     // Admob
-    public void get_admob_appopen_AdsLoad() {
+    void get_admob_appopen_AdsLoad() {
         if (app_data != null && app_data.size() > 0) {
-            // Admob Appopen
             if (isadmob_appopen_Loaded) {
                 return;
             }
@@ -3286,18 +3025,16 @@ public class AdsControl {
                 public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                     super.onAdFailedToLoad(loadAdError);
                     Log.e("Parth", "Admob Open Failed" + loadAdError.getMessage());
-                    isadmob_appopen_Loaded = false;
                     appopen_Ads();
                 }
             };
-            AppOpenAd.load(activity, app_data.get(0).getAdmobAppopenid(), getAdRequest(), 1, loadCallback);
+            AppOpenAd.load(activity, app_data.get(0).getAdmobAppopenid(), getAdRequest(), loadCallback);
         }
     }
 
     // Adx
-    public void get_adx_appopen_AdsLoad() {
+    void get_adx_appopen_AdsLoad() {
         if (app_data != null && app_data.size() > 0) {
-            // Adx Appopen
             if (isadx_appopen_Loaded) {
                 return;
             }
@@ -3312,18 +3049,16 @@ public class AdsControl {
                 public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                     super.onAdFailedToLoad(loadAdError);
                     Log.e("Parth", "Adx Open Failed" + loadAdError.getMessage());
-                    isadmob_appopen_Loaded = false;
                     appopen_Ads();
                 }
             };
-            AppOpenAd.load(activity, app_data.get(0).getAdxAppopenId(), adManagerAdRequest(), 1, loadCallback);
+            AppOpenAd.load(activity, app_data.get(0).getAdxAppopenId(), adManagerAdRequest(), loadCallback);
         }
     }
 
     // Wortise
-    public void get_wortise_appopen_AdsLoad() {
+    void get_wortise_appopen_AdsLoad() {
         if (app_data != null && app_data.size() > 0) {
-            // Wortise Appopen
             if (iswortise_appopen_Loaded) {
                 return;
             }
@@ -3343,7 +3078,6 @@ public class AdsControl {
 
                 @Override
                 public void onAppOpenFailed(@NonNull com.wortise.ads.appopen.AppOpenAd appOpenAd, @NonNull com.wortise.ads.AdError adError) {
-                    iswortise_appopen_Loaded = false;
                     appopen_Ads();
                 }
 
@@ -3366,7 +3100,7 @@ public class AdsControl {
     }
 
     // Applovin
-    public void get_applovin_appopen_AdsLoad() {
+    void get_applovin_appopen_AdsLoad() {
         if (app_data != null && app_data.size() > 0) {
             if (isapplovin_appopen_Loaded) {
                 return;
@@ -3402,11 +3136,6 @@ public class AdsControl {
                 @Override
                 public void onAdLoadFailed(String s, MaxError maxError) {
                     Log.e("Parth", "Applovin Failed Open Ad" + maxError.getMessage());
-                    if (callback != null) {
-                        callback.onSuccess();
-                        callback = null;
-                    }
-                    isapplovin_appopen_Loaded = false;
                     appopen_Ads();
 
                 }
@@ -3419,7 +3148,7 @@ public class AdsControl {
     }
 
     // Local
-    public void get_local_Appopen_AdLoad() {
+    void get_local_Appopen_AdLoad() {
         if (islocal_appopen_Loaded) {
             return;
         }
@@ -3427,7 +3156,8 @@ public class AdsControl {
     }
 
     // Local Appopen
-    public void show_local_Appopen_inter(getDataListner callback2) {
+    @SuppressLint("SetTextI18n")
+    private void show_local_Appopen_inter(getDataListner callback2) {
         callback = callback2;
         if (app_data != null && app_data.size() > 0) {
             Dialog dialog = new Dialog(activity, android.R.style.Theme_Translucent_NoTitleBar);
@@ -3435,15 +3165,15 @@ public class AdsControl {
             dialog.setContentView(view);
             dialog.setCancelable(false);
             Window window = dialog.getWindow();
-            window.setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+            Objects.requireNonNull(window).setLayout(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
             dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
-            RelativeLayout lay1 = (RelativeLayout) dialog.findViewById(R.id.llPersonalAd);
-            TextView install = (TextView) dialog.findViewById(R.id.install);
-            LinearLayout linearLayout = (LinearLayout) dialog.findViewById(R.id.ll_continue_app);
-            TextView App_name = (TextView) dialog.findViewById(R.id.txt_appname);
-            ImageView appicon = (ImageView) dialog.findViewById(R.id.app_icon);
-            ImageView ad_banner = (ImageView) dialog.findViewById(R.id.ad_banner);
-            TextView app_ad_body = (TextView) dialog.findViewById(R.id.ad_body);
+            RelativeLayout lay1 = dialog.findViewById(R.id.llPersonalAd);
+            TextView install = dialog.findViewById(R.id.install);
+            LinearLayout linearLayout = dialog.findViewById(R.id.ll_continue_app);
+            TextView App_name = dialog.findViewById(R.id.txt_appname);
+            ImageView appicon = dialog.findViewById(R.id.app_icon);
+            ImageView ad_banner = dialog.findViewById(R.id.ad_banner);
+            TextView app_ad_body = dialog.findViewById(R.id.ad_body);
             try {
                 Glide.with(activity).load(app_data.get(0).getNew_app_icon()).into(appicon);
                 Glide.with(activity).load(app_data.get(0).getNew_app_banner()).into(ad_banner);
@@ -3452,62 +3182,46 @@ public class AdsControl {
                 app_ad_body.setText(app_data.get(0).getNew_app_body());
                 app_ad_body.setSelected(true);
                 install.setText("Install");
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
-            install.setOnClickListener(new View.OnClickListener() {
-                @SuppressLint("WrongConstant")
-                @Override
-                public void onClick(View v) {
-                    try {
-                        Intent intent = new Intent("android.intent.action.VIEW");
-                        intent.setData(Uri.parse(app_data.get(0).getNew_app_link()));
-                        intent.addFlags(268435456);
-                        activity.startActivity(intent);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+            install.setOnClickListener(v -> {
+                try {
+                    Intent intent = new Intent("android.intent.action.VIEW");
+                    intent.setData(Uri.parse(app_data.get(0).getNew_app_link()));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    activity.startActivity(intent);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
 
-            lay1.setOnClickListener(new View.OnClickListener() {
-                @SuppressLint("WrongConstant")
-                @Override
-                public void onClick(View v) {
-                    try {
-                        Intent intent = new Intent("android.intent.action.VIEW");
-                        intent.setData(Uri.parse(app_data.get(0).getNew_app_link()));
-                        intent.addFlags(268435456);
-                        activity.startActivity(intent);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+            lay1.setOnClickListener(v -> {
+                try {
+                    Intent intent = new Intent("android.intent.action.VIEW");
+                    intent.setData(Uri.parse(app_data.get(0).getNew_app_link()));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    activity.startActivity(intent);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
 
-            linearLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dialog.dismiss();
-                }
-            });
+            linearLayout.setOnClickListener(v -> dialog.dismiss());
 
-            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    if (callback != null) {
-                        callback.onSuccess();
-                        callback = null;
-                    }
-                    islocal_appopen_Loaded = false;
-                    appopen_Ads();
+            dialog.setOnDismissListener(dialog1 -> {
+                if (callback != null) {
+                    callback.onSuccess();
+                    callback = null;
                 }
             });
             dialog.show();
+            islocal_appopen_Loaded = false;
+            appopen_Ads();
         }
     }
 
     // TODO: 8/10/2023  Splash Inter Ads
-    public void show_splash_inter(getDataListner callback3) {
+    void show_splash_inter(getDataListner callback3) {
         callback = callback3;
         if (app_data != null && app_data.size() > 0) {
             // Admob
@@ -3529,7 +3243,7 @@ public class AdsControl {
                         }
 
                         @Override
-                        public void onAdFailedToShowFullScreenContent(com.google.android.gms.ads.AdError adError) {
+                        public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
                             Log.d("Parth", "Admob Inter failed to show" + adError.getMessage());
                             if (callback != null) {
                                 callback.onSuccess();
@@ -3565,7 +3279,7 @@ public class AdsControl {
                                 }
 
                                 @Override
-                                public void onAdFailedToShowFullScreenContent(com.google.android.gms.ads.AdError adError) {
+                                public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
                                     Log.d("Parth", "Admob Inter failed to show" + adError.getMessage());
                                     if (callback != null) {
                                         callback.onSuccess();

@@ -105,6 +105,12 @@ public class Data {
     @SerializedName("wortise_native_id")
     @Expose
     private List<String> wortiseNativeId;
+    @SerializedName("inmobi_banner_id")
+    @Expose
+    private List<String> inmobi_banner_id;
+    @SerializedName("inmobi_inter_id")
+    @Expose
+    private List<String> inmobi_inter_id;
     @SerializedName("new_app_name")
     @Expose
     private String new_app_name;
@@ -452,6 +458,22 @@ public class Data {
 
     public void setWortiseNativeId(List<String> wortiseNativeId) {
         this.wortiseNativeId = wortiseNativeId;
+    }
+
+    public List<String> getInmobi_banner_id() {
+        return inmobi_banner_id;
+    }
+
+    public void setInmobi_banner_id(List<String> inmobi_banner_id) {
+        this.inmobi_banner_id = inmobi_banner_id;
+    }
+
+    public List<String> getInmobi_inter_id() {
+        return inmobi_inter_id;
+    }
+
+    public void setInmobi_inter_id(List<String> inmobi_inter_id) {
+        this.inmobi_inter_id = inmobi_inter_id;
     }
 
     public String getNew_app_name() {

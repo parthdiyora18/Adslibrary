@@ -25,6 +25,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.core.content.ContextCompat;
 
@@ -32,12 +33,10 @@ import com.ads.data.Api.APIClient;
 import com.ads.data.Api.APIInterface;
 import com.ads.data.Api.Recover;
 import com.ads.data.VPN_Block.Vpn_Block_Detector;
-import com.ads.data.VPN_Block.vpn_Block;
 import com.airbnb.lottie.LottieAnimationView;
 import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
-import com.google.android.play.core.tasks.OnFailureListener;
 import com.google.android.play.core.tasks.Task;
 
 import org.jetbrains.annotations.NotNull;
@@ -46,6 +45,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Objects;
 
 import retrofit2.Call;
 
@@ -61,7 +61,7 @@ public class Conts {
     public void networkinfo() {
         Dialog dialog = new Dialog(ctx, R.style.FullWidth_Dialog);
         dialog.requestWindowFeature(1);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.getWindow().setLayout(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         dialog.setCanceledOnTouchOutside(false);
         dialog.setCancelable(false);
@@ -102,7 +102,7 @@ public class Conts {
         lotti.playAnimation();
         dialog.findViewById(R.id.iv_vpn_close).setOnClickListener(view -> finishActivity((Activity) ctx));
         dialog.findViewById(R.id.tv_vpn_submit).setOnClickListener(view -> finishActivity((Activity) ctx));
-        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
         dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
         dialog.show();
         Window window = dialog.getWindow();
@@ -127,12 +127,9 @@ public class Conts {
                 onOpenReview(activity, activity.getPackageName());
             }
         });
-        requestReviewFlow.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(Exception exc) {
-                Activity activity = null;
-                onOpenReview(activity, activity.getPackageName());
-            }
+        requestReviewFlow.addOnFailureListener(exc -> {
+            Activity activity2 = null;
+            onOpenReview(activity2, activity2.getPackageName());
         });
     }
 
@@ -235,7 +232,7 @@ public class Conts {
     }
 
     // TODO: 7/24/2023  Debuug Mode
-    @SuppressLint("UseCompatLoadingForDrawables")
+    @SuppressLint({"UseCompatLoadingForDrawables", "SetTextI18n"})
     public void Debugging(getDataListner callback) {
         if (Settings.Secure.getInt(ctx.getContentResolver(), Settings.Global.ADB_ENABLED, 0) == 1) {
             // debugging enabled
@@ -256,14 +253,11 @@ public class Conts {
             detail.setText("Please Disable USB Debugging from your phone to use the app!");
             tv_vpn_submit.setText("Go To Disable");
             dialog.findViewById(R.id.iv_vpn_close).setOnClickListener(view -> finishActivity((Activity) ctx));
-            tv_vpn_submit.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS);
-                    ctx.startActivity(intent);
-                }
+            tv_vpn_submit.setOnClickListener(v -> {
+                Intent intent = new Intent(Settings.ACTION_APPLICATION_DEVELOPMENT_SETTINGS);
+                ctx.startActivity(intent);
             });
-            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
             dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
             dialog.show();
             Window window = dialog.getWindow();
@@ -274,28 +268,25 @@ public class Conts {
     }
 
     public void check_VPN_App(Activity activity, getDataListner callbak) {
-        new Vpn_Block_Detector(activity).detectvpnBlockers(new vpn_Block.VPNBlockerCallback() {
-            @Override
-            public void onResult(boolean vpnFound, vpn_Block.Info info) {
-                if (vpnFound) {
-                    Dialog dialog = new Dialog(ctx);
-                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                    dialog.setContentView(R.layout.all_app_dailog);
-                    dialog.setCancelable(false);
-                    LottieAnimationView lotti = dialog.findViewById(R.id.icon);
-                    lotti.setAnimation(R.raw.warning);
-                    lotti.loop(true);
-                    lotti.playAnimation();
-                    dialog.findViewById(R.id.iv_vpn_close).setOnClickListener(view -> finishActivity((Activity) ctx));
-                    dialog.findViewById(R.id.tv_vpn_submit).setOnClickListener(view -> finishActivity((Activity) ctx));
-                    dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-                    dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
-                    dialog.show();
-                    Window window = dialog.getWindow();
-                    window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-                } else {
-                    callbak.onSuccess();
-                }
+        new Vpn_Block_Detector(activity).detectvpnBlockers((vpnFound, info) -> {
+            if (vpnFound) {
+                Dialog dialog = new Dialog(ctx);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.all_app_dailog);
+                dialog.setCancelable(false);
+                LottieAnimationView lotti = dialog.findViewById(R.id.icon);
+                lotti.setAnimation(R.raw.warning);
+                lotti.loop(true);
+                lotti.playAnimation();
+                dialog.findViewById(R.id.iv_vpn_close).setOnClickListener(view -> finishActivity((Activity) ctx));
+                dialog.findViewById(R.id.tv_vpn_submit).setOnClickListener(view -> finishActivity((Activity) ctx));
+                Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
+                dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
+                dialog.show();
+                Window window = dialog.getWindow();
+                window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+            } else {
+                callbak.onSuccess();
             }
         });
     }
@@ -319,22 +310,14 @@ public class Conts {
         dialog.setCancelable(false);
         this.exit_dialog.setContentView(R.layout.exit_dg);
         AdsControl.getInstance(activity).show_native_ad(exit_dialog.findViewById(R.id.exit_native));
-        ((ImageView) this.exit_dialog.findViewById(R.id.continuee)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                exit_dialog.dismiss();
-            }
-        });
-        ((ImageView) this.exit_dialog.findViewById(R.id.exit)).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                exit_dialog.dismiss();
-                activity.finishAffinity();
-            }
+        ((ImageView) this.exit_dialog.findViewById(R.id.continuee)).setOnClickListener(v -> exit_dialog.dismiss());
+        ((ImageView) this.exit_dialog.findViewById(R.id.exit)).setOnClickListener(v -> {
+            exit_dialog.dismiss();
+            activity.finishAffinity();
         });
         this.exit_dialog.setCanceledOnTouchOutside(false);
         this.exit_dialog.setCancelable(false);
-        this.exit_dialog.getWindow().setSoftInputMode(3);
+        Objects.requireNonNull(this.exit_dialog.getWindow()).setSoftInputMode(3);
         this.exit_dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
         this.exit_dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));
         this.exit_dialog.show();
@@ -354,7 +337,7 @@ public class Conts {
     public void App_Data() {
         APIInterface apiInterface = APIClient.getClient().create(APIInterface.class);
         Call<Recover> call1 = apiInterface.getadsdetail(paksg, Service);
-        call1.enqueue(new retrofit2.Callback<Recover>() {
+        call1.enqueue(new retrofit2.Callback<>() {
             @Override
             public void onResponse(@NotNull Call<Recover> call, @NotNull retrofit2.Response<Recover> response) {
                 if (response.isSuccessful() && response.body() != null) {
@@ -369,7 +352,7 @@ public class Conts {
             }
 
             @Override
-            public void onFailure(Call<Recover> call, Throwable t) {
+            public void onFailure(@NonNull Call<Recover> call, Throwable t) {
                 call.cancel();
             }
         });
@@ -389,12 +372,8 @@ public class Conts {
 
     public static void openCustomTab(Activity activity, CustomTabsIntent customTabsIntent, Uri uri) {
         String packageName = "com.android.chrome";
-        if (packageName != null) {
-            customTabsIntent.intent.setPackage(packageName);
-            customTabsIntent.launchUrl(activity, uri);
-        } else {
-            activity.startActivity(new Intent(Intent.ACTION_VIEW, uri));
-        }
+        customTabsIntent.intent.setPackage(packageName);
+        customTabsIntent.launchUrl(activity, uri);
     }
 
     // TODO: 8/21/2023 Share App
