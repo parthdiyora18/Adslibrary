@@ -261,11 +261,11 @@ public class All_Type_Ads {
     @SuppressLint("SetTextI18n")
     public void show_local_native_banner_ad(ViewGroup native_banner_ad) {
         if (app_data != null && app_data.size() > 0) {
-            RelativeLayout custm_native = (RelativeLayout) native_banner_ad.findViewById(R.id.custm_native_ad);
-            ImageView app_icon_native = (ImageView) native_banner_ad.findViewById(R.id.ad_app_icon);
-            TextView app_name_native = (TextView) native_banner_ad.findViewById(R.id.ad_headline);
-            TextView app_ad_body = (TextView) native_banner_ad.findViewById(R.id.ad_body);
-            TextView ad_call_to_action = (TextView) native_banner_ad.findViewById(R.id.ad_call_to_action);
+            RelativeLayout custm_native = native_banner_ad.findViewById(R.id.custm_native_ad);
+            ImageView app_icon_native = native_banner_ad.findViewById(R.id.ad_app_icon);
+            TextView app_name_native = native_banner_ad.findViewById(R.id.ad_headline);
+            TextView app_ad_body = native_banner_ad.findViewById(R.id.ad_body);
+            TextView ad_call_to_action = native_banner_ad.findViewById(R.id.ad_call_to_action);
             try {
                 Glide.with(activity).load(app_data.get(0).getNew_app_icon()).into(app_icon_native);
                 app_name_native.setText(app_data.get(0).getNew_app_name());
@@ -349,11 +349,11 @@ public class All_Type_Ads {
     @SuppressLint("SetTextI18n")
     public void show_local_small_native(ViewGroup native_banner_ad) {
         if (app_data != null && app_data.size() > 0) {
-            RelativeLayout custm_native = (RelativeLayout) native_banner_ad.findViewById(R.id.custm_small_native_ad);
-            ImageView app_icon_native = (ImageView) native_banner_ad.findViewById(R.id.ad_app_icon);
-            TextView app_name_native = (TextView) native_banner_ad.findViewById(R.id.ad_Tital);
-            TextView app_ad_body = (TextView) native_banner_ad.findViewById(R.id.ad_body);
-            TextView ad_call_to_action = (TextView) native_banner_ad.findViewById(R.id.ad_call_to_action);
+            RelativeLayout custm_native = native_banner_ad.findViewById(R.id.custm_small_native_ad);
+            ImageView app_icon_native = native_banner_ad.findViewById(R.id.ad_app_icon);
+            TextView app_name_native = native_banner_ad.findViewById(R.id.ad_Tital);
+            TextView app_ad_body = native_banner_ad.findViewById(R.id.ad_body);
+            TextView ad_call_to_action = native_banner_ad.findViewById(R.id.ad_call_to_action);
             try {
                 Glide.with(activity).load(app_data.get(0).getNew_app_icon()).into(app_icon_native);
                 app_name_native.setText(app_data.get(0).getNew_app_name());
@@ -439,12 +439,12 @@ public class All_Type_Ads {
     public void show_local_native(ViewGroup banner_container) {
         if (app_data != null && app_data.size() > 0) {
             if (AdsControl.isLocal_Native_Loaded) {
-                RelativeLayout custm_native = (RelativeLayout) banner_container.findViewById(R.id.custm_native_ad);
-                ImageView app_icon_native = (ImageView) banner_container.findViewById(R.id.ad_app_icon);
-                TextView app_name_native = (TextView) banner_container.findViewById(R.id.ad_headline);
-                ImageView app_banner = (ImageView) banner_container.findViewById(R.id.ad_banner);
-                TextView app_ad_body = (TextView) banner_container.findViewById(R.id.ad_body);
-                TextView ad_call_to_action = (TextView) banner_container.findViewById(R.id.ad_call_to_action);
+                RelativeLayout custm_native = banner_container.findViewById(R.id.custm_native_ad);
+                ImageView app_icon_native = banner_container.findViewById(R.id.ad_app_icon);
+                TextView app_name_native = banner_container.findViewById(R.id.ad_headline);
+                ImageView app_banner = banner_container.findViewById(R.id.ad_banner);
+                TextView app_ad_body = banner_container.findViewById(R.id.ad_body);
+                TextView ad_call_to_action = banner_container.findViewById(R.id.ad_call_to_action);
                 try {
                     Glide.with(activity).load(app_data.get(0).getNew_app_icon()).into(app_icon_native);
                     Glide.with(activity).load(app_data.get(0).getNew_app_banner()).into(app_banner);

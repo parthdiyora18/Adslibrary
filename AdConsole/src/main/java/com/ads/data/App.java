@@ -1,6 +1,5 @@
 package com.ads.data;
 
-
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.BroadcastReceiver;
@@ -31,7 +30,7 @@ public class App extends Application {
         _instance = this;
         MobileAds.initialize(this, initializationStatus -> {
         });
-        AudienceNetworkAds.initialize(this);
+        AudienceNetworkAds.initialize(_instance);
         AppLovinSdk.getInstance(_instance).isInitialized();
         AppLovinSdk.getInstance(_instance).setMediationProvider("max");
         AppLovinSdk.initializeSdk(_instance, configuration -> {
@@ -39,8 +38,7 @@ public class App extends Application {
         JSONObject consentObject = new JSONObject();
         try {
             consentObject.put(InMobiSdk.IM_GDPR_CONSENT_AVAILABLE, true);
-            consentObject.put("gdpr", "0");
-            consentObject.put(InMobiSdk.IM_GDPR_CONSENT_IAB, false);
+            consentObject.put("gdpr", "1");
         } catch (JSONException e) {
             e.printStackTrace();
         }

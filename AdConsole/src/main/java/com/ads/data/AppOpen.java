@@ -60,7 +60,7 @@ public class AppOpen implements LifecycleObserver, Application.ActivityLifecycle
         appopen_Ads();
     }
 
-    public static int ad_openad_network = 0;
+    int ad_openad_network = 0;
 
     public void appopen_Ads() {
         try {

@@ -19,13 +19,21 @@
         android:orientation="vertical">
 
         <ImageView
-            android:layout_width="12dp"
-            android:layout_height="12dp"
+            android:id="@+id/ad_close"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_alignParentEnd="true"
-            android:src="@drawable/g_ad_icon"
-            android:layout_marginEnd="5dp"
-            android:layout_marginTop="5dp"
-            tools:ignore="RtlCompat" />
+            android:layout_gravity="end"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/round_bg"
+            android:padding="2dp"
+            android:src="@drawable/ic_close_white"
+            android:visibility="invisible"
+            app:tint="#000"
+            tools:ignore="ContentDescription" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cvTopAd"
@@ -59,15 +67,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
+                    android:layout_marginTop="160dp"
                     app:cardCornerRadius="@dimen/_20sdp"
-                    app:cardElevation="7dp"
-                    android:layout_marginTop="160dp">
+                    app:cardElevation="7dp">
 
                     <ImageView
                         android:id="@+id/app_icon"
                         android:layout_width="@dimen/_120sdp"
                         android:layout_height="@dimen/_120sdp"
-                        android:scaleType="fitXY"/>
+                        android:scaleType="fitXY" />
                 </androidx.cardview.widget.CardView>
 
                 <RelativeLayout
@@ -225,43 +233,21 @@
 
                     <LinearLayout
                         android:id="@+id/adPersonalLlCloseInstallBtns"
-                        android:layout_width="wrap_content"
-                        android:layout_height="@dimen/_30sdp"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
                         android:layout_centerHorizontal="true"
                         android:layout_gravity="bottom"
                         android:layout_margin="10dp"
                         android:gravity="center_vertical"
                         android:orientation="horizontal">
 
-                        <LinearLayout
-                            android:id="@+id/ad_close"
-                            android:layout_width="@dimen/_90sdp"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:layout_marginRight="@dimen/_4sdp"
-                            android:layout_weight="1"
-                            android:background="@drawable/round_bg"
-                            android:gravity="center"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:layout_width="@dimen/_90sdp"
-                                android:layout_height="@dimen/_30sdp"
-                                android:layout_gravity="center"
-                                android:gravity="center"
-                                android:text="Close"
-                                android:textColor="@color/black"
-                                android:textSize="15sp"
-                                tools:ignore="SmallSp" />
-                        </LinearLayout>
-
                         <androidx.cardview.widget.CardView
                             android:id="@+id/btn"
-                            android:layout_width="@dimen/_90sdp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="3dp"
                             app:cardBackgroundColor="#388E3C"
-                            app:cardCornerRadius="5dp"
+                            app:cardCornerRadius="30dp"
                             app:cardElevation="3dp"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -270,7 +256,7 @@
 
                             <TextView
                                 android:id="@+id/install"
-                                android:layout_width="@dimen/_90sdp"
+                                android:layout_width="match_parent"
                                 android:layout_height="@dimen/_30sdp"
                                 android:layout_gravity="center"
                                 android:gravity="center"

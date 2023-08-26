@@ -21,6 +21,6 @@ public class Secound_Activity extends AppCompatActivity {
         AdsControl.getInstance(Secound_Activity.this).show_small_native_banner_ad(findViewById(R.id.small_native_banner_ads));
         findViewById(R.id.btn).setOnClickListener(v ->
                 AdsControl.getInstance(Secound_Activity.this).show_Interstitial(() ->
-                Toast.makeText(Secound_Activity.this, "Show Inter", Toast.LENGTH_SHORT).show()));
+                        Toast.makeText(Secound_Activity.this, "Show Inter", Toast.LENGTH_SHORT).show()));
     }
 }

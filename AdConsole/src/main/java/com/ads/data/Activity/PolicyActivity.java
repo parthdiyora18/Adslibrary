@@ -28,7 +28,7 @@ public class PolicyActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Conts.StatusBar(this);
         setContentView(R.layout.activity_privacypolicy);
-        webPrivacyPolicy = (WebView) findViewById(R.id.wvPrivacyPolicy);
+        webPrivacyPolicy = findViewById(R.id.wvPrivacyPolicy);
         WebSettings webSettings = webPrivacyPolicy.getSettings();
         webSettings.setJavaScriptEnabled(true);// enable javascript
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
@@ -49,7 +49,6 @@ public class PolicyActivity extends AppCompatActivity {
                 startActivity(intent);
                 return true;
             }
-
             public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
                 Toast.makeText(PolicyActivity.this, description, Toast.LENGTH_SHORT).show();
             }

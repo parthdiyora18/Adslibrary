@@ -169,7 +169,7 @@ public class Conts {
         dialog.setCancelable(false);
         dialog.findViewById(R.id.iv_close).setOnClickListener(view -> dialog.dismiss());
         dialog.findViewById(R.id.tv_submit).setOnClickListener(view -> dialog.dismiss());
-        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
         dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
         dialog.show();
         Window window = dialog.getWindow();
@@ -183,7 +183,7 @@ public class Conts {
         dialog.setCancelable(false);
         dialog.findViewById(R.id.iv_close).setOnClickListener(view -> dialog.dismiss());
         dialog.findViewById(R.id.tv_submit).setOnClickListener(view -> dialog.dismiss());
-        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawableResource(android.R.color.transparent);
         dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation;
         dialog.show();
         Window window = dialog.getWindow();

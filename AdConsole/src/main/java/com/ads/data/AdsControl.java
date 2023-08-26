@@ -2652,7 +2652,7 @@ public class AdsControl {
             CardView cvTopAd = dialog.findViewById(R.id.cvTopAd);
             RelativeLayout lat1 = dialog.findViewById(R.id.lat1);
             TextView install = dialog.findViewById(R.id.install);
-            LinearLayout ad_close = dialog.findViewById(R.id.ad_close);
+            ImageView ad_close = dialog.findViewById(R.id.ad_close);
             TextView App_name = dialog.findViewById(R.id.appname);
             ImageView appicon = dialog.findViewById(R.id.app_icon);
             ImageView ad_banner = dialog.findViewById(R.id.ad_banner);
@@ -2684,15 +2684,15 @@ public class AdsControl {
                     intent.setData(Uri.parse(app_data.get(0).getNew_app_link()));
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     activity.startActivity(intent);
-
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
                 dialog.dismiss();
             });
-
-            ad_close.setOnClickListener(v -> dialog.dismiss());
-
+            new Handler().postDelayed(() -> {
+                ad_close.setVisibility(View.VISIBLE);
+                ad_close.setOnClickListener(v -> dialog.dismiss());
+            }, 2500);
             dialog.setOnDismissListener(dialog1 -> {
                 if (callback != null) {
                     callback.onSuccess();
@@ -2788,7 +2788,6 @@ public class AdsControl {
                     Log.d("Parth", "Adx Open Ad show");
                     appOpenAd.show((Activity) activity);
                 }
-
                 public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                     super.onAdFailedToLoad(loadAdError);
                     Log.e("Parth", "Admob Open Failed" + loadAdError.getMessage());
