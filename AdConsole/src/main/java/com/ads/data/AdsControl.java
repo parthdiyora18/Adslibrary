@@ -97,7 +97,6 @@ public class AdsControl {
     public static boolean isApplovinBannerLoaded;
     public static boolean isWortiseBannerLoaded;
     public static boolean isInmobiBannerLoaded;
-    public static boolean isLocal_BannerLoaded;
     public static AdView googleBannerAd;
     public static AdManagerAdView adxBannerAd;
     public static com.facebook.ads.AdView fbadView;
@@ -112,7 +111,6 @@ public class AdsControl {
     public static boolean isFB_Mediam_Ragtangal_Loaded;
     public static boolean isApplovin_Mediam_Ragtangal_Loaded;
     public static boolean isWortise_medium_ragtangal_Loaded;
-    public static boolean isLocal_medium_ragtangal_Loaded;
     public static AdView admobMediam_Ragtangal;
     public static AdManagerAdView adxMediam_Ragtangal;
     public static com.facebook.ads.AdView fb_Ragtangal_adView;
@@ -252,22 +250,22 @@ public class AdsControl {
                                             conts.check_VPN_App(activity, () -> {
                                                 if (isBeingDebugged && app_data.get(0).isDev_option()) {
                                                     Conts conts1 = new Conts(activity);
-                                                    conts1.Debugging(() -> call(Callback));
+                                                    conts1.Debugging(() -> preload_ads_call(Callback));
                                                 } else {
-                                                    call(Callback);
+                                                    preload_ads_call(Callback);
                                                 }
                                             });
                                         } else {
                                             if (isBeingDebugged && app_data.get(0).isDev_option()) {
                                                 Conts conts1 = new Conts(activity);
-                                                conts1.Debugging(() -> call(Callback));
+                                                conts1.Debugging(() -> preload_ads_call(Callback));
                                             } else {
-                                                call(Callback);
+                                                preload_ads_call(Callback);
                                             }
                                         }
                                     }
                                 } else {
-                                    With_out(Callback);
+                                    preload_ads_call(Callback);
                                     Toast.makeText(activity, "Server not Response", Toast.LENGTH_SHORT).show();
                                 }
                             }
@@ -276,7 +274,7 @@ public class AdsControl {
                         @Override
                         public void onFailure(@NonNull Call<Recover> call, @NonNull Throwable t) {
                             call.cancel();
-                            With_out(Callback);
+                            preload_ads_call(Callback);
                         }
                     });
                 }
@@ -297,36 +295,47 @@ public class AdsControl {
         return activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
     }
 
-    private void call(getDataListner Callback) {
-        if (app_data.get(0).isAds_show()) {
-            if (app_data.get(0).getAd_native_type().equalsIgnoreCase("mrec")) {
-                medium_rect_Ads();
+    // TODO: 8/29/2023  Preload ads
+    private void preload_ads_call(getDataListner myCallback) {
+        if (app_data != null && app_data.size() > 0) {
+            if (app_data.get(0).isAds_show()) {
+                if (app_data.get(0).isPreload_native_ads()) {
+                    if (app_data.get(0).getAd_native_type().equalsIgnoreCase("mrec")) {
+                        medium_rect_Ads();
+                    } else {
+                        native_Ads();
+                    }
+                    small_native_banner_Ads();
+                    small_native_Ads();
+                }
+                if (app_data.get(0).isPreload_inter_ads()) {
+                    if (app_data.get(0).getAd_inter_type().equalsIgnoreCase("appopen")) {
+                        appopen_Ads();
+                    } else {
+                        inter_Ads();
+                    }
+                }
+                if (app_data.get(0).isPreload_banner_ads()) {
+                    banner_Ads();
+                }
+                call(myCallback);
             } else {
-                native_Ads();
+                call(myCallback);
             }
-            if (app_data.get(0).getAd_inter_type().equalsIgnoreCase("appopen")) {
-                appopen_Ads();
-            } else {
-                inter_Ads();
-            }
-            banner_Ads();
-            small_native_Ads();
-            small_native_banner_Ads();
-            With_out(Callback);
         } else {
-            With_out(Callback);
+            call(myCallback);
         }
     }
 
     // TODO: 7/17/2023 Call Intent
-    private void With_out(getDataListner myCallback) {
+    private void call(getDataListner myCallback) {
         try {
             if (app_data != null && app_data.size() > 0) {
                 if (app_data.get(0).isAds_show()) {
                     String adnetwork = app_data.get(0).getAdSplash();
                     switch (adnetwork) {
                         case "native":
-                            new Handler().postDelayed(() -> open_native(myCallback), 2500);
+                            new Handler().postDelayed(() -> open_native(myCallback), 3000);
                             break;
                         case "inter":
                             AdsControl.getInstance(activity).show_splash_inter(() -> Next_Call(myCallback));
@@ -347,12 +356,12 @@ public class AdsControl {
                             AdsControl.getInstance(activity).show_local_Appopen(() -> Next_Call(myCallback));
                             break;
                         case "off":
-                            new Handler().postDelayed(() -> Next_Call(myCallback), 2500);
+                            Next_Call(myCallback);
                             break;
                         default:
                     }
                 } else {
-                    new Handler().postDelayed(() -> Next_Call(myCallback), 2500);
+                    Next_Call(myCallback);
                 }
             }
         } catch (Exception e) {
@@ -425,7 +434,7 @@ public class AdsControl {
     }
 
     private void Next_Call(getDataListner myCallback) {
-        myCallback.onSuccess();
+        new Handler().postDelayed(myCallback::onSuccess, 3000);
     }
 
     //-------------------------------------------------------- Banner Ads -------------------------------------------------------
@@ -476,10 +485,6 @@ public class AdsControl {
                                 }
                                 ad_banner_network++;
                                 break;
-                            case "local":
-                                preload_local_Banner_ad();
-                                ad_banner_network++;
-                                break;
                             default:
                         }
                         if (ad_banner_network == adnetwork.length) {
@@ -507,29 +512,32 @@ public class AdsControl {
             if (isGoogleBannerLoaded) {
                 return;
             }
-            final AdView admob_Banner = new AdView(activity);
-            admob_Banner.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(activity, AdSize.FULL_WIDTH));
-            admob_Banner.setAdUnitId(app_data.get(0).getAdmobBannerid().get(current_admob_BannerId));
-            AdRequest adRequest = new AdRequest.Builder().build();
-            admob_Banner.loadAd(adRequest);
-            admob_Banner.setAdListener(new AdListener() {
-                @Override
-                public void onAdLoaded() {
-                    Log.d("Parth", "Admob Banner Loadedd ");
-                    googleBannerAd = admob_Banner;
-                    isGoogleBannerLoaded = true;
-                }
+            String placementId = app_data.get(0).getAdmobBannerid().get(current_admob_BannerId);
+            if (!placementId.equalsIgnoreCase("")) {
+                final AdView admob_Banner = new AdView(activity);
+                admob_Banner.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(activity, AdSize.FULL_WIDTH));
+                admob_Banner.setAdUnitId(placementId);
+                AdRequest adRequest = new AdRequest.Builder().build();
+                admob_Banner.loadAd(adRequest);
+                admob_Banner.setAdListener(new AdListener() {
+                    @Override
+                    public void onAdLoaded() {
+                        Log.d("Parth", "Admob Banner Loadedd ");
+                        googleBannerAd = admob_Banner;
+                        isGoogleBannerLoaded = true;
+                    }
 
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError adError) {
-                    super.onAdFailedToLoad(adError);
-                    Log.d("Parth", "Admob Banner Failed");
-                    banner_Ads();
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError adError) {
+                        super.onAdFailedToLoad(adError);
+                        Log.d("Parth", "Admob Banner Failed" + adError.getMessage());
+                        banner_Ads();
+                    }
+                });
+                current_admob_BannerId++;
+                if (current_admob_BannerId == app_data.get(0).getAdmobBannerid().size()) {
+                    current_admob_BannerId = 0;
                 }
-            });
-            current_admob_BannerId++;
-            if (current_admob_BannerId == app_data.get(0).getAdmobBannerid().size()) {
-                current_admob_BannerId = 0;
             }
         }
     }
@@ -541,31 +549,33 @@ public class AdsControl {
             if (isAdxBannerLoaded) {
                 return;
             }
-            final AdManagerAdView adx_Banner = new AdManagerAdView(activity);
-            adx_Banner.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(activity, AdSize.FULL_WIDTH));
-            adx_Banner.setAdUnitId(app_data.get(0).getAdxBannerId().get(current_adx_BannerId));
-            @SuppressLint("VisibleForTests") AdManagerAdRequest adRequest = new AdManagerAdRequest.Builder().build();
-            adx_Banner.loadAd(adRequest);
-            adx_Banner.setAdListener(new AdListener() {
-                @Override
-                public void onAdLoaded() {
-                    super.onAdLoaded();
-                    Log.d("Parth", "Adx Banner Loadedd ");
-                    adxBannerAd = adx_Banner;
-                    isAdxBannerLoaded = true;
-                }
+            String placementId = app_data.get(0).getAdxBannerId().get(current_adx_BannerId);
+            if (!placementId.equalsIgnoreCase("")) {
+                final AdManagerAdView adx_Banner = new AdManagerAdView(activity);
+                adx_Banner.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(activity, AdSize.FULL_WIDTH));
+                adx_Banner.setAdUnitId(placementId);
+                @SuppressLint("VisibleForTests") AdManagerAdRequest adRequest = new AdManagerAdRequest.Builder().build();
+                adx_Banner.loadAd(adRequest);
+                adx_Banner.setAdListener(new AdListener() {
+                    @Override
+                    public void onAdLoaded() {
+                        super.onAdLoaded();
+                        Log.d("Parth", "Adx Banner Loadedd ");
+                        adxBannerAd = adx_Banner;
+                        isAdxBannerLoaded = true;
+                    }
 
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    super.onAdFailedToLoad(loadAdError);
-                    Log.d("Parth", "Adx Banner Failed");
-                    banner_Ads();
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        super.onAdFailedToLoad(loadAdError);
+                        Log.d("Parth", "Adx Banner Failed" + loadAdError.getMessage());
+                        banner_Ads();
+                    }
+                });
+                current_adx_BannerId++;
+                if (current_adx_BannerId == app_data.get(0).getAdxBannerId().size()) {
+                    current_adx_BannerId = 0;
                 }
-
-            });
-            current_adx_BannerId++;
-            if (current_adx_BannerId == app_data.get(0).getAdxBannerId().size()) {
-                current_adx_BannerId = 0;
             }
         }
     }
@@ -576,34 +586,37 @@ public class AdsControl {
             if (isFBBannerLoaded) {
                 return;
             }
-            final com.facebook.ads.AdView fb_banner = new com.facebook.ads.AdView(activity, app_data.get(0).getFbBannerId().get(current_fb_BannerId), com.facebook.ads.AdSize.BANNER_HEIGHT_50);
-            com.facebook.ads.AdListener adListener = new com.facebook.ads.AdListener() {
+            String placementId = app_data.get(0).getFbBannerId().get(current_fb_BannerId);
+            if (!placementId.equalsIgnoreCase("")) {
+                final com.facebook.ads.AdView fb_banner = new com.facebook.ads.AdView(activity, placementId, com.facebook.ads.AdSize.BANNER_HEIGHT_50);
+                com.facebook.ads.AdListener adListener = new com.facebook.ads.AdListener() {
 
-                @Override
-                public void onAdLoaded(Ad ad) {
-                    Log.d("Parth", "Fb Banner Loadedd ");
-                    fbadView = fb_banner;
-                    isFBBannerLoaded = true;
-                }
+                    @Override
+                    public void onAdLoaded(Ad ad) {
+                        Log.d("Parth", "Fb Banner Loadedd ");
+                        fbadView = fb_banner;
+                        isFBBannerLoaded = true;
+                    }
 
-                @Override
-                public void onError(Ad ad, AdError adError) {
-                    Log.d("Parth", "FB Banner Failed");
-                    banner_Ads();
-                }
+                    @Override
+                    public void onError(Ad ad, AdError adError) {
+                        Log.d("Parth", "FB Banner Failed" + adError.getErrorMessage());
+                        banner_Ads();
+                    }
 
-                @Override
-                public void onAdClicked(Ad ad) {
-                }
+                    @Override
+                    public void onAdClicked(Ad ad) {
+                    }
 
-                @Override
-                public void onLoggingImpression(Ad ad) {
+                    @Override
+                    public void onLoggingImpression(Ad ad) {
+                    }
+                };
+                fb_banner.loadAd(fb_banner.buildLoadAdConfig().withAdListener(adListener).build());
+                current_fb_BannerId++;
+                if (current_fb_BannerId == app_data.get(0).getFbBannerId().size()) {
+                    current_fb_BannerId = 0;
                 }
-            };
-            fb_banner.loadAd(fb_banner.buildLoadAdConfig().withAdListener(adListener).build());
-            current_fb_BannerId++;
-            if (current_fb_BannerId == app_data.get(0).getFbBannerId().size()) {
-                current_fb_BannerId = 0;
             }
         }
     }
@@ -614,50 +627,53 @@ public class AdsControl {
             if (isApplovinBannerLoaded) {
                 return;
             }
-            final MaxAdView applo_banner_ad = new MaxAdView(app_data.get(0).getApplovin_banner_id().get(current_applovin_BannerId), activity);
-            applo_banner_ad.setLayoutParams(new ViewGroup.LayoutParams(320, 50));
-            applo_banner_ad.setListener(new MaxAdViewAdListener() {
-                @Override
-                public void onAdExpanded(MaxAd maxAd) {
-                }
+            String placementId = app_data.get(0).getApplovin_banner_id().get(current_applovin_BannerId);
+            if (!placementId.equalsIgnoreCase("")) {
+                final MaxAdView applo_banner_ad = new MaxAdView(placementId, activity);
+                applo_banner_ad.setLayoutParams(new ViewGroup.LayoutParams(320, 50));
+                applo_banner_ad.setListener(new MaxAdViewAdListener() {
+                    @Override
+                    public void onAdExpanded(MaxAd maxAd) {
+                    }
 
-                @Override
-                public void onAdCollapsed(MaxAd maxAd) {
-                }
+                    @Override
+                    public void onAdCollapsed(MaxAd maxAd) {
+                    }
 
-                @Override
-                public void onAdLoaded(MaxAd maxAd) {
-                    Log.d("Parth", "Applovin Banner Loadedd ");
-                    applovin_banner_ad = applo_banner_ad;
-                    isApplovinBannerLoaded = true;
-                }
+                    @Override
+                    public void onAdLoaded(MaxAd maxAd) {
+                        Log.d("Parth", "Applovin Banner Loadedd ");
+                        applovin_banner_ad = applo_banner_ad;
+                        isApplovinBannerLoaded = true;
+                    }
 
-                @Override
-                public void onAdDisplayed(MaxAd maxAd) {
-                }
+                    @Override
+                    public void onAdDisplayed(MaxAd maxAd) {
+                    }
 
-                @Override
-                public void onAdHidden(MaxAd maxAd) {
-                }
+                    @Override
+                    public void onAdHidden(MaxAd maxAd) {
+                    }
 
-                @Override
-                public void onAdClicked(MaxAd maxAd) {
-                }
+                    @Override
+                    public void onAdClicked(MaxAd maxAd) {
+                    }
 
-                @Override
-                public void onAdLoadFailed(String s, MaxError maxError) {
-                    Log.d("Parth", "Applovin Banner Failed");
-                    banner_Ads();
-                }
+                    @Override
+                    public void onAdLoadFailed(String s, MaxError maxError) {
+                        Log.d("Parth", "Applovin Banner Failed" + maxError.getMessage());
+                        banner_Ads();
+                    }
 
-                @Override
-                public void onAdDisplayFailed(MaxAd maxAd, MaxError maxError) {
+                    @Override
+                    public void onAdDisplayFailed(MaxAd maxAd, MaxError maxError) {
+                    }
+                });
+                applo_banner_ad.loadAd();
+                current_applovin_BannerId++;
+                if (current_applovin_BannerId == app_data.get(0).getApplovin_banner_id().size()) {
+                    current_applovin_BannerId = 0;
                 }
-            });
-            applo_banner_ad.loadAd();
-            current_applovin_BannerId++;
-            if (current_applovin_BannerId == app_data.get(0).getApplovin_banner_id().size()) {
-                current_applovin_BannerId = 0;
             }
         }
     }
@@ -668,31 +684,34 @@ public class AdsControl {
             if (isWortiseBannerLoaded) {
                 return;
             }
-            final BannerAd wortise_BannerAd = new BannerAd(activity);
-            wortise_BannerAd.setAdSize(com.wortise.ads.AdSize.HEIGHT_50);
-            wortise_BannerAd.setAdUnitId(app_data.get(0).getWortiseBannerId().get(current_wortise_BannerId));
-            wortise_BannerAd.loadAd();
-            wortise_BannerAd.setListener(new BannerAd.Listener() {
-                @Override
-                public void onBannerLoaded(@NonNull BannerAd bannerAd) {
-                    Log.d("Parth", "Wortise Banner Loadedd ");
-                    wBannerAd = wortise_BannerAd;
-                    isWortiseBannerLoaded = true;
-                }
+            String placementId = app_data.get(0).getWortiseBannerId().get(current_wortise_BannerId);
+            if (!placementId.equalsIgnoreCase("")) {
+                final BannerAd wortise_BannerAd = new BannerAd(activity);
+                wortise_BannerAd.setAdSize(com.wortise.ads.AdSize.HEIGHT_50);
+                wortise_BannerAd.setAdUnitId(placementId);
+                wortise_BannerAd.loadAd();
+                wortise_BannerAd.setListener(new BannerAd.Listener() {
+                    @Override
+                    public void onBannerLoaded(@NonNull BannerAd bannerAd) {
+                        Log.d("Parth", "Wortise Banner Loadedd ");
+                        wBannerAd = wortise_BannerAd;
+                        isWortiseBannerLoaded = true;
+                    }
 
-                @Override
-                public void onBannerClicked(@NonNull BannerAd bannerAd) {
-                }
+                    @Override
+                    public void onBannerClicked(@NonNull BannerAd bannerAd) {
+                    }
 
-                @Override
-                public void onBannerFailed(@NonNull BannerAd bannerAd, @NonNull com.wortise.ads.AdError adError) {
-                    Log.d("Parth", "Wortise banner onError: " + adError);
-                    banner_Ads();
+                    @Override
+                    public void onBannerFailed(@NonNull BannerAd bannerAd, @NonNull com.wortise.ads.AdError adError) {
+                        Log.d("Parth", "Wortise banner Failed " + adError);
+                        banner_Ads();
+                    }
+                });
+                current_wortise_BannerId++;
+                if (current_wortise_BannerId == app_data.get(0).getWortiseBannerId().size()) {
+                    current_wortise_BannerId = 0;
                 }
-            });
-            current_wortise_BannerId++;
-            if (current_wortise_BannerId == app_data.get(0).getWortiseBannerId().size()) {
-                current_wortise_BannerId = 0;
             }
         }
     }
@@ -703,62 +722,43 @@ public class AdsControl {
             if (isInmobiBannerLoaded) {
                 return;
             }
-            final InMobiBanner inMobiBanner = new InMobiBanner(activity, current_inmobi_BannerId);
-            inMobiBanner.setBannerSize(320, 50);
-            inMobiBanner.load();
-            inMobiBanner.setListener(new BannerAdEventListener() {
-                @Override
-                public void onAdFetchFailed(@NonNull InMobiBanner inMobiBanner, @NonNull InMobiAdRequestStatus inMobiAdRequestStatus) {
-                    super.onAdFetchFailed(inMobiBanner, inMobiAdRequestStatus);
-                    Log.d("Parth", "Inmobi banner onError: " + inMobiAdRequestStatus);
-                    banner_Ads();
-                }
+            Long placementId = app_data.get(0).getInmobi_banner_id().get(current_inmobi_BannerId);
+            if (!(placementId == 0)) {
+                final InMobiBanner inMobiBanner = new InMobiBanner(activity, placementId);
+                inMobiBanner.setBannerSize(320, 50);
+                inMobiBanner.load();
 
-                @Override
-                public void onAdFetchSuccessful(@NonNull InMobiBanner inMobiBanner, @NonNull AdMetaInfo adMetaInfo) {
-                    super.onAdFetchSuccessful(inMobiBanner, adMetaInfo);
-                }
+                inMobiBanner.setListener(new BannerAdEventListener() {
+                    @Override
+                    public void onAdFetchFailed(@NonNull InMobiBanner inMobiBanner, @NonNull InMobiAdRequestStatus inMobiAdRequestStatus) {
+                        super.onAdFetchFailed(inMobiBanner, inMobiAdRequestStatus);
 
-                @Override
-                public void onAdLoadSucceeded(@NonNull InMobiBanner inMobiBanner, @NonNull AdMetaInfo adMetaInfo) {
-                    super.onAdLoadSucceeded(inMobiBanner, adMetaInfo);
-                    InmobiBannerAd = inMobiBanner;
-                    isInmobiBannerLoaded = true;
+                    }
+
+                    public void onAdLoadFailed(@NonNull InMobiBanner inMobiBanner, @NonNull InMobiAdRequestStatus inMobiAdRequestStatus) {
+                        super.onAdLoadFailed(inMobiBanner, inMobiAdRequestStatus);
+                        Log.d("Parth", "Inmobi banner Failed: " + inMobiAdRequestStatus.getMessage());
+                        banner_Ads();
+                    }
+
+                    @Override
+                    public void onAdFetchSuccessful(@NonNull InMobiBanner inMobiBanner, @NonNull AdMetaInfo adMetaInfo) {
+                        super.onAdFetchSuccessful(inMobiBanner, adMetaInfo);
+                    }
+
+                    @Override
+                    public void onAdLoadSucceeded(@NonNull InMobiBanner inMobiBanner, @NonNull AdMetaInfo adMetaInfo) {
+                        super.onAdLoadSucceeded(inMobiBanner, adMetaInfo);
+                        Log.d("Parth", "Inmobi banner loaded");
+                        InmobiBannerAd = inMobiBanner;
+                        isInmobiBannerLoaded = true;
+                    }
+                });
+                current_inmobi_BannerId++;
+                if (current_inmobi_BannerId == app_data.get(0).getInmobi_banner_id().size()) {
+                    current_inmobi_BannerId = 0;
                 }
-            });
-            current_inmobi_BannerId++;
-            if (current_inmobi_BannerId == app_data.get(0).getInmobi_banner_id().size()) {
-                current_inmobi_BannerId = 0;
             }
-        }
-    }
-
-    // Local Mode
-    void preload_local_Banner_ad() {
-        if (isLocal_BannerLoaded) {
-            return;
-        }
-        isLocal_BannerLoaded = true;
-    }
-
-    void local_banner(ViewGroup local_banner) {
-        if (app_data != null && app_data.size() > 0) {
-            RelativeLayout local_banner_ad = local_banner.findViewById(R.id.local_banner_ads);
-            ImageView app_banner = local_banner.findViewById(R.id.app_banner);
-            try {
-                Glide.with(activity).load(app_data.get(0).getNew_app_banner_ad()).into(app_banner);
-            } catch (Exception ignored) {
-            }
-            local_banner_ad.setOnClickListener(view -> {
-                try {
-                    Intent intent = new Intent("android.intent.action.VIEW").setData(Uri.parse(app_data.get(0).getNew_app_link()));
-                    activity.startActivity(intent);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            isLocal_BannerLoaded = false;
-            banner_Ads();
         }
     }
 
@@ -767,23 +767,150 @@ public class AdsControl {
     public void show_banner_ad(final ViewGroup banner_container) {
         if (app_data != null && app_data.size() > 0) {
             if (app_data.get(0).isAds_show()) {
-                if (isGoogleBannerLoaded) {
-                    new All_Type_Ads(activity).show_banner_ad_Admob(banner_container);
-                } else if (isAdxBannerLoaded) {
-                    new All_Type_Ads(activity).show_banner_ad_Adx(banner_container);
-                } else if (isFBBannerLoaded) {
-                    new All_Type_Ads(activity).show_banner_ad_FB(banner_container);
-                } else if (isApplovinBannerLoaded) {
-                    new All_Type_Ads(activity).show_banner_ad_Applovin(banner_container);
-                } else if (isWortiseBannerLoaded) {
-                    new All_Type_Ads(activity).show_banner_ad_Wortise(banner_container);
-                } else if (isInmobiBannerLoaded) {
-                    new All_Type_Ads(activity).show_banner_ad_Inmobi(banner_container);
-                } else if (isLocal_BannerLoaded) {
-                    @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_banner_ad, null);
-                    local_banner(viewGroup);
-                    banner_container.removeAllViews();
-                    banner_container.addView(viewGroup);
+                if (app_data.get(0).isPreload_banner_ads()) {
+                    if (isGoogleBannerLoaded) {
+                        try {
+                            if (googleBannerAd.getParent() != null) {
+                                ((ViewGroup) googleBannerAd.getParent()).removeView(googleBannerAd);
+                            }
+                            banner_container.addView(googleBannerAd);
+                            AdsControl.isGoogleBannerLoaded = false;
+                            banner_Ads();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else if (isAdxBannerLoaded) {
+                        try {
+                            try {
+                                if (adxBannerAd.getParent() != null) {
+                                    ((ViewGroup) adxBannerAd.getParent()).removeView(adxBannerAd);
+                                }
+                                banner_container.addView(adxBannerAd);
+                                AdsControl.isAdxBannerLoaded = false;
+                                banner_Ads();
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else if (isFBBannerLoaded) {
+                        try {
+                            if (fbadView.getParent() != null) {
+                                ((ViewGroup) fbadView.getParent()).removeView(fbadView);
+                            }
+                            banner_container.addView(fbadView);
+                            AdsControl.isFBBannerLoaded = false;
+                            banner_Ads();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else if (isApplovinBannerLoaded) {
+                        try {
+                            if (applovin_banner_ad.getParent() != null) {
+                                ((ViewGroup) applovin_banner_ad.getParent()).removeView(applovin_banner_ad);
+                            }
+                            banner_container.addView(applovin_banner_ad);
+                            AdsControl.isApplovinBannerLoaded = false;
+                            banner_Ads();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else if (isWortiseBannerLoaded) {
+                        try {
+                            if (wBannerAd.getParent() != null) {
+                                ((ViewGroup) wBannerAd.getParent()).removeView(wBannerAd);
+                            }
+                            banner_container.addView(wBannerAd);
+                            AdsControl.isWortiseBannerLoaded = false;
+                            banner_Ads();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else if (isInmobiBannerLoaded) {
+                        try {
+                            if (InmobiBannerAd.getParent() != null) {
+                                ((ViewGroup) InmobiBannerAd.getParent()).removeView(InmobiBannerAd);
+                            }
+                            banner_container.addView(InmobiBannerAd);
+                            AdsControl.isInmobiBannerLoaded = false;
+                            banner_Ads();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                } else {
+                    banner_Ads();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (isGoogleBannerLoaded) {
+                                try {
+                                    if (googleBannerAd.getParent() != null) {
+                                        ((ViewGroup) googleBannerAd.getParent()).removeView(googleBannerAd);
+                                    }
+                                    banner_container.addView(googleBannerAd);
+                                    AdsControl.isGoogleBannerLoaded = false;
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            } else if (isAdxBannerLoaded) {
+                                try {
+                                    try {
+                                        if (adxBannerAd.getParent() != null) {
+                                            ((ViewGroup) adxBannerAd.getParent()).removeView(adxBannerAd);
+                                        }
+                                        banner_container.addView(adxBannerAd);
+                                        AdsControl.isAdxBannerLoaded = false;
+                                    } catch (Exception e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            } else if (isFBBannerLoaded) {
+                                try {
+                                    if (fbadView.getParent() != null) {
+                                        ((ViewGroup) fbadView.getParent()).removeView(fbadView);
+                                    }
+                                    banner_container.addView(fbadView);
+                                    AdsControl.isFBBannerLoaded = false;
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            } else if (isApplovinBannerLoaded) {
+                                try {
+                                    if (applovin_banner_ad.getParent() != null) {
+                                        ((ViewGroup) applovin_banner_ad.getParent()).removeView(applovin_banner_ad);
+                                    }
+                                    banner_container.addView(applovin_banner_ad);
+                                    AdsControl.isApplovinBannerLoaded = false;
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            } else if (isWortiseBannerLoaded) {
+                                try {
+                                    if (wBannerAd.getParent() != null) {
+                                        ((ViewGroup) wBannerAd.getParent()).removeView(wBannerAd);
+                                    }
+                                    banner_container.addView(wBannerAd);
+                                    AdsControl.isWortiseBannerLoaded = false;
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            } else if (isInmobiBannerLoaded) {
+                                try {
+                                    if (InmobiBannerAd.getParent() != null) {
+                                        ((ViewGroup) InmobiBannerAd.getParent()).removeView(InmobiBannerAd);
+                                    }
+                                    banner_container.addView(InmobiBannerAd);
+                                    AdsControl.isInmobiBannerLoaded = false;
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        }
+                    }, 2500);
                 }
             }
         }
@@ -860,27 +987,30 @@ public class AdsControl {
             if (isadmob_small_native_banner_Loaded) {
                 return;
             }
-            final AdLoader.Builder builder = new AdLoader.Builder(activity, app_data.get(0).getAdmobNativeid().get(current_admob_small_native_BannerId));
-            builder.forNativeAd(nativeAd -> {
-                Admob_small_native_banner_Ad = nativeAd;
-                isadmob_small_native_banner_Loaded = true;
-                Log.d("Parth", "Admob Small Native Banner Ad Loaded");
-            });
-            builder.withAdListener(new AdListener() {
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    super.onAdFailedToLoad(loadAdError);
-                    Log.d("Parth", "Admob Small Native Banner Ad Failed");
-                    preload_Admob_Native_Banner_Ad();
-                }
+            String placementId = app_data.get(0).getAdmobNativeid().get(current_admob_small_native_BannerId);
+            if (!placementId.equalsIgnoreCase("")) {
+                final AdLoader.Builder builder = new AdLoader.Builder(activity, placementId);
+                builder.forNativeAd(nativeAd -> {
+                    Admob_small_native_banner_Ad = nativeAd;
+                    isadmob_small_native_banner_Loaded = true;
+                    Log.d("Parth", "Admob Small Native Banner Ad Loaded");
+                });
+                builder.withAdListener(new AdListener() {
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        super.onAdFailedToLoad(loadAdError);
+                        Log.d("Parth", "Admob Small Native Banner Ad Failed");
+                        small_native_banner_Ads();
+                    }
 
-                public void onAdLoaded() {
-                    super.onAdLoaded();
+                    public void onAdLoaded() {
+                        super.onAdLoaded();
+                    }
+                }).build().loadAd(new AdRequest.Builder().build());
+                current_admob_small_native_BannerId++;
+                if (current_admob_small_native_BannerId == app_data.get(0).getAdmobNativeid().size()) {
+                    current_admob_small_native_BannerId = 0;
                 }
-            }).build().loadAd(new AdRequest.Builder().build());
-            current_admob_small_native_BannerId++;
-            if (current_admob_small_native_BannerId == app_data.get(0).getAdmobNativeid().size()) {
-                current_admob_small_native_BannerId = 0;
             }
         }
     }
@@ -892,29 +1022,32 @@ public class AdsControl {
             if (isadx_small_native_banner_Loaded) {
                 return;
             }
-            final AdLoader.Builder builder = new AdLoader.Builder(activity, app_data.get(0).getAdxNativeId().get(current_adx_small_native_BannerId));
-            builder.forNativeAd(nativeAd -> {
-                Log.d("Parth", "Adx Small Native Banner Ad Loaded");
-                Adx_small_native_banner_Ad = nativeAd;
-                isadx_small_native_banner_Loaded = true;
+            String placementId = app_data.get(0).getAdxNativeId().get(current_adx_small_native_BannerId);
+            if (!placementId.equalsIgnoreCase("")) {
+                final AdLoader.Builder builder = new AdLoader.Builder(activity, placementId);
+                builder.forNativeAd(nativeAd -> {
+                    Log.d("Parth", "Adx Small Native Banner Ad Loaded");
+                    Adx_small_native_banner_Ad = nativeAd;
+                    isadx_small_native_banner_Loaded = true;
 
-            });
-            builder.withAdListener(new AdListener() {
-                @SuppressLint("MissingPermission")
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    super.onAdFailedToLoad(loadAdError);
-                    Log.d("Parth", "Adx Small Native Banner Ad Failed");
-                    small_native_banner_Ads();
-                }
+                });
+                builder.withAdListener(new AdListener() {
+                    @SuppressLint("MissingPermission")
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        super.onAdFailedToLoad(loadAdError);
+                        Log.d("Parth", "Adx Small Native Banner Ad Failed");
+                        small_native_banner_Ads();
+                    }
 
-                public void onAdLoaded() {
-                    super.onAdLoaded();
+                    public void onAdLoaded() {
+                        super.onAdLoaded();
+                    }
+                }).build().loadAd(new AdManagerAdRequest.Builder().build());
+                current_adx_small_native_BannerId++;
+                if (current_adx_small_native_BannerId == app_data.get(0).getAdxNativeId().size()) {
+                    current_adx_small_native_BannerId = 0;
                 }
-            }).build().loadAd(new AdManagerAdRequest.Builder().build());
-            current_adx_small_native_BannerId++;
-            if (current_adx_small_native_BannerId == app_data.get(0).getAdxNativeId().size()) {
-                current_adx_small_native_BannerId = 0;
             }
         }
     }
@@ -925,42 +1058,45 @@ public class AdsControl {
             if (isFB_small_native_banner_Loaded) {
                 return;
             }
-            final NativeBannerAd fb_nativeBanner_Ad = new NativeBannerAd(activity, app_data.get(0).getFbNativeBannerId().get(current_fb_small_native_BannerId));
-            NativeAdListener nativeAdListener = new NativeAdListener() {
-                @Override
-                public void onMediaDownloaded(Ad ad) {
-                    Log.d("Parth", "FB Native ad finished downloading all assets.");
-                }
+            String placementId = app_data.get(0).getFbNativeBannerId().get(current_fb_small_native_BannerId);
+            if (!placementId.equalsIgnoreCase("")) {
+                final NativeBannerAd fb_nativeBanner_Ad = new NativeBannerAd(activity, placementId);
+                NativeAdListener nativeAdListener = new NativeAdListener() {
+                    @Override
+                    public void onMediaDownloaded(Ad ad) {
+                        Log.d("Parth", "FB Native ad finished downloading all assets.");
+                    }
 
-                @Override
-                public void onError(Ad ad, AdError adError) {
-                    Log.d("Parth", "FB Native ad failed to load: " + adError.getErrorMessage());
-                    small_native_banner_Ads();
-                }
+                    @Override
+                    public void onError(Ad ad, AdError adError) {
+                        Log.d("Parth", "FB Native ad failed to load: " + adError.getErrorMessage());
+                        small_native_banner_Ads();
+                    }
 
-                @Override
-                public void onAdLoaded(Ad ad) {
-                    Log.d("Parth", "FB Native Banner ad is loaded");
-                    fb_small_native_banner_Ad = fb_nativeBanner_Ad;
-                    isFB_small_native_banner_Loaded = true;
+                    @Override
+                    public void onAdLoaded(Ad ad) {
+                        Log.d("Parth", "FB Native Banner ad is loaded");
+                        fb_small_native_banner_Ad = fb_nativeBanner_Ad;
+                        isFB_small_native_banner_Loaded = true;
 
-                }
+                    }
 
-                @Override
-                public void onAdClicked(Ad ad) {
-                    Log.d("Parth", "FB Native ad clicked!");
-                }
+                    @Override
+                    public void onAdClicked(Ad ad) {
+                        Log.d("Parth", "FB Native ad clicked!");
+                    }
 
-                @Override
-                public void onLoggingImpression(Ad ad) {
-                    Log.d("Parth", "FB Native ad impression logged!");
+                    @Override
+                    public void onLoggingImpression(Ad ad) {
+                        Log.d("Parth", "FB Native ad impression logged!");
+                    }
+                };
+                // Request an ad
+                fb_nativeBanner_Ad.loadAd(fb_nativeBanner_Ad.buildLoadAdConfig().withAdListener(nativeAdListener).build());
+                current_fb_small_native_BannerId++;
+                if (current_fb_small_native_BannerId == app_data.get(0).getFbNativeBannerId().size()) {
+                    current_fb_small_native_BannerId = 0;
                 }
-            };
-            // Request an ad
-            fb_nativeBanner_Ad.loadAd(fb_nativeBanner_Ad.buildLoadAdConfig().withAdListener(nativeAdListener).build());
-            current_fb_small_native_BannerId++;
-            if (current_fb_small_native_BannerId == app_data.get(0).getFbNativeBannerId().size()) {
-                current_fb_small_native_BannerId = 0;
             }
         }
     }
@@ -971,32 +1107,35 @@ public class AdsControl {
             if (isApplovin_small_native_banner_Loaded) {
                 return;
             }
-            final MaxNativeAdLoader nativeAdLoader = new MaxNativeAdLoader(app_data.get(0).getApplovin_small_native_bannerid().get(current_applovin_small_native_BannerId), activity);
-            nativeAdLoader.setRevenueListener(ad -> {
-            });
-            nativeAdLoader.setNativeAdListener(new MaxNativeAdListener() {
-                @Override
-                public void onNativeAdLoaded(final MaxNativeAdView nativeAdView, final MaxAd ad) {
-                    Log.d("Parth", "Applovin Small Native Banner ad Loaded");
-                    applovin_small_native_banner_Ad = nativeAdView;
-                    Applovin_small_native_banner_Ad = ad;
-                    isApplovin_small_native_banner_Loaded = true;
-                }
+            String placementId = app_data.get(0).getApplovin_small_native_bannerid().get(current_applovin_small_native_BannerId);
+            if (!placementId.equalsIgnoreCase("")) {
+                final MaxNativeAdLoader nativeAdLoader = new MaxNativeAdLoader(placementId, activity);
+                nativeAdLoader.setRevenueListener(ad -> {
+                });
+                nativeAdLoader.setNativeAdListener(new MaxNativeAdListener() {
+                    @Override
+                    public void onNativeAdLoaded(final MaxNativeAdView nativeAdView, final MaxAd ad) {
+                        Log.d("Parth", "Applovin Small Native Banner ad Loaded");
+                        applovin_small_native_banner_Ad = nativeAdView;
+                        Applovin_small_native_banner_Ad = ad;
+                        isApplovin_small_native_banner_Loaded = true;
+                    }
 
-                @Override
-                public void onNativeAdLoadFailed(final String adUnitId, final MaxError error) {
-                    Log.d("Parth", "Applovin Small Native Banner ad Failed " + error.getMessage());
-                    small_native_banner_Ads();
-                }
+                    @Override
+                    public void onNativeAdLoadFailed(final String adUnitId, final MaxError error) {
+                        Log.d("Parth", "Applovin Small Native Banner ad Failed " + error.getMessage());
+                        small_native_banner_Ads();
+                    }
 
-                @Override
-                public void onNativeAdClicked(final MaxAd ad) {
+                    @Override
+                    public void onNativeAdClicked(final MaxAd ad) {
+                    }
+                });
+                nativeAdLoader.loadAd(new NativeAds(activity).create_Small_Native_Banner_AdView());
+                current_applovin_small_native_BannerId++;
+                if (current_applovin_small_native_BannerId == app_data.get(0).getApplovin_small_native_bannerid().size()) {
+                    current_applovin_small_native_BannerId = 0;
                 }
-            });
-            nativeAdLoader.loadAd(new NativeAds(activity).create_Small_Native_Banner_AdView());
-            current_applovin_small_native_BannerId++;
-            if (current_applovin_small_native_BannerId == app_data.get(0).getApplovin_small_native_bannerid().size()) {
-                current_applovin_small_native_BannerId = 0;
             }
         }
     }
@@ -1007,34 +1146,37 @@ public class AdsControl {
             if (isWortise_small_Native_banner_Loaded) {
                 return;
             }
-            final GoogleNativeAd wortise_google_native_banner = new GoogleNativeAd(activity, app_data.get(0).getWortiseNativeId().get(current_wortise_small_native_BannerId), new GoogleNativeAd.Listener() {
-                @Override
-                public void onNativeClicked(@NonNull GoogleNativeAd googleNativeAd) {
-                }
+            String placementId = app_data.get(0).getWortiseNativeId().get(current_wortise_small_native_BannerId);
+            if (!placementId.equalsIgnoreCase("")) {
+                final GoogleNativeAd wortise_google_native_banner = new GoogleNativeAd(activity, placementId, new GoogleNativeAd.Listener() {
+                    @Override
+                    public void onNativeClicked(@NonNull GoogleNativeAd googleNativeAd) {
+                    }
 
-                @Override
-                public void onNativeFailed(@NonNull GoogleNativeAd googleNativeAd, @NonNull com.wortise.ads.AdError adError) {
-                    Log.d("Parth", "Wortise Small Native Banner Ad Failed");
-                    small_native_banner_Ads();
-                }
+                    @Override
+                    public void onNativeFailed(@NonNull GoogleNativeAd googleNativeAd, @NonNull com.wortise.ads.AdError adError) {
+                        Log.d("Parth", "Wortise Small Native Banner Ad Failed");
+                        small_native_banner_Ads();
+                    }
 
-                @Override
-                public void onNativeImpression(@NonNull GoogleNativeAd googleNativeAd) {
-                }
+                    @Override
+                    public void onNativeImpression(@NonNull GoogleNativeAd googleNativeAd) {
+                    }
 
-                @Override
-                public void onNativeLoaded(@NonNull GoogleNativeAd googleNativeAd, @NonNull NativeAd nativeAd) {
-                    Log.d("Parth", "Wortise Small Naive Banner Loaded");
-                    wortise_small_google_native_banner_Ad = googleNativeAd;
-                    wortise_small_native_banner_Ad = nativeAd;
-                    isWortise_small_Native_banner_Loaded = true;
+                    @Override
+                    public void onNativeLoaded(@NonNull GoogleNativeAd googleNativeAd, @NonNull NativeAd nativeAd) {
+                        Log.d("Parth", "Wortise Small Naive Banner Loaded");
+                        wortise_small_google_native_banner_Ad = googleNativeAd;
+                        wortise_small_native_banner_Ad = nativeAd;
+                        isWortise_small_Native_banner_Loaded = true;
 
+                    }
+                });
+                wortise_google_native_banner.load();
+                current_wortise_small_native_BannerId++;
+                if (current_wortise_small_native_BannerId == app_data.get(0).getWortiseNativeId().size()) {
+                    current_wortise_small_native_BannerId = 0;
                 }
-            });
-            wortise_google_native_banner.load();
-            current_wortise_small_native_BannerId++;
-            if (current_wortise_small_native_BannerId == app_data.get(0).getWortiseNativeId().size()) {
-                current_wortise_small_native_BannerId = 0;
             }
         }
     }
@@ -1047,25 +1189,112 @@ public class AdsControl {
         isLocal_small_Native_banner_Loaded = true;
     }
 
+    void show_local_native_banner_ad(ViewGroup native_banner_ad) {
+        if (app_data != null && app_data.size() > 0) {
+            RelativeLayout custm_native = native_banner_ad.findViewById(R.id.custm_native_ad);
+            ImageView app_icon_native = native_banner_ad.findViewById(R.id.ad_app_icon);
+            TextView app_name_native = native_banner_ad.findViewById(R.id.ad_headline);
+            TextView app_ad_body = native_banner_ad.findViewById(R.id.ad_body);
+            TextView ad_call_to_action = native_banner_ad.findViewById(R.id.ad_call_to_action);
+            try {
+                Glide.with(activity).load(app_data.get(0).getNew_app_icon()).into(app_icon_native);
+                app_name_native.setText(app_data.get(0).getNew_app_name());
+                app_name_native.setSelected(true);
+                app_ad_body.setText(app_data.get(0).getNew_app_body());
+                app_ad_body.setSelected(true);
+                ad_call_to_action.setText("Install");
+            } catch (Exception ignored) {
+            }
+            custm_native.setOnClickListener(view -> {
+                try {
+                    Intent intent = new Intent("android.intent.action.VIEW").setData(Uri.parse(app_data.get(0).getNew_app_link()));
+                    activity.startActivity(intent);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+    }
+
     // TODO: 7/17/2023 Show Small Native Banner Ads
     public void show_small_native_banner_ad(final ViewGroup native_banner_ad) {
         if (app_data != null && app_data.size() > 0) {
             if (app_data.get(0).isAds_show()) {
-                if (isadmob_small_native_banner_Loaded) {
-                    new All_Type_Ads(activity).show_samll_native_bannerad_Admob(native_banner_ad);
-                } else if (isadx_small_native_banner_Loaded) {
-                    new All_Type_Ads(activity).show_samll_native_bannerad_Adx(native_banner_ad);
-                } else if (isFB_small_native_banner_Loaded) {
-                    new All_Type_Ads(activity).show_samll_native_bannerad_FB(native_banner_ad);
-                } else if (isApplovin_small_native_banner_Loaded) {
-                    new All_Type_Ads(activity).show_small_native_banner_ad_Applovin(native_banner_ad);
-                } else if (isWortise_small_Native_banner_Loaded) {
-                    new All_Type_Ads(activity).show_samll_native_bannerad_wortise(native_banner_ad);
-                } else if (isLocal_small_Native_banner_Loaded) {
-                    @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_small_native_banner, null);
-                    native_banner_ad.removeAllViews();
-                    native_banner_ad.addView(viewGroup);
-                    new All_Type_Ads(activity).show_local_native_banner_ad(native_banner_ad);
+                if (app_data.get(0).isPreload_native_ads()) {
+                    if (isadmob_small_native_banner_Loaded) {
+                        new NativeAds(activity).Admob_Small_Native_Banner_Ad(AdsControl.Admob_small_native_banner_Ad, native_banner_ad);
+                        Log.d("Parth", "Admob Native Banner ad show");
+                        AdsControl.isadmob_small_native_banner_Loaded = false;
+                        small_native_banner_Ads();
+                    } else if (isadx_small_native_banner_Loaded) {
+                        new NativeAds(activity).Admob_Small_Native_Banner_Ad(AdsControl.Adx_small_native_banner_Ad, native_banner_ad);
+                        Log.d("Parth", "Adx Native Banner ad show");
+                        AdsControl.isadx_small_native_banner_Loaded = false;
+                        small_native_banner_Ads();
+                    } else if (isFB_small_native_banner_Loaded) {
+                        new NativeAds(activity).FB_Smalle_Native_Banner(AdsControl.fb_small_native_banner_Ad, native_banner_ad);
+                        Log.d("Parth", "FB Native Banner ad show");
+                        AdsControl.isFB_small_native_banner_Loaded = false;
+                        small_native_banner_Ads();
+                    } else if (isApplovin_small_native_banner_Loaded) {
+                        if (Applovin_small_native_banner_Ad != null) {
+                            native_banner_ad.removeAllViews();
+                        }
+                        native_banner_ad.removeAllViews();
+                        native_banner_ad.addView(applovin_small_native_banner_Ad);
+                        Log.d("Parth", "Applovin Native Banner ad show");
+                        AdsControl.isApplovin_small_native_banner_Loaded = false;
+                        small_native_banner_Ads();
+                    } else if (isWortise_small_Native_banner_Loaded) {
+                        new NativeAds(activity).Admob_Small_Native_Banner_Ad(AdsControl.wortise_small_native_banner_Ad, native_banner_ad);
+                        Log.d("Parth", "Wortise Native Banner ad show");
+                        AdsControl.isWortise_small_Native_banner_Loaded = false;
+                        small_native_banner_Ads();
+                    } else if (isLocal_small_Native_banner_Loaded) {
+                        @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_small_native_banner, null);
+                        native_banner_ad.removeAllViews();
+                        native_banner_ad.addView(viewGroup);
+                        show_local_native_banner_ad(native_banner_ad);
+                        Log.d("Parth", "Local Native Banner ad show");
+                        AdsControl.isLocal_small_Native_banner_Loaded = false;
+                        small_native_banner_Ads();
+                    }
+                } else {
+                    small_native_banner_Ads();
+                    new Handler().postDelayed(() -> {
+                        if (isadmob_small_native_banner_Loaded) {
+                            new NativeAds(activity).Admob_Small_Native_Banner_Ad(AdsControl.Admob_small_native_banner_Ad, native_banner_ad);
+                            Log.d("Parth", "Admob Native Banner ad show");
+                            AdsControl.isadmob_small_native_banner_Loaded = false;
+                        } else if (isadx_small_native_banner_Loaded) {
+                            new NativeAds(activity).Admob_Small_Native_Banner_Ad(AdsControl.Adx_small_native_banner_Ad, native_banner_ad);
+                            Log.d("Parth", "Adx Native Banner ad show");
+                            AdsControl.isadx_small_native_banner_Loaded = false;
+                        } else if (isFB_small_native_banner_Loaded) {
+                            new NativeAds(activity).FB_Smalle_Native_Banner(AdsControl.fb_small_native_banner_Ad, native_banner_ad);
+                            Log.d("Parth", "FB Native Banner ad show");
+                            AdsControl.isFB_small_native_banner_Loaded = false;
+                        } else if (isApplovin_small_native_banner_Loaded) {
+                            if (Applovin_small_native_banner_Ad != null) {
+                                native_banner_ad.removeAllViews();
+                            }
+                            native_banner_ad.removeAllViews();
+                            native_banner_ad.addView(applovin_small_native_banner_Ad);
+                            Log.d("Parth", "Applovin Native Banner ad show");
+                            AdsControl.isApplovin_small_native_banner_Loaded = false;
+                        } else if (isWortise_small_Native_banner_Loaded) {
+                            new NativeAds(activity).Admob_Small_Native_Banner_Ad(AdsControl.wortise_small_native_banner_Ad, native_banner_ad);
+                            Log.d("Parth", "Wortise Native Banner ad show");
+                            AdsControl.isWortise_small_Native_banner_Loaded = false;
+                        } else if (isLocal_small_Native_banner_Loaded) {
+                            @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_small_native_banner, null);
+                            native_banner_ad.removeAllViews();
+                            native_banner_ad.addView(viewGroup);
+                            show_local_native_banner_ad(native_banner_ad);
+                            Log.d("Parth", "Local Native Banner ad show");
+                            AdsControl.isLocal_small_Native_banner_Loaded = false;
+                        }
+                    }, 2800);
                 }
             }
         }
@@ -1141,28 +1370,31 @@ public class AdsControl {
             if (isAdmob_small_native_Loaded) {
                 return;
             }
-            final AdLoader.Builder builder = new AdLoader.Builder(activity, app_data.get(0).getAdmobNativeid().get(current_admob_small_native_Id));
-            builder.forNativeAd(nativeAd -> {
-                Log.d("Parth", "Admob Small Native Ad Loaded");
-                Admob_small_native_Ad = nativeAd;
-                isAdmob_small_native_Loaded = true;
-            });
-            builder.withAdListener(new AdListener() {
-                @SuppressLint("MissingPermission")
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    super.onAdFailedToLoad(loadAdError);
-                    Log.d("Parth", "Admob Small Native Ad Failed");
-                    small_native_Ads();
-                }
+            String placementId = app_data.get(0).getAdmobNativeid().get(current_admob_small_native_Id);
+            if (!placementId.equalsIgnoreCase("")) {
+                final AdLoader.Builder builder = new AdLoader.Builder(activity, placementId);
+                builder.forNativeAd(nativeAd -> {
+                    Log.d("Parth", "Admob Small Native Ad Loaded");
+                    Admob_small_native_Ad = nativeAd;
+                    isAdmob_small_native_Loaded = true;
+                });
+                builder.withAdListener(new AdListener() {
+                    @SuppressLint("MissingPermission")
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        super.onAdFailedToLoad(loadAdError);
+                        Log.d("Parth", "Admob Small Native Ad Failed" + loadAdError.getMessage());
+                        small_native_Ads();
+                    }
 
-                public void onAdLoaded() {
-                    super.onAdLoaded();
+                    public void onAdLoaded() {
+                        super.onAdLoaded();
+                    }
+                }).build().loadAd(new AdRequest.Builder().build());
+                current_admob_small_native_Id++;
+                if (current_admob_small_native_Id == app_data.get(0).getAdmobNativeid().size()) {
+                    current_admob_small_native_Id = 0;
                 }
-            }).build().loadAd(new AdRequest.Builder().build());
-            current_admob_small_native_Id++;
-            if (current_admob_small_native_Id == app_data.get(0).getAdmobNativeid().size()) {
-                current_admob_small_native_Id = 0;
             }
         }
     }
@@ -1173,28 +1405,31 @@ public class AdsControl {
             if (isadx_small_native_Loaded) {
                 return;
             }
-            final AdLoader.Builder builder = new AdLoader.Builder(activity, app_data.get(0).getAdxNativeId().get(current_adx_small_native_Id));
-            builder.forNativeAd(nativeAd -> {
-                Log.d("Parth", "Adx Small Native Ad Loaded");
-                Adx_small_native_Ad = nativeAd;
-                isadx_small_native_Loaded = true;
-            });
-            builder.withAdListener(new AdListener() {
-                @SuppressLint("MissingPermission")
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    super.onAdFailedToLoad(loadAdError);
-                    Log.d("Parth", "Adx Small Native Ad Failed");
-                    small_native_Ads();
-                }
+            String placementId = app_data.get(0).getAdxNativeId().get(current_adx_small_native_Id);
+            if (!placementId.equalsIgnoreCase("")) {
+                final AdLoader.Builder builder = new AdLoader.Builder(activity, placementId);
+                builder.forNativeAd(nativeAd -> {
+                    Log.d("Parth", "Adx Small Native Ad Loaded");
+                    Adx_small_native_Ad = nativeAd;
+                    isadx_small_native_Loaded = true;
+                });
+                builder.withAdListener(new AdListener() {
+                    @SuppressLint("MissingPermission")
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        super.onAdFailedToLoad(loadAdError);
+                        Log.d("Parth", "Adx Small Native Ad Failed" + loadAdError.getMessage());
+                        small_native_Ads();
+                    }
 
-                public void onAdLoaded() {
-                    super.onAdLoaded();
+                    public void onAdLoaded() {
+                        super.onAdLoaded();
+                    }
+                }).build().loadAd(new AdManagerAdRequest.Builder().build());
+                current_adx_small_native_Id++;
+                if (current_adx_small_native_Id == app_data.get(0).getAdxNativeId().size()) {
+                    current_adx_small_native_Id = 0;
                 }
-            }).build().loadAd(new AdManagerAdRequest.Builder().build());
-            current_adx_small_native_Id++;
-            if (current_adx_small_native_Id == app_data.get(0).getAdxNativeId().size()) {
-                current_adx_small_native_Id = 0;
             }
         }
     }
@@ -1205,45 +1440,44 @@ public class AdsControl {
             if (isFb_small_native_Loaded) {
                 return;
             }
-            final NativeBannerAd fb_small_native = new NativeBannerAd(activity, app_data.get(0).getFbNativeBannerId().get(current_fb_small_native_Id));
-            NativeAdListener nativeAdListener = new NativeAdListener() {
+            String placementId = app_data.get(0).getFbNativeBannerId().get(current_fb_small_native_Id);
+            if (!placementId.equalsIgnoreCase("")) {
+                final NativeBannerAd fb_small_native = new NativeBannerAd(activity, placementId);
+                NativeAdListener nativeAdListener = new NativeAdListener() {
 
-                @Override
-                public void onAdLoaded(Ad ad) {
-                    Log.d("Parth", "FB Small Native Banner ad is loaded");
-                    fb_small_native_Ad = fb_small_native;
-                    isFb_small_native_Loaded = true;
+                    @Override
+                    public void onAdLoaded(Ad ad) {
+                        Log.d("Parth", "FB Small Native Banner ad is loaded");
+                        fb_small_native_Ad = fb_small_native;
+                        isFb_small_native_Loaded = true;
+                    }
+
+                    @Override
+                    public void onMediaDownloaded(Ad ad) {
+                        // Native ad finished downloading all assets
+                    }
+
+                    @SuppressLint("MissingPermission")
+                    @Override
+                    public void onError(Ad ad, AdError adError) {
+                        Log.d("Parth", "FB Small Native ad failed to load: " + adError.getErrorMessage());
+                        small_native_Ads();
+                    }
+
+                    @Override
+                    public void onAdClicked(Ad ad) {
+                    }
+
+                    @Override
+                    public void onLoggingImpression(Ad ad) {
+                    }
+                };
+                // Request an ad
+                fb_small_native.loadAd(fb_small_native.buildLoadAdConfig().withAdListener(nativeAdListener).build());
+                current_fb_small_native_Id++;
+                if (current_fb_small_native_Id == app_data.get(0).getFbNativeBannerId().size()) {
+                    current_fb_small_native_Id = 0;
                 }
-
-                @Override
-                public void onMediaDownloaded(Ad ad) {
-                    // Native ad finished downloading all assets
-                    Log.d("Parth", "FB Small Native ad finished downloading all assets.");
-                }
-
-                @SuppressLint("MissingPermission")
-                @Override
-                public void onError(Ad ad, AdError adError) {
-                    Log.d("Parth", "FB Small Native ad failed to load: " + adError.getErrorMessage());
-                    small_native_Ads();
-                }
-
-
-                @Override
-                public void onAdClicked(Ad ad) {
-                    Log.d("Parth", "FB Small Native ad clicked!");
-                }
-
-                @Override
-                public void onLoggingImpression(Ad ad) {
-                    Log.d("Parth", "FB Small Native ad impression logged!");
-                }
-            };
-            // Request an ad
-            fb_small_native.loadAd(fb_small_native.buildLoadAdConfig().withAdListener(nativeAdListener).build());
-            current_fb_small_native_Id++;
-            if (current_fb_small_native_Id == app_data.get(0).getFbNativeBannerId().size()) {
-                current_fb_small_native_Id = 0;
             }
         }
     }
@@ -1254,32 +1488,35 @@ public class AdsControl {
             if (isapplovin_small_native_Loaded) {
                 return;
             }
-            final MaxNativeAdLoader nativeAdLoader = new MaxNativeAdLoader(app_data.get(0).getApplovin_small_nativeid().get(current_applovin_small_native_Id), activity);
-            nativeAdLoader.setRevenueListener(ad -> {
-            });
-            nativeAdLoader.setNativeAdListener(new MaxNativeAdListener() {
-                @Override
-                public void onNativeAdLoaded(final MaxNativeAdView nativeAdView, final MaxAd ad) {
-                    Log.d("Parth", "Applovin Small Native ad Loaded");
-                    applovin_small_native_Ad = nativeAdView;
-                    Applovin_small_native_Ad = ad;
-                    isapplovin_small_native_Loaded = true;
-                }
+            String placementId = app_data.get(0).getApplovin_small_nativeid().get(current_applovin_small_native_Id);
+            if (!placementId.equalsIgnoreCase("")) {
+                final MaxNativeAdLoader nativeAdLoader = new MaxNativeAdLoader(placementId, activity);
+                nativeAdLoader.setRevenueListener(ad -> {
+                });
+                nativeAdLoader.setNativeAdListener(new MaxNativeAdListener() {
+                    @Override
+                    public void onNativeAdLoaded(final MaxNativeAdView nativeAdView, final MaxAd ad) {
+                        Log.d("Parth", "Applovin Small Native ad Loaded");
+                        applovin_small_native_Ad = nativeAdView;
+                        Applovin_small_native_Ad = ad;
+                        isapplovin_small_native_Loaded = true;
+                    }
 
-                @Override
-                public void onNativeAdLoadFailed(final String adUnitId, final MaxError error) {
-                    Log.d("Parth", "Applovin Small Native ad Failed " + error.getMessage());
-                    small_native_Ads();
-                }
+                    @Override
+                    public void onNativeAdLoadFailed(final String adUnitId, final MaxError error) {
+                        Log.d("Parth", "Applovin Small Native ad Failed " + error.getMessage());
+                        small_native_Ads();
+                    }
 
-                @Override
-                public void onNativeAdClicked(final MaxAd ad) {
+                    @Override
+                    public void onNativeAdClicked(final MaxAd ad) {
+                    }
+                });
+                nativeAdLoader.loadAd(new NativeAds(activity).create_Small_NativeAdView());
+                current_applovin_small_native_Id++;
+                if (current_applovin_small_native_Id == app_data.get(0).getApplovin_small_nativeid().size()) {
+                    current_applovin_small_native_Id = 0;
                 }
-            });
-            nativeAdLoader.loadAd(new NativeAds(activity).create_Small_NativeAdView());
-            current_applovin_small_native_Id++;
-            if (current_applovin_small_native_Id == app_data.get(0).getApplovin_small_nativeid().size()) {
-                current_applovin_small_native_Id = 0;
             }
         }
     }
@@ -1290,34 +1527,37 @@ public class AdsControl {
             if (isWortise_small_Native_Loaded) {
                 return;
             }
-            final GoogleNativeAd wortise_google_small_native = new GoogleNativeAd(activity, app_data.get(0).getWortiseNativeId().get(current_wortise_small_native_Id), new GoogleNativeAd.Listener() {
-                @Override
-                public void onNativeClicked(@NonNull GoogleNativeAd googleNativeAd) {
-                }
+            String placementId = app_data.get(0).getWortiseNativeId().get(current_wortise_small_native_Id);
+            if (!placementId.equalsIgnoreCase("")) {
+                final GoogleNativeAd wortise_google_small_native = new GoogleNativeAd(activity, placementId, new GoogleNativeAd.Listener() {
+                    @Override
+                    public void onNativeClicked(@NonNull GoogleNativeAd googleNativeAd) {
+                    }
 
-                @SuppressLint("MissingPermission")
-                @Override
-                public void onNativeFailed(@NonNull GoogleNativeAd googleNativeAd, @NonNull com.wortise.ads.AdError adError) {
-                    Log.d("Parth", "Wortise Small Native Ad Failed");
-                    small_native_Ads();
-                }
+                    @SuppressLint("MissingPermission")
+                    @Override
+                    public void onNativeFailed(@NonNull GoogleNativeAd googleNativeAd, @NonNull com.wortise.ads.AdError adError) {
+                        Log.d("Parth", "Wortise Small Native Ad Failed" + adError);
+                        small_native_Ads();
+                    }
 
-                @Override
-                public void onNativeImpression(@NonNull GoogleNativeAd googleNativeAd) {
-                }
+                    @Override
+                    public void onNativeImpression(@NonNull GoogleNativeAd googleNativeAd) {
+                    }
 
-                @Override
-                public void onNativeLoaded(@NonNull GoogleNativeAd googleNativeAd, @NonNull NativeAd nativeAd) {
-                    Log.d("Parth", "Wortise Small Native Ad Loaded");
-                    wortise_google_small_native_Ad = googleNativeAd;
-                    wortise_small_native_Ad = nativeAd;
-                    isWortise_small_Native_Loaded = true;
+                    @Override
+                    public void onNativeLoaded(@NonNull GoogleNativeAd googleNativeAd, @NonNull NativeAd nativeAd) {
+                        Log.d("Parth", "Wortise Small Native Ad Loaded");
+                        wortise_google_small_native_Ad = googleNativeAd;
+                        wortise_small_native_Ad = nativeAd;
+                        isWortise_small_Native_Loaded = true;
+                    }
+                });
+                wortise_google_small_native.load();
+                current_wortise_small_native_Id++;
+                if (current_wortise_small_native_Id == app_data.get(0).getWortiseNativeId().size()) {
+                    current_wortise_small_native_Id = 0;
                 }
-            });
-            wortise_google_small_native.load();
-            current_wortise_small_native_Id++;
-            if (current_wortise_small_native_Id == app_data.get(0).getWortiseNativeId().size()) {
-                current_wortise_small_native_Id = 0;
             }
         }
     }
@@ -1330,26 +1570,117 @@ public class AdsControl {
         isLocal_small_Native_Loaded = true;
     }
 
+    @SuppressLint("SetTextI18n")
+    void show_local_small_native(ViewGroup native_banner_ad) {
+        if (app_data != null && app_data.size() > 0) {
+            RelativeLayout custm_native = native_banner_ad.findViewById(R.id.custm_small_native_ad);
+            ImageView app_icon_native = native_banner_ad.findViewById(R.id.ad_app_icon);
+            TextView app_name_native = native_banner_ad.findViewById(R.id.ad_Tital);
+            TextView app_ad_body = native_banner_ad.findViewById(R.id.ad_body);
+            TextView ad_call_to_action = native_banner_ad.findViewById(R.id.ad_call_to_action);
+            try {
+                Glide.with(activity).load(app_data.get(0).getNew_app_icon()).into(app_icon_native);
+                app_name_native.setText(app_data.get(0).getNew_app_name());
+                app_name_native.setSelected(true);
+                app_ad_body.setText(app_data.get(0).getNew_app_body());
+                app_ad_body.setSelected(true);
+                ad_call_to_action.setText("Install");
+            } catch (Exception ignored) {
+            }
+            custm_native.setOnClickListener(view -> {
+                try {
+                    Intent intent = new Intent("android.intent.action.VIEW").setData(Uri.parse(app_data.get(0).getNew_app_link()));
+                    activity.startActivity(intent);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+    }
+
     // TODO: 7/17/2023  Show Small Native Ads
     @SuppressLint("MissingPermission")
     public void show_small_native_ad(final ViewGroup native_banner_ad) {
         if (app_data != null && app_data.size() > 0) {
             if (app_data.get(0).isAds_show()) {
-                if (isAdmob_small_native_Loaded) {
-                    new All_Type_Ads(activity).show_small_native_Admob(native_banner_ad);
-                } else if (isadx_small_native_Loaded) {
-                    new All_Type_Ads(activity).show_small_native_Adx(native_banner_ad);
-                } else if (isFb_small_native_Loaded) {
-                    new All_Type_Ads(activity).show_small_native_FB(native_banner_ad);
-                } else if (isapplovin_small_native_Loaded) {
-                    new All_Type_Ads(activity).show_small_native_ad_Applovin(native_banner_ad);
-                } else if (isWortise_small_Native_Loaded) {
-                    new All_Type_Ads(activity).show_small_native_Wortise(native_banner_ad);
-                } else if (isLocal_small_Native_Loaded) {
-                    @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_small_native_ad, null);
-                    new All_Type_Ads(activity).show_local_small_native(viewGroup);
-                    native_banner_ad.removeAllViews();
-                    native_banner_ad.addView(viewGroup);
+                if (app_data.get(0).isPreload_native_ads()) {
+                    if (isAdmob_small_native_Loaded) {
+                        new NativeAds(activity).Admob_Small_Native_Ad(AdsControl.Admob_small_native_Ad, native_banner_ad);
+                        Log.d("Parth", "Admob Small Native ad show");
+                        AdsControl.isAdmob_small_native_Loaded = false;
+                        small_native_Ads();
+                    } else if (isadx_small_native_Loaded) {
+                        new NativeAds(activity).Admob_Small_Native_Ad(AdsControl.Adx_small_native_Ad, native_banner_ad);
+                        Log.d("Parth", "Adx Small Native ad show");
+                        AdsControl.isadx_small_native_Loaded = false;
+                        small_native_Ads();
+                    } else if (isFb_small_native_Loaded) {
+                        new NativeAds(activity).FB_Smalle_Native(AdsControl.fb_small_native_Ad, native_banner_ad);
+                        Log.d("Parth", "FB Small Native ad show");
+                        AdsControl.isFb_small_native_Loaded = false;
+                        small_native_Ads();
+                    } else if (isapplovin_small_native_Loaded) {
+                        if (Applovin_small_native_Ad != null) {
+                            native_banner_ad.removeAllViews();
+                        }
+                        native_banner_ad.removeAllViews();
+                        native_banner_ad.addView(applovin_small_native_Ad);
+                        Log.d("Parth", "Applovin Small Native ad show");
+                        AdsControl.isapplovin_small_native_Loaded = false;
+                        small_native_Ads();
+                    } else if (isWortise_small_Native_Loaded) {
+                        new NativeAds(activity).Admob_Small_Native_Ad(AdsControl.wortise_small_native_Ad, native_banner_ad);
+                        Log.d("Parth", "Wortise Small Native ad show");
+                        AdsControl.isWortise_small_Native_Loaded = false;
+                        small_native_Ads();
+                    } else if (isLocal_small_Native_Loaded) {
+                        @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_small_native_ad, null);
+                        show_local_small_native(viewGroup);
+                        native_banner_ad.removeAllViews();
+                        native_banner_ad.addView(viewGroup);
+                        Log.d("Parth", "Local Small Native ad show");
+                        AdsControl.isLocal_small_Native_Loaded = false;
+                        small_native_Ads();
+                    }
+                } else {
+                    small_native_Ads();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (isAdmob_small_native_Loaded) {
+                                new NativeAds(activity).Admob_Small_Native_Ad(AdsControl.Admob_small_native_Ad, native_banner_ad);
+                                Log.d("Parth", "Admob Small Native ad show");
+                                AdsControl.isAdmob_small_native_Loaded = false;
+                            } else if (isadx_small_native_Loaded) {
+                                new NativeAds(activity).Admob_Small_Native_Ad(AdsControl.Adx_small_native_Ad, native_banner_ad);
+                                Log.d("Parth", "Adx Small Native ad show");
+                                AdsControl.isadx_small_native_Loaded = false;
+                            } else if (isFb_small_native_Loaded) {
+                                new NativeAds(activity).FB_Smalle_Native(AdsControl.fb_small_native_Ad, native_banner_ad);
+                                Log.d("Parth", "FB Small Native ad show");
+                                AdsControl.isFb_small_native_Loaded = false;
+                            } else if (isapplovin_small_native_Loaded) {
+                                if (Applovin_small_native_Ad != null) {
+                                    native_banner_ad.removeAllViews();
+                                }
+                                native_banner_ad.removeAllViews();
+                                native_banner_ad.addView(applovin_small_native_Ad);
+                                Log.d("Parth", "Applovin Small Native ad show");
+                                AdsControl.isapplovin_small_native_Loaded = false;
+                            } else if (isWortise_small_Native_Loaded) {
+                                new NativeAds(activity).Admob_Small_Native_Ad(AdsControl.wortise_small_native_Ad, native_banner_ad);
+                                Log.d("Parth", "Wortise Small Native ad show");
+                                AdsControl.isWortise_small_Native_Loaded = false;
+                            } else if (isLocal_small_Native_Loaded) {
+                                @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_small_native_ad, null);
+                                show_local_small_native(viewGroup);
+                                native_banner_ad.removeAllViews();
+                                native_banner_ad.addView(viewGroup);
+                                Log.d("Parth", "Local Small Native ad show");
+                                AdsControl.isLocal_small_Native_Loaded = false;
+                            }
+                        }
+                    }, 2800);
                 }
             }
         }
@@ -1427,27 +1758,30 @@ public class AdsControl {
             if (isadmob_native_Loaded) {
                 return;
             }
-            final AdLoader.Builder builder = new AdLoader.Builder(activity, app_data.get(0).getAdmobNativeid().get(current_admob_native_Id));
-            builder.forNativeAd(nativeAd -> {
-                Log.d("Parth", "Admob Native Ad Loaded");
-                Admob_native_Ad = nativeAd;
-                isadmob_native_Loaded = true;
-            });
-            builder.withAdListener(new AdListener() {
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    super.onAdFailedToLoad(loadAdError);
-                    Log.d("Parth", "Admob Native Ad Failed" + loadAdError);
-                    native_Ads();
-                }
+            String placementId = app_data.get(0).getAdmobNativeid().get(current_admob_native_Id);
+            if (!placementId.equalsIgnoreCase("")) {
+                final AdLoader.Builder builder = new AdLoader.Builder(activity, placementId);
+                builder.forNativeAd(nativeAd -> {
+                    Log.d("Parth", "Admob Native Ad Loaded");
+                    Admob_native_Ad = nativeAd;
+                    isadmob_native_Loaded = true;
+                });
+                builder.withAdListener(new AdListener() {
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        super.onAdFailedToLoad(loadAdError);
+                        Log.d("Parth", "Admob Native Ad Failed" + loadAdError.getMessage());
+                        native_Ads();
+                    }
 
-                public void onAdLoaded() {
-                    super.onAdLoaded();
+                    public void onAdLoaded() {
+                        super.onAdLoaded();
+                    }
+                }).build().loadAd(new AdRequest.Builder().build());
+                current_admob_native_Id++;
+                if (current_admob_native_Id == app_data.get(0).getAdmobNativeid().size()) {
+                    current_admob_native_Id = 0;
                 }
-            }).build().loadAd(new AdRequest.Builder().build());
-            current_admob_native_Id++;
-            if (current_admob_native_Id == app_data.get(0).getAdmobNativeid().size()) {
-                current_admob_native_Id = 0;
             }
         }
     }
@@ -1459,27 +1793,30 @@ public class AdsControl {
             if (isadx_native_Loaded) {
                 return;
             }
-            final AdLoader.Builder builder = new AdLoader.Builder(activity, app_data.get(0).getAdxNativeId().get(current_adx_native_Id));
-            builder.forNativeAd(nativeAd -> {
-                Log.d("Parth", "Adx Native Ad Loaded");
-                Adx_native_Ad = nativeAd;
-                isadx_native_Loaded = true;
-            });
-            builder.withAdListener(new AdListener() {
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    super.onAdFailedToLoad(loadAdError);
-                    Log.d("Parth", "Adx Native Ad Failed" + loadAdError);
-                    native_Ads();
-                }
+            String placementId = app_data.get(0).getAdxNativeId().get(current_adx_native_Id);
+            if (!placementId.equalsIgnoreCase("")) {
+                final AdLoader.Builder builder = new AdLoader.Builder(activity, placementId);
+                builder.forNativeAd(nativeAd -> {
+                    Log.d("Parth", "Adx Native Ad Loaded");
+                    Adx_native_Ad = nativeAd;
+                    isadx_native_Loaded = true;
+                });
+                builder.withAdListener(new AdListener() {
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        super.onAdFailedToLoad(loadAdError);
+                        Log.d("Parth", "Adx Native Ad Failed" + loadAdError.getMessage());
+                        native_Ads();
+                    }
 
-                public void onAdLoaded() {
-                    super.onAdLoaded();
+                    public void onAdLoaded() {
+                        super.onAdLoaded();
+                    }
+                }).build().loadAd(new AdRequest.Builder().build());
+                current_adx_native_Id++;
+                if (current_adx_native_Id == app_data.get(0).getAdxNativeId().size()) {
+                    current_adx_native_Id = 0;
                 }
-            }).build().loadAd(new AdRequest.Builder().build());
-            current_adx_native_Id++;
-            if (current_adx_native_Id == app_data.get(0).getAdxNativeId().size()) {
-                current_adx_native_Id = 0;
             }
         }
     }
@@ -1490,42 +1827,42 @@ public class AdsControl {
             if (isFB_Native_Loaded) {
                 return;
             }
-            final com.facebook.ads.NativeAd fbnative_Ad = new com.facebook.ads.NativeAd(activity, app_data.get(0).getFbNativeId().get(current_fb_native_Id));
-            NativeAdListener nativeAdListener = new NativeAdListener() {
-                @Override
-                public void onMediaDownloaded(Ad ad) {
-                    Log.d("Parth", "FB Native ad finished downloading all assets.");
-                }
+            String placementId = app_data.get(0).getFbNativeId().get(current_fb_native_Id);
+            if (!placementId.equalsIgnoreCase("")) {
+                final com.facebook.ads.NativeAd fbnative_Ad = new com.facebook.ads.NativeAd(activity, placementId);
+                NativeAdListener nativeAdListener = new NativeAdListener() {
+                    @Override
+                    public void onMediaDownloaded(Ad ad) {
+                    }
 
-                @SuppressLint("MissingPermission")
-                @Override
-                public void onError(Ad ad, AdError adError) {
-                    Log.d("Parth", "FB Native ad Failed " + adError.getErrorMessage());
-                    native_Ads();
-                }
+                    @SuppressLint("MissingPermission")
+                    @Override
+                    public void onError(Ad ad, AdError adError) {
+                        Log.d("Parth", "FB Native ad Failed " + adError.getErrorMessage());
+                        native_Ads();
+                    }
 
-                @Override
-                public void onAdLoaded(Ad ad) {
-                    Log.d("Parth", " FB Native ad is loaded");
-                    fb_native_Ad = fbnative_Ad;
-                    isFB_Native_Loaded = true;
-                }
+                    @Override
+                    public void onAdLoaded(Ad ad) {
+                        Log.d("Parth", " FB Native ad is loaded");
+                        fb_native_Ad = fbnative_Ad;
+                        isFB_Native_Loaded = true;
+                    }
 
-                @Override
-                public void onAdClicked(Ad ad) {
-                    Log.d("Parth", "FB Native ad clicked!");
-                }
+                    @Override
+                    public void onAdClicked(Ad ad) {
+                    }
 
-                @Override
-                public void onLoggingImpression(Ad ad) {
-                    Log.d("Parth", "FB Native ad impression");
+                    @Override
+                    public void onLoggingImpression(Ad ad) {
+                    }
+                };
+                // Request an ad
+                fbnative_Ad.loadAd(fbnative_Ad.buildLoadAdConfig().withAdListener(nativeAdListener).withMediaCacheFlag(NativeAdBase.MediaCacheFlag.ALL).build());
+                current_fb_native_Id++;
+                if (current_fb_native_Id == app_data.get(0).getFbNativeId().size()) {
+                    current_fb_native_Id = 0;
                 }
-            };
-            // Request an ad
-            fbnative_Ad.loadAd(fbnative_Ad.buildLoadAdConfig().withAdListener(nativeAdListener).withMediaCacheFlag(NativeAdBase.MediaCacheFlag.ALL).build());
-            current_fb_native_Id++;
-            if (current_fb_native_Id == app_data.get(0).getFbNativeId().size()) {
-                current_fb_native_Id = 0;
             }
         }
     }
@@ -1536,32 +1873,35 @@ public class AdsControl {
             if (isApplovin_Native_Loaded) {
                 return;
             }
-            final MaxNativeAdLoader nativeAdLoader = new MaxNativeAdLoader(app_data.get(0).getApplovin_nativeid().get(current_applovin_native_Id), activity);
-            nativeAdLoader.setRevenueListener(ad -> {
-            });
-            nativeAdLoader.setNativeAdListener(new MaxNativeAdListener() {
-                @Override
-                public void onNativeAdLoaded(final MaxNativeAdView nativeAdView, final MaxAd ad) {
-                    Log.d("Parth", "Applovin Native ad Loaded");
-                    applovin_maxnativeadview = nativeAdView;
-                    Applovin_native_ad = ad;
-                    isApplovin_Native_Loaded = true;
-                }
+            String placementId = app_data.get(0).getApplovin_nativeid().get(current_applovin_native_Id);
+            if (!placementId.equalsIgnoreCase("")) {
+                final MaxNativeAdLoader nativeAdLoader = new MaxNativeAdLoader(placementId, activity);
+                nativeAdLoader.setRevenueListener(ad -> {
+                });
+                nativeAdLoader.setNativeAdListener(new MaxNativeAdListener() {
+                    @Override
+                    public void onNativeAdLoaded(final MaxNativeAdView nativeAdView, final MaxAd ad) {
+                        Log.d("Parth", "Applovin Native ad Loaded");
+                        applovin_maxnativeadview = nativeAdView;
+                        Applovin_native_ad = ad;
+                        isApplovin_Native_Loaded = true;
+                    }
 
-                @Override
-                public void onNativeAdLoadFailed(final String adUnitId, final MaxError error) {
-                    Log.d("Parth", "Applovin Native ad Failed " + error.getMessage());
-                    native_Ads();
-                }
+                    @Override
+                    public void onNativeAdLoadFailed(final String adUnitId, final MaxError error) {
+                        Log.d("Parth", "Applovin Native ad Failed " + error.getMessage());
+                        native_Ads();
+                    }
 
-                @Override
-                public void onNativeAdClicked(final MaxAd ad) {
+                    @Override
+                    public void onNativeAdClicked(final MaxAd ad) {
+                    }
+                });
+                nativeAdLoader.loadAd(new NativeAds(activity).createNativeAdView());
+                current_applovin_native_Id++;
+                if (current_applovin_native_Id == app_data.get(0).getApplovin_nativeid().size()) {
+                    current_applovin_native_Id = 0;
                 }
-            });
-            nativeAdLoader.loadAd(new NativeAds(activity).createNativeAdView());
-            current_applovin_native_Id++;
-            if (current_applovin_native_Id == app_data.get(0).getApplovin_nativeid().size()) {
-                current_applovin_native_Id = 0;
             }
         }
     }
@@ -1572,34 +1912,37 @@ public class AdsControl {
             if (isWortise_Native_Loaded) {
                 return;
             }
-            final GoogleNativeAd wortise_google_native = new GoogleNativeAd(activity, app_data.get(0).getWortiseNativeId().get(current_wortise_native_Id), new GoogleNativeAd.Listener() {
-                @Override
-                public void onNativeClicked(@NonNull GoogleNativeAd googleNativeAd) {
-                }
+            String placementId = app_data.get(0).getWortiseNativeId().get(current_wortise_native_Id);
+            if (!placementId.equalsIgnoreCase("")) {
+                final GoogleNativeAd wortise_google_native = new GoogleNativeAd(activity, placementId, new GoogleNativeAd.Listener() {
+                    @Override
+                    public void onNativeClicked(@NonNull GoogleNativeAd googleNativeAd) {
+                    }
 
-                @SuppressLint("MissingPermission")
-                @Override
-                public void onNativeFailed(@NonNull GoogleNativeAd googleNativeAd, @NonNull com.wortise.ads.AdError adError) {
-                    Log.d("Parth", "Wortise Native ad Failed" + adError);
-                    native_Ads();
-                }
+                    @SuppressLint("MissingPermission")
+                    @Override
+                    public void onNativeFailed(@NonNull GoogleNativeAd googleNativeAd, @NonNull com.wortise.ads.AdError adError) {
+                        Log.d("Parth", "Wortise Native ad Failed" + adError);
+                        native_Ads();
+                    }
 
-                @Override
-                public void onNativeImpression(@NonNull GoogleNativeAd googleNativeAd) {
-                }
+                    @Override
+                    public void onNativeImpression(@NonNull GoogleNativeAd googleNativeAd) {
+                    }
 
-                @Override
-                public void onNativeLoaded(@NonNull GoogleNativeAd googleNativeAd, @NonNull NativeAd nativeAd) {
-                    Log.d("Parth", "Wortise Naive ad Loaded");
-                    wortise_google_native_Ad = googleNativeAd;
-                    wortise_native_Ad = nativeAd;
-                    isWortise_Native_Loaded = true;
+                    @Override
+                    public void onNativeLoaded(@NonNull GoogleNativeAd googleNativeAd, @NonNull NativeAd nativeAd) {
+                        Log.d("Parth", "Wortise Naive ad Loaded");
+                        wortise_google_native_Ad = googleNativeAd;
+                        wortise_native_Ad = nativeAd;
+                        isWortise_Native_Loaded = true;
+                    }
+                });
+                wortise_google_native.load();
+                current_wortise_native_Id++;
+                if (current_wortise_native_Id == app_data.get(0).getWortiseNativeId().size()) {
+                    current_wortise_native_Id = 0;
                 }
-            });
-            wortise_google_native.load();
-            current_wortise_native_Id++;
-            if (current_wortise_native_Id == app_data.get(0).getWortiseNativeId().size()) {
-                current_wortise_native_Id = 0;
             }
         }
     }
@@ -1610,6 +1953,37 @@ public class AdsControl {
             return;
         }
         isLocal_Native_Loaded = true;
+    }
+
+    void show_local_native(ViewGroup banner_container) {
+        if (app_data != null && app_data.size() > 0) {
+            if (AdsControl.isLocal_Native_Loaded) {
+                RelativeLayout custm_native = banner_container.findViewById(R.id.custm_native_ad);
+                ImageView app_icon_native = banner_container.findViewById(R.id.ad_app_icon);
+                TextView app_name_native = banner_container.findViewById(R.id.ad_headline);
+                ImageView app_banner = banner_container.findViewById(R.id.ad_banner);
+                TextView app_ad_body = banner_container.findViewById(R.id.ad_body);
+                TextView ad_call_to_action = banner_container.findViewById(R.id.ad_call_to_action);
+                try {
+                    Glide.with(activity).load(app_data.get(0).getNew_app_icon()).into(app_icon_native);
+                    Glide.with(activity).load(app_data.get(0).getNew_app_banner()).into(app_banner);
+                    app_name_native.setText(app_data.get(0).getNew_app_name());
+                    app_name_native.setSelected(true);
+                    app_ad_body.setText(app_data.get(0).getNew_app_body());
+                    app_ad_body.setSelected(true);
+                    ad_call_to_action.setText("Install");
+                } catch (Exception ignored) {
+                }
+                custm_native.setOnClickListener(view -> {
+                    try {
+                        Intent intent = new Intent("android.intent.action.VIEW").setData(Uri.parse(app_data.get(0).getNew_app_link()));
+                        activity.startActivity(intent);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+        }
     }
 
     // TODO: 8/3/2023  Medium Rect Ad
@@ -1652,10 +2026,6 @@ public class AdsControl {
                                 }
                                 ad_medium_network++;
                                 break;
-                            case "local":
-                                preloadmedium_rect_Local();
-                                ad_medium_network++;
-                                break;
                             default:
                         }
                         if (ad_medium_network == adnetwork.length) {
@@ -1682,29 +2052,32 @@ public class AdsControl {
             if (isAdmob_Mediam_Ragtangal_Loaded) {
                 return;
             }
-            final AdView admob_Mediam_Ragtangal = new AdView(activity);
-            admob_Mediam_Ragtangal.setAdSize(AdSize.MEDIUM_RECTANGLE);
-            admob_Mediam_Ragtangal.setAdUnitId(app_data.get(0).getAdmobMediumRectangleid().get(current_admob_medium_rectId));
-            AdRequest adRequest = new AdRequest.Builder().build();
-            admob_Mediam_Ragtangal.loadAd(adRequest);
-            admob_Mediam_Ragtangal.setAdListener(new AdListener() {
-                @Override
-                public void onAdLoaded() {
-                    Log.d("Parth", "admob mediam ragtangal loaded");
-                    admobMediam_Ragtangal = admob_Mediam_Ragtangal;
-                    isAdmob_Mediam_Ragtangal_Loaded = true;
-                }
+            String placmentId = app_data.get(0).getAdmobMediumRectangleid().get(current_admob_medium_rectId);
+            if (!placmentId.equalsIgnoreCase("")) {
+                final AdView admob_Mediam_Ragtangal = new AdView(activity);
+                admob_Mediam_Ragtangal.setAdSize(AdSize.MEDIUM_RECTANGLE);
+                admob_Mediam_Ragtangal.setAdUnitId(placmentId);
+                AdRequest adRequest = new AdRequest.Builder().build();
+                admob_Mediam_Ragtangal.loadAd(adRequest);
+                admob_Mediam_Ragtangal.setAdListener(new AdListener() {
+                    @Override
+                    public void onAdLoaded() {
+                        Log.d("Parth", "admob mediam ragtangal loaded");
+                        admobMediam_Ragtangal = admob_Mediam_Ragtangal;
+                        isAdmob_Mediam_Ragtangal_Loaded = true;
+                    }
 
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError adError) {
-                    super.onAdFailedToLoad(adError);
-                    Log.d("Parth", "admob mediam ragtangal failed" + adError);
-                    medium_rect_Ads();
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError adError) {
+                        super.onAdFailedToLoad(adError);
+                        Log.d("Parth", "admob mediam ragtangal failed" + adError.getMessage());
+                        medium_rect_Ads();
+                    }
+                });
+                current_admob_medium_rectId++;
+                if (current_admob_medium_rectId == app_data.get(0).getAdmobMediumRectangleid().size()) {
+                    current_admob_medium_rectId = 0;
                 }
-            });
-            current_admob_medium_rectId++;
-            if (current_admob_medium_rectId == app_data.get(0).getAdmobMediumRectangleid().size()) {
-                current_admob_medium_rectId = 0;
             }
         }
     }
@@ -1716,31 +2089,34 @@ public class AdsControl {
             if (isAdx_Mediam_Ragtangal_Loaded) {
                 return;
             }
-            final AdManagerAdView adx_Mediam_Ragtangal = new AdManagerAdView(activity);
-            adx_Mediam_Ragtangal.setAdSize(AdSize.MEDIUM_RECTANGLE);
-            adx_Mediam_Ragtangal.setAdUnitId(app_data.get(0).getAdxMediumRectangleid().get(current_adx_medium_rectId));
-            AdManagerAdRequest adRequest = new AdManagerAdRequest.Builder().build();
-            adx_Mediam_Ragtangal.loadAd(adRequest);
-            adx_Mediam_Ragtangal.setAdListener(new AdListener() {
-                @Override
-                public void onAdLoaded() {
-                    super.onAdLoaded();
-                    Log.d("Parth", "adx mediam ragtangal loaded");
-                    adxMediam_Ragtangal = adx_Mediam_Ragtangal;
-                    isAdx_Mediam_Ragtangal_Loaded = true;
-                }
+            String placmentId = app_data.get(0).getAdxMediumRectangleid().get(current_adx_medium_rectId);
+            if (!placmentId.equalsIgnoreCase("")) {
+                final AdManagerAdView adx_Mediam_Ragtangal = new AdManagerAdView(activity);
+                adx_Mediam_Ragtangal.setAdSize(AdSize.MEDIUM_RECTANGLE);
+                adx_Mediam_Ragtangal.setAdUnitId(placmentId);
+                AdManagerAdRequest adRequest = new AdManagerAdRequest.Builder().build();
+                adx_Mediam_Ragtangal.loadAd(adRequest);
+                adx_Mediam_Ragtangal.setAdListener(new AdListener() {
+                    @Override
+                    public void onAdLoaded() {
+                        super.onAdLoaded();
+                        Log.d("Parth", "adx mediam ragtangal loaded");
+                        adxMediam_Ragtangal = adx_Mediam_Ragtangal;
+                        isAdx_Mediam_Ragtangal_Loaded = true;
+                    }
 
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    super.onAdFailedToLoad(loadAdError);
-                    Log.d("Parth", "adx mediam ragtangal failed" + loadAdError);
-                    medium_rect_Ads();
-                }
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        super.onAdFailedToLoad(loadAdError);
+                        Log.d("Parth", "adx mediam ragtangal failed" + loadAdError.getMessage());
+                        medium_rect_Ads();
+                    }
 
-            });
-            current_adx_medium_rectId++;
-            if (current_adx_medium_rectId == app_data.get(0).getAdxMediumRectangleid().size()) {
-                current_adx_medium_rectId = 0;
+                });
+                current_adx_medium_rectId++;
+                if (current_adx_medium_rectId == app_data.get(0).getAdxMediumRectangleid().size()) {
+                    current_adx_medium_rectId = 0;
+                }
             }
         }
     }
@@ -1751,33 +2127,36 @@ public class AdsControl {
             if (isFB_Mediam_Ragtangal_Loaded) {
                 return;
             }
-            final com.facebook.ads.AdView fb_Ragtangal = new com.facebook.ads.AdView(activity, app_data.get(0).getFbMediumRectangleId().get(current_fb_medium_rectId), com.facebook.ads.AdSize.RECTANGLE_HEIGHT_250);
-            com.facebook.ads.AdListener adListener = new com.facebook.ads.AdListener() {
-                @Override
-                public void onAdLoaded(Ad ad) {
-                    Log.d("Parth", "FB mediam ragtangal Loadedd ");
-                    fb_Ragtangal_adView = fb_Ragtangal;
-                    isFB_Mediam_Ragtangal_Loaded = true;
-                }
+            String placmentId = app_data.get(0).getFbMediumRectangleId().get(current_fb_medium_rectId);
+            if (!placmentId.equalsIgnoreCase("")) {
+                final com.facebook.ads.AdView fb_Ragtangal = new com.facebook.ads.AdView(activity, placmentId, com.facebook.ads.AdSize.RECTANGLE_HEIGHT_250);
+                com.facebook.ads.AdListener adListener = new com.facebook.ads.AdListener() {
+                    @Override
+                    public void onAdLoaded(Ad ad) {
+                        Log.d("Parth", "FB mediam ragtangal Loadedd ");
+                        fb_Ragtangal_adView = fb_Ragtangal;
+                        isFB_Mediam_Ragtangal_Loaded = true;
+                    }
 
-                @Override
-                public void onError(Ad ad, AdError adError) {
-                    Log.d("Parth", "FB mediam ragtangal Failed" + adError);
-                    medium_rect_Ads();
-                }
+                    @Override
+                    public void onError(Ad ad, AdError adError) {
+                        Log.d("Parth", "FB mediam ragtangal Failed" + adError.getErrorMessage());
+                        medium_rect_Ads();
+                    }
 
-                @Override
-                public void onAdClicked(Ad ad) {
-                }
+                    @Override
+                    public void onAdClicked(Ad ad) {
+                    }
 
-                @Override
-                public void onLoggingImpression(Ad ad) {
+                    @Override
+                    public void onLoggingImpression(Ad ad) {
+                    }
+                };
+                fb_Ragtangal.loadAd(fb_Ragtangal.buildLoadAdConfig().withAdListener(adListener).build());
+                current_fb_medium_rectId++;
+                if (current_fb_medium_rectId == app_data.get(0).getFbMediumRectangleId().size()) {
+                    current_fb_medium_rectId = 0;
                 }
-            };
-            fb_Ragtangal.loadAd(fb_Ragtangal.buildLoadAdConfig().withAdListener(adListener).build());
-            current_fb_medium_rectId++;
-            if (current_fb_medium_rectId == app_data.get(0).getFbMediumRectangleId().size()) {
-                current_fb_medium_rectId = 0;
             }
         }
     }
@@ -1788,52 +2167,55 @@ public class AdsControl {
             if (isApplovin_Mediam_Ragtangal_Loaded) {
                 return;
             }
-            final MaxAdView applovin_medium_rect = new MaxAdView(app_data.get(0).getApplovin_medium_rectangle_id().get(current_applovin_medium_rectId), MaxAdFormat.MREC, activity);
-            int widthPx = AppLovinSdkUtils.dpToPx(activity, 300);
-            int heightPx = AppLovinSdkUtils.dpToPx(activity, 250);
-            applovin_medium_rect.setLayoutParams(new ViewGroup.LayoutParams(widthPx, heightPx));
-            applovin_medium_rect.loadAd();
-            applovin_medium_rect.setListener(new MaxAdViewAdListener() {
-                @Override
-                public void onAdExpanded(MaxAd maxAd) {
-                }
+            String placmentId = app_data.get(0).getApplovin_medium_rectangle_id().get(current_applovin_medium_rectId);
+            if (!placmentId.equalsIgnoreCase("")) {
+                final MaxAdView applovin_medium_rect = new MaxAdView(placmentId, MaxAdFormat.MREC, activity);
+                int widthPx = AppLovinSdkUtils.dpToPx(activity, 300);
+                int heightPx = AppLovinSdkUtils.dpToPx(activity, 250);
+                applovin_medium_rect.setLayoutParams(new ViewGroup.LayoutParams(widthPx, heightPx));
+                applovin_medium_rect.loadAd();
+                applovin_medium_rect.setListener(new MaxAdViewAdListener() {
+                    @Override
+                    public void onAdExpanded(MaxAd maxAd) {
+                    }
 
-                @Override
-                public void onAdCollapsed(MaxAd maxAd) {
-                }
+                    @Override
+                    public void onAdCollapsed(MaxAd maxAd) {
+                    }
 
-                @Override
-                public void onAdLoaded(MaxAd maxAd) {
-                    Log.d("Parth", "Applovin mediam ragtangal Loaded");
-                    applovin_Medium_Ragtangal_adview = applovin_medium_rect;
-                    isApplovin_Mediam_Ragtangal_Loaded = true;
-                }
+                    @Override
+                    public void onAdLoaded(MaxAd maxAd) {
+                        Log.d("Parth", "Applovin mediam ragtangal Loaded");
+                        applovin_Medium_Ragtangal_adview = applovin_medium_rect;
+                        isApplovin_Mediam_Ragtangal_Loaded = true;
+                    }
 
-                @Override
-                public void onAdDisplayed(MaxAd maxAd) {
-                }
+                    @Override
+                    public void onAdDisplayed(MaxAd maxAd) {
+                    }
 
-                @Override
-                public void onAdHidden(MaxAd maxAd) {
-                }
+                    @Override
+                    public void onAdHidden(MaxAd maxAd) {
+                    }
 
-                @Override
-                public void onAdClicked(MaxAd maxAd) {
-                }
+                    @Override
+                    public void onAdClicked(MaxAd maxAd) {
+                    }
 
-                @Override
-                public void onAdLoadFailed(String s, MaxError maxError) {
-                    Log.d("Parth", "Applovin mediam ragtangal Failed " + maxError);
-                    medium_rect_Ads();
-                }
+                    @Override
+                    public void onAdLoadFailed(String s, MaxError maxError) {
+                        Log.d("Parth", "Applovin mediam ragtangal Failed " + maxError.getMessage());
+                        medium_rect_Ads();
+                    }
 
-                @Override
-                public void onAdDisplayFailed(MaxAd maxAd, MaxError maxError) {
+                    @Override
+                    public void onAdDisplayFailed(MaxAd maxAd, MaxError maxError) {
+                    }
+                });
+                current_applovin_medium_rectId++;
+                if (current_applovin_medium_rectId == app_data.get(0).getApplovin_medium_rectangle_id().size()) {
+                    current_applovin_medium_rectId = 0;
                 }
-            });
-            current_applovin_medium_rectId++;
-            if (current_applovin_medium_rectId == app_data.get(0).getApplovin_medium_rectangle_id().size()) {
-                current_applovin_medium_rectId = 0;
             }
         }
     }
@@ -1844,62 +2226,35 @@ public class AdsControl {
             if (isWortise_medium_ragtangal_Loaded) {
                 return;
             }
-            final BannerAd wortise_medium_ragtangal = new BannerAd(activity);
-            wortise_medium_ragtangal.setAdSize(com.wortise.ads.AdSize.HEIGHT_250);
-            wortise_medium_ragtangal.setAdUnitId(app_data.get(0).getWortiseMediumRectangleId().get(current_wortise_medium_rectId));
-            wortise_medium_ragtangal.loadAd();
-            wortise_medium_ragtangal.setListener(new BannerAd.Listener() {
-                @Override
-                public void onBannerLoaded(@NonNull BannerAd bannerAd) {
-                    Log.d("Parth", "Wortise Medium Ragtangal Loadedd ");
-                    w_medium_ragtangal = wortise_medium_ragtangal;
-                    isWortise_medium_ragtangal_Loaded = true;
-                }
+            String placmentId = app_data.get(0).getWortiseMediumRectangleId().get(current_wortise_medium_rectId);
+            if (!placmentId.equalsIgnoreCase("")) {
+                final BannerAd wortise_medium_ragtangal = new BannerAd(activity);
+                wortise_medium_ragtangal.setAdSize(com.wortise.ads.AdSize.HEIGHT_250);
+                wortise_medium_ragtangal.setAdUnitId(placmentId);
+                wortise_medium_ragtangal.loadAd();
+                wortise_medium_ragtangal.setListener(new BannerAd.Listener() {
+                    @Override
+                    public void onBannerLoaded(@NonNull BannerAd bannerAd) {
+                        Log.d("Parth", "Wortise Medium Ragtangal Loadedd ");
+                        w_medium_ragtangal = wortise_medium_ragtangal;
+                        isWortise_medium_ragtangal_Loaded = true;
+                    }
 
-                @Override
-                public void onBannerClicked(@NonNull BannerAd bannerAd) {
-                }
+                    @Override
+                    public void onBannerClicked(@NonNull BannerAd bannerAd) {
+                    }
 
-                @Override
-                public void onBannerFailed(@NonNull BannerAd bannerAd, @NonNull com.wortise.ads.AdError adError) {
-                    Log.d("Parth", "Wortise Medium Ragtangal failed " + adError);
-                    medium_rect_Ads();
+                    @Override
+                    public void onBannerFailed(@NonNull BannerAd bannerAd, @NonNull com.wortise.ads.AdError adError) {
+                        Log.d("Parth", "Wortise Medium Ragtangal failed " + adError);
+                        medium_rect_Ads();
+                    }
+                });
+                current_wortise_medium_rectId++;
+                if (current_wortise_medium_rectId == app_data.get(0).getWortiseMediumRectangleId().size()) {
+                    current_wortise_medium_rectId = 0;
                 }
-            });
-            current_wortise_medium_rectId++;
-            if (current_wortise_medium_rectId == app_data.get(0).getWortiseMediumRectangleId().size()) {
-                current_wortise_medium_rectId = 0;
             }
-        }
-    }
-
-    // Local Mode
-    void preloadmedium_rect_Local() {
-        if (isLocal_medium_ragtangal_Loaded) {
-            return;
-        }
-        isLocal_medium_ragtangal_Loaded = true;
-    }
-
-    void local_medium(ViewGroup local_medium) {
-        if (app_data != null && app_data.size() > 0) {
-            RelativeLayout local_banner_ad = local_medium.findViewById(R.id.local_medium_ads);
-            ImageView app_banner = local_medium.findViewById(R.id.app_medium_banner);
-            try {
-                Glide.with(activity).load(app_data.get(0).getNew_app_banner()).into(app_banner);
-            } catch (Exception ignored) {
-            }
-            local_banner_ad.setOnClickListener(view -> {
-                try {
-                    Intent intent = new Intent("android.intent.action.VIEW").setData(Uri.parse(app_data.get(0).getNew_app_link()));
-                    activity.startActivity(intent);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            Log.d("Parth", "Local Medium Ragtangal Show ");
-            isLocal_medium_ragtangal_Loaded = false;
-            medium_rect_Ads();
         }
     }
 
@@ -1908,36 +2263,193 @@ public class AdsControl {
     public void show_native_ad(final ViewGroup native_ad) {
         if (app_data != null && app_data.size() > 0) {
             if (app_data.get(0).isAds_show()) {
-                if (isadmob_native_Loaded) {
-                    new All_Type_Ads(activity).show_native_ad_Admob(native_ad);
-                } else if (isadx_native_Loaded) {
-                    new All_Type_Ads(activity).show_native_ad_Adx(native_ad);
-                } else if (isFB_Native_Loaded) {
-                    new All_Type_Ads(activity).show_native_ad_FB(native_ad);
-                } else if (isApplovin_Native_Loaded) {
-                    new All_Type_Ads(activity).show_native_ad_Applovin(native_ad);
-                } else if (isWortise_Native_Loaded) {
-                    new All_Type_Ads(activity).show_native_ad_Wortise(native_ad);
-                } else if (isLocal_Native_Loaded) {
-                    @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_native_ad, null);
-                    new All_Type_Ads(activity).show_local_native(viewGroup);
-                    native_ad.removeAllViews();
-                    native_ad.addView(viewGroup);
-                } else if (isAdmob_Mediam_Ragtangal_Loaded) {
-                    new All_Type_Ads(activity).show_medium_ad_Admob(native_ad);
-                } else if (isAdx_Mediam_Ragtangal_Loaded) {
-                    new All_Type_Ads(activity).show_medium_ad_Adx(native_ad);
-                } else if (isFB_Mediam_Ragtangal_Loaded) {
-                    new All_Type_Ads(activity).show_medium_ad_FB(native_ad);
-                } else if (isApplovin_Mediam_Ragtangal_Loaded) {
-                    new All_Type_Ads(activity).show_medium_ad_Applovin(native_ad);
-                } else if (isWortise_medium_ragtangal_Loaded) {
-                    new All_Type_Ads(activity).show_medium_ad_Wortise(native_ad);
-                } else if (isLocal_medium_ragtangal_Loaded) {
-                    @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_medium_ad, null);
-                    local_medium(viewGroup);
-                    native_ad.removeAllViews();
-                    native_ad.addView(viewGroup);
+                if (app_data.get(0).isPreload_native_ads()) {
+                    if (isadmob_native_Loaded) {
+                        new NativeAds(activity).Admob_NativeAd(AdsControl.Admob_native_Ad, native_ad);
+                        Log.d("Parth", "Admob Native ad show");
+                        AdsControl.isadmob_native_Loaded = false;
+                        native_Ads();
+                    } else if (isadx_native_Loaded) {
+                        new NativeAds(activity).Admob_NativeAd(AdsControl.Adx_native_Ad, native_ad);
+                        Log.d("Parth", "Adx Native ad show");
+                        AdsControl.isadx_native_Loaded = false;
+                        native_Ads();
+                    } else if (isFB_Native_Loaded) {
+                        new NativeAds(activity).FB_Native(AdsControl.fb_native_Ad, native_ad);
+                        Log.d("Parth", "FB Native ad show");
+                        AdsControl.isFB_Native_Loaded = false;
+                        native_Ads();
+                    } else if (isApplovin_Native_Loaded) {
+                        if (Applovin_native_ad != null) {
+                            native_ad.removeAllViews();
+                        }
+                        native_ad.removeAllViews();
+                        native_ad.addView(applovin_maxnativeadview);
+                        Log.d("Parth", "Applovin Native ad show");
+                        AdsControl.isApplovin_Native_Loaded = false;
+                        native_Ads();
+                    } else if (isWortise_Native_Loaded) {
+                        new NativeAds(activity).Admob_NativeAd(AdsControl.wortise_native_Ad, native_ad);
+                        Log.d("Parth", "Wortise Native ad show");
+                        AdsControl.isWortise_Native_Loaded = false;
+                        native_Ads();
+                    } else if (isLocal_Native_Loaded) {
+                        @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_native_ad, null);
+                        show_local_native(viewGroup);
+                        native_ad.removeAllViews();
+                        native_ad.addView(viewGroup);
+                        Log.d("Parth", "Local Native ad show");
+                        AdsControl.isLocal_Native_Loaded = false;
+                        native_Ads();
+                    } else if (isAdmob_Mediam_Ragtangal_Loaded) {
+                        try {
+                            if (admobMediam_Ragtangal.getParent() != null) {
+                                ((ViewGroup) admobMediam_Ragtangal.getParent()).removeView(admobMediam_Ragtangal);
+                            }
+                            native_ad.addView(admobMediam_Ragtangal);
+                            AdsControl.isAdmob_Mediam_Ragtangal_Loaded = false;
+                            medium_rect_Ads();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else if (isAdx_Mediam_Ragtangal_Loaded) {
+                        try {
+                            if (adxMediam_Ragtangal.getParent() != null) {
+                                ((ViewGroup) adxMediam_Ragtangal.getParent()).removeView(adxMediam_Ragtangal);
+                            }
+                            native_ad.addView(adxMediam_Ragtangal);
+                            AdsControl.isAdx_Mediam_Ragtangal_Loaded = false;
+                            medium_rect_Ads();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else if (isFB_Mediam_Ragtangal_Loaded) {
+                        try {
+                            if (fb_Ragtangal_adView.getParent() != null) {
+                                ((ViewGroup) fb_Ragtangal_adView.getParent()).removeView(fb_Ragtangal_adView);
+                            }
+                            native_ad.addView(fb_Ragtangal_adView);
+                            AdsControl.isFB_Mediam_Ragtangal_Loaded = false;
+                            medium_rect_Ads();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else if (isApplovin_Mediam_Ragtangal_Loaded) {
+                        try {
+                            if (applovin_Medium_Ragtangal_adview.getParent() != null) {
+                                ((ViewGroup) applovin_Medium_Ragtangal_adview.getParent()).removeView(applovin_Medium_Ragtangal_adview);
+                            }
+                            native_ad.addView(applovin_Medium_Ragtangal_adview);
+                            AdsControl.isApplovin_Mediam_Ragtangal_Loaded = false;
+                            medium_rect_Ads();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else if (isWortise_medium_ragtangal_Loaded) {
+                        try {
+                            if (w_medium_ragtangal.getParent() != null) {
+                                ((ViewGroup) w_medium_ragtangal.getParent()).removeView(w_medium_ragtangal);
+                            }
+                            native_ad.addView(w_medium_ragtangal);
+                            AdsControl.isWortise_medium_ragtangal_Loaded = false;
+                            medium_rect_Ads();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                } else {
+                    if (app_data.get(0).getAd_native_type().equalsIgnoreCase("mrec")) {
+                        medium_rect_Ads();
+                    } else {
+                        native_Ads();
+                    }
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (isadmob_native_Loaded) {
+                                new NativeAds(activity).Admob_NativeAd(AdsControl.Admob_native_Ad, native_ad);
+                                Log.d("Parth", "Admob Native ad show");
+                                AdsControl.isadmob_native_Loaded = false;
+                            } else if (isadx_native_Loaded) {
+                                new NativeAds(activity).Admob_NativeAd(AdsControl.Adx_native_Ad, native_ad);
+                                Log.d("Parth", "Adx Native ad show");
+                                AdsControl.isadx_native_Loaded = false;
+                            } else if (isFB_Native_Loaded) {
+                                new NativeAds(activity).FB_Native(AdsControl.fb_native_Ad, native_ad);
+                                Log.d("Parth", "FB Native ad show");
+                                AdsControl.isFB_Native_Loaded = false;
+                            } else if (isApplovin_Native_Loaded) {
+                                if (Applovin_native_ad != null) {
+                                    native_ad.removeAllViews();
+                                }
+                                native_ad.removeAllViews();
+                                native_ad.addView(applovin_maxnativeadview);
+                                Log.d("Parth", "Applovin Native ad show");
+                                AdsControl.isApplovin_Native_Loaded = false;
+                            } else if (isWortise_Native_Loaded) {
+                                new NativeAds(activity).Admob_NativeAd(AdsControl.wortise_native_Ad, native_ad);
+                                Log.d("Parth", "Wortise Native ad show");
+                                AdsControl.isWortise_Native_Loaded = false;
+                            } else if (isLocal_Native_Loaded) {
+                                @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_native_ad, null);
+                                show_local_native(viewGroup);
+                                native_ad.removeAllViews();
+                                native_ad.addView(viewGroup);
+                                Log.d("Parth", "Local Native ad show");
+                                AdsControl.isLocal_Native_Loaded = false;
+                            } else if (isAdmob_Mediam_Ragtangal_Loaded) {
+                                try {
+                                    if (admobMediam_Ragtangal.getParent() != null) {
+                                        ((ViewGroup) admobMediam_Ragtangal.getParent()).removeView(admobMediam_Ragtangal);
+                                    }
+                                    native_ad.addView(admobMediam_Ragtangal);
+                                    AdsControl.isAdmob_Mediam_Ragtangal_Loaded = false;
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            } else if (isAdx_Mediam_Ragtangal_Loaded) {
+                                try {
+                                    if (adxMediam_Ragtangal.getParent() != null) {
+                                        ((ViewGroup) adxMediam_Ragtangal.getParent()).removeView(adxMediam_Ragtangal);
+                                    }
+                                    native_ad.addView(adxMediam_Ragtangal);
+                                    AdsControl.isAdx_Mediam_Ragtangal_Loaded = false;
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            } else if (isFB_Mediam_Ragtangal_Loaded) {
+                                try {
+                                    if (fb_Ragtangal_adView.getParent() != null) {
+                                        ((ViewGroup) fb_Ragtangal_adView.getParent()).removeView(fb_Ragtangal_adView);
+                                    }
+                                    native_ad.addView(fb_Ragtangal_adView);
+                                    AdsControl.isFB_Mediam_Ragtangal_Loaded = false;
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            } else if (isApplovin_Mediam_Ragtangal_Loaded) {
+                                try {
+                                    if (applovin_Medium_Ragtangal_adview.getParent() != null) {
+                                        ((ViewGroup) applovin_Medium_Ragtangal_adview.getParent()).removeView(applovin_Medium_Ragtangal_adview);
+                                    }
+                                    native_ad.addView(applovin_Medium_Ragtangal_adview);
+                                    AdsControl.isApplovin_Mediam_Ragtangal_Loaded = false;
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            } else if (isWortise_medium_ragtangal_Loaded) {
+                                try {
+                                    if (w_medium_ragtangal.getParent() != null) {
+                                        ((ViewGroup) w_medium_ragtangal.getParent()).removeView(w_medium_ragtangal);
+                                    }
+                                    native_ad.addView(w_medium_ragtangal);
+                                    AdsControl.isWortise_medium_ragtangal_Loaded = false;
+                                } catch (Exception e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        }
+                    }, 2500);
                 }
             }
         }
@@ -2022,44 +2534,46 @@ public class AdsControl {
                 return;
             }
             String placementId = app_data.get(0).getAdmobInterid().get(current_admob_IntrId);
-            final AdRequest adRequest = new AdRequest.Builder().build();
-            InterstitialAd.load(activity, placementId, adRequest, new InterstitialAdLoadCallback() {
-                @Override
-                public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                    Log.d("Parth", "Admob Inter Loaded");
-                    ADMOBInterstitialAd = interstitialAd;
-                    isGoogleInterLoaded = true;
-                    interstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
-                        @Override
-                        public void onAdDismissedFullScreenContent() {
-                            Log.d("Parth", "Admob Inter Close");
-                            if (callback != null) {
-                                callback.onSuccess();
-                                callback = null;
+            if (!placementId.equalsIgnoreCase("")) {
+                final AdRequest adRequest = new AdRequest.Builder().build();
+                InterstitialAd.load(activity, placementId, adRequest, new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        Log.d("Parth", "Admob Inter Loaded");
+                        ADMOBInterstitialAd = interstitialAd;
+                        isGoogleInterLoaded = true;
+                        interstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                            @Override
+                            public void onAdDismissedFullScreenContent() {
+                                Log.d("Parth", "Admob Inter Close");
+                                if (callback != null) {
+                                    callback.onSuccess();
+                                    callback = null;
+                                }
                             }
-                        }
 
-                        @Override
-                        public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
-                            Log.d("Parth", "Admob Inter failed to show" + adError.getMessage());
-                        }
+                            @Override
+                            public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
+                                Log.d("Parth", "Admob Inter failed to show" + adError.getMessage());
+                            }
 
-                        @Override
-                        public void onAdShowedFullScreenContent() {
+                            @Override
+                            public void onAdShowedFullScreenContent() {
+                                Log.d("Parth", "Admob Inter Show");
+                            }
+                        });
+                    }
 
-                        }
-                    });
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        Log.d("Parth", "Admob Inter Failed");
+                        inter_Ads();
+                    }
+                });
+                current_admob_IntrId++;
+                if (current_admob_IntrId == app_data.get(0).getAdmobInterid().size()) {
+                    current_admob_IntrId = 0;
                 }
-
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    Log.d("Parth", "Admob Inter Failed");
-                    inter_Ads();
-                }
-            });
-            current_admob_IntrId++;
-            if (current_admob_IntrId == app_data.get(0).getAdmobInterid().size()) {
-                current_admob_IntrId = 0;
             }
         }
     }
@@ -2071,43 +2585,46 @@ public class AdsControl {
                 return;
             }
             String placementId = app_data.get(0).getAdxInterId().get(current_adx_IntrId);
-            final AdManagerAdRequest adRequest = new AdManagerAdRequest.Builder().build();
-            AdManagerInterstitialAd.load(activity, placementId, adRequest, new AdManagerInterstitialAdLoadCallback() {
-                @Override
-                public void onAdLoaded(@NonNull AdManagerInterstitialAd interstitialAd) {
-                    super.onAdLoaded(interstitialAd);
-                    Log.d("Parth", "Adx Inter Loaded");
-                    ADXInterstitialAd = interstitialAd;
-                    isAdxInterLoaded = true;
-                    interstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
-                        @Override
-                        public void onAdDismissedFullScreenContent() {
-                            Log.d("Parth", "Adx Inter Close");
-                            if (callback != null) {
-                                callback.onSuccess();
-                                callback = null;
+            if (!placementId.equalsIgnoreCase("")) {
+                final AdManagerAdRequest adRequest = new AdManagerAdRequest.Builder().build();
+                AdManagerInterstitialAd.load(activity, placementId, adRequest, new AdManagerInterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull AdManagerInterstitialAd interstitialAd) {
+                        super.onAdLoaded(interstitialAd);
+                        Log.d("Parth", "Adx Inter Loaded");
+                        ADXInterstitialAd = interstitialAd;
+                        isAdxInterLoaded = true;
+                        interstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                            @Override
+                            public void onAdDismissedFullScreenContent() {
+                                Log.d("Parth", "Adx Inter Close");
+                                if (callback != null) {
+                                    callback.onSuccess();
+                                    callback = null;
+                                }
                             }
-                        }
 
-                        @Override
-                        public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
-                        }
+                            @Override
+                            public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
+                            }
 
-                        @Override
-                        public void onAdShowedFullScreenContent() {
-                        }
-                    });
+                            @Override
+                            public void onAdShowedFullScreenContent() {
+                                Log.d("Parth", "Adx Inter Show");
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        Log.d("Parth", "Adx Inter Failed");
+                        inter_Ads();
+                    }
+                });
+                current_adx_IntrId++;
+                if (current_adx_IntrId == app_data.get(0).getAdxInterId().size()) {
+                    current_adx_IntrId = 0;
                 }
-
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    Log.d("Parth", "Adx Inter Failed");
-                    inter_Ads();
-                }
-            });
-            current_adx_IntrId++;
-            if (current_adx_IntrId == app_data.get(0).getAdxInterId().size()) {
-                current_adx_IntrId = 0;
             }
         }
     }
@@ -2118,49 +2635,52 @@ public class AdsControl {
             if (isFBInterLoaded) {
                 return;
             }
-            final com.facebook.ads.InterstitialAd FB_interstitial = new com.facebook.ads.InterstitialAd(activity, app_data.get(0).getFbInterId().get(current_fb_IntrId));
-            InterstitialAdListener interstitialAdListener = new InterstitialAdListener() {
-                @Override
-                public void onInterstitialDisplayed(Ad ad) {
-                    Log.d("Parth", "FB Interstitial ad displayed.");
-                }
-
-                @Override
-                public void onInterstitialDismissed(Ad ad) {
-                    Log.d("Parth", "FB Inter ad Close.");
-                    if (callback != null) {
-                        callback.onSuccess();
-                        callback = null;
+            String placementId = app_data.get(0).getFbInterId().get(current_fb_IntrId);
+            if (!placementId.equalsIgnoreCase("")) {
+                final com.facebook.ads.InterstitialAd FB_interstitial = new com.facebook.ads.InterstitialAd(activity, placementId);
+                InterstitialAdListener interstitialAdListener = new InterstitialAdListener() {
+                    @Override
+                    public void onInterstitialDisplayed(Ad ad) {
+                        Log.d("Parth", "FB Inter Show");
                     }
-                }
 
-                @Override
-                public void onError(Ad ad, AdError adError) {
-                    Log.d("Parth", "FB Inter Failed");
-                    inter_Ads();
-                }
+                    @Override
+                    public void onInterstitialDismissed(Ad ad) {
+                        Log.d("Parth", "FB Inter ad Close.");
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
+                        }
+                    }
 
-                @Override
-                public void onAdLoaded(Ad ad) {
-                    Log.d("Parth", "FB Inter ad Loaded");
-                    FB_interstitialAd = FB_interstitial;
-                    isFBInterLoaded = true;
-                }
+                    @Override
+                    public void onError(Ad ad, AdError adError) {
+                        Log.d("Parth", "FB Inter Failed");
+                        inter_Ads();
+                    }
 
-                @Override
-                public void onAdClicked(Ad ad) {
-                    Log.d("Parth", "FB Interstitial ad clicked!");
-                }
+                    @Override
+                    public void onAdLoaded(Ad ad) {
+                        Log.d("Parth", "FB Inter ad Loaded");
+                        FB_interstitialAd = FB_interstitial;
+                        isFBInterLoaded = true;
+                    }
 
-                @Override
-                public void onLoggingImpression(Ad ad) {
-                    Log.d("Parth", "FB Interstitial ad impression logged!");
+                    @Override
+                    public void onAdClicked(Ad ad) {
+                        Log.d("Parth", "FB Interstitial ad clicked!");
+                    }
+
+                    @Override
+                    public void onLoggingImpression(Ad ad) {
+                        Log.d("Parth", "FB Interstitial ad impression logged!");
+                    }
+                };
+                FB_interstitial.loadAd(FB_interstitial.buildLoadAdConfig().withAdListener(interstitialAdListener).build());
+                current_fb_IntrId++;
+                if (current_fb_IntrId == app_data.get(0).getFbInterId().size()) {
+                    current_fb_IntrId = 0;
                 }
-            };
-            FB_interstitial.loadAd(FB_interstitial.buildLoadAdConfig().withAdListener(interstitialAdListener).build());
-            current_fb_IntrId++;
-            if (current_fb_IntrId == app_data.get(0).getFbInterId().size()) {
-                current_fb_IntrId = 0;
             }
         }
     }
@@ -2171,46 +2691,50 @@ public class AdsControl {
             if (isApplovinInterLoaded) {
                 return;
             }
-            MaxInterstitialAd interstitialAdmax = new MaxInterstitialAd(app_data.get(0).getApplovin_interid().get(current_applovin_IntrId), (Activity) activity);
-            interstitialAdmax.setListener(new MaxAdListener() {
-                @Override
-                public void onAdLoaded(MaxAd ad) {
-                    Log.d("Parth", "Applovin Inter Loaded");
-                    Applovin_maxInterstitialAd = interstitialAdmax;
-                    isApplovinInterLoaded = true;
-                }
-
-                @Override
-                public void onAdDisplayed(MaxAd ad) {
-                }
-
-                @Override
-                public void onAdHidden(MaxAd ad) {
-                    Log.d("Parth", "Applovin Inter Close");
-                    if (callback != null) {
-                        callback.onSuccess();
-                        callback = null;
+            String placementId = app_data.get(0).getApplovin_interid().get(current_applovin_IntrId);
+            if (!placementId.equalsIgnoreCase("")) {
+                MaxInterstitialAd interstitialAdmax = new MaxInterstitialAd(placementId, (Activity) activity);
+                interstitialAdmax.setListener(new MaxAdListener() {
+                    @Override
+                    public void onAdLoaded(MaxAd ad) {
+                        Log.d("Parth", "Applovin Inter Loaded");
+                        Applovin_maxInterstitialAd = interstitialAdmax;
+                        isApplovinInterLoaded = true;
                     }
-                }
 
-                @Override
-                public void onAdClicked(MaxAd ad) {
-                }
+                    @Override
+                    public void onAdDisplayed(MaxAd ad) {
+                        Log.d("Parth", "Applovin Inter Show");
+                    }
 
-                @Override
-                public void onAdLoadFailed(String adUnitId, MaxError error) {
-                    Log.d("Parth", "Applovin Inter Failed");
-                    inter_Ads();
-                }
+                    @Override
+                    public void onAdHidden(MaxAd ad) {
+                        Log.d("Parth", "Applovin Inter Close");
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
+                        }
+                    }
 
-                @Override
-                public void onAdDisplayFailed(MaxAd ad, MaxError error) {
+                    @Override
+                    public void onAdClicked(MaxAd ad) {
+                    }
+
+                    @Override
+                    public void onAdLoadFailed(String adUnitId, MaxError error) {
+                        Log.d("Parth", "Applovin Inter Failed");
+                        inter_Ads();
+                    }
+
+                    @Override
+                    public void onAdDisplayFailed(MaxAd ad, MaxError error) {
+                    }
+                });
+                interstitialAdmax.loadAd();
+                current_applovin_IntrId++;
+                if (current_applovin_IntrId == app_data.get(0).getApplovin_interid().size()) {
+                    current_applovin_IntrId = 0;
                 }
-            });
-            interstitialAdmax.loadAd();
-            current_applovin_IntrId++;
-            if (current_applovin_IntrId == app_data.get(0).getApplovin_interid().size()) {
-                current_applovin_IntrId = 0;
             }
         }
     }
@@ -2221,42 +2745,46 @@ public class AdsControl {
             if (isWortiseInterLoaded) {
                 return;
             }
-            final com.wortise.ads.interstitial.InterstitialAd Wortise_inter_ad = new com.wortise.ads.interstitial.InterstitialAd(activity, app_data.get(0).getWortiseInterId().get(current_wortise_IntrId));
-            Wortise_inter_ad.loadAd();
-            Wortise_inter_ad.setListener(new com.wortise.ads.interstitial.InterstitialAd.Listener() {
-                @Override
-                public void onInterstitialClicked(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
-                }
-
-                @Override
-                public void onInterstitialDismissed(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
-                    Log.d("Parth", "Wortise Inter ad Close.");
-                    if (callback != null) {
-                        callback.onSuccess();
-                        callback = null;
+            String placementId = app_data.get(0).getWortiseInterId().get(current_wortise_IntrId);
+            if (!placementId.equalsIgnoreCase("")) {
+                final com.wortise.ads.interstitial.InterstitialAd Wortise_inter_ad = new com.wortise.ads.interstitial.InterstitialAd(activity, placementId);
+                Wortise_inter_ad.loadAd();
+                Wortise_inter_ad.setListener(new com.wortise.ads.interstitial.InterstitialAd.Listener() {
+                    @Override
+                    public void onInterstitialClicked(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
                     }
-                }
 
-                @Override
-                public void onInterstitialFailed(@NonNull com.wortise.ads.interstitial.InterstitialAd ad, @NonNull com.wortise.ads.AdError error) {
-                    Log.d("Parth", "Wortise Inter Failed");
-                    inter_Ads();
-                }
+                    @Override
+                    public void onInterstitialDismissed(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
+                        Log.d("Parth", "Wortise Inter ad Close.");
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
+                        }
+                    }
 
-                @Override
-                public void onInterstitialLoaded(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
-                    Log.d("Parth", "Wortise Inter ad Loaded.");
-                    Wortise_inter = Wortise_inter_ad;
-                    isWortiseInterLoaded = true;
-                }
+                    @Override
+                    public void onInterstitialFailed(@NonNull com.wortise.ads.interstitial.InterstitialAd ad, @NonNull com.wortise.ads.AdError error) {
+                        Log.d("Parth", "Wortise Inter Failed");
+                        inter_Ads();
+                    }
 
-                @Override
-                public void onInterstitialShown(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
+                    @Override
+                    public void onInterstitialLoaded(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
+                        Log.d("Parth", "Wortise Inter ad Loaded.");
+                        Wortise_inter = Wortise_inter_ad;
+                        isWortiseInterLoaded = true;
+                    }
+
+                    @Override
+                    public void onInterstitialShown(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
+                        Log.d("Parth", "Wortise Inter Show");
+                    }
+                });
+                current_wortise_IntrId++;
+                if (current_wortise_IntrId == app_data.get(0).getWortiseInterId().size()) {
+                    current_wortise_IntrId = 0;
                 }
-            });
-            current_wortise_IntrId++;
-            if (current_wortise_IntrId == app_data.get(0).getWortiseInterId().size()) {
-                current_wortise_IntrId = 0;
             }
         }
     }
@@ -2266,46 +2794,50 @@ public class AdsControl {
             if (isInmobiInterLoaded) {
                 return;
             }
-            final InMobiInterstitial inMobiInterstitial = new InMobiInterstitial(activity, current_inmobi_IntrId, new
-                    InterstitialAdEventListener() {
-                        @Override
-                        public void onAdFetchFailed(@NonNull InMobiInterstitial inMobiInterstitial, @NonNull InMobiAdRequestStatus inMobiAdRequestStatus) {
-                            super.onAdFetchFailed(inMobiInterstitial, inMobiAdRequestStatus);
-                        }
+            Long placementId = app_data.get(0).getInmobi_inter_id().get(current_inmobi_IntrId);
+            if (!(placementId == 0)) {
+                final InMobiInterstitial inMobiInterstitial = new InMobiInterstitial(activity, placementId, new InterstitialAdEventListener() {
+                    @Override
+                    public void onAdFetchFailed(@NonNull InMobiInterstitial inMobiInterstitial, @NonNull InMobiAdRequestStatus inMobiAdRequestStatus) {
+                        super.onAdFetchFailed(inMobiInterstitial, inMobiAdRequestStatus);
+                    }
 
-                        @Override
-                        public void onAdFetchSuccessful(@NonNull InMobiInterstitial inMobiInterstitial, @NonNull AdMetaInfo adMetaInfo) {
-                            super.onAdFetchSuccessful(inMobiInterstitial, adMetaInfo);
-                        }
+                    @Override
+                    public void onAdFetchSuccessful(@NonNull InMobiInterstitial inMobiInterstitial, @NonNull AdMetaInfo adMetaInfo) {
+                        super.onAdFetchSuccessful(inMobiInterstitial, adMetaInfo);
+                        Log.d("Parth", "Inmobi Inter Show");
+                    }
 
-                        public void onAdDismissed(@NonNull InMobiInterstitial ad) {
-                            Log.d("Parth", "Inmobi Inter ad Close.");
-                            if (callback != null) {
-                                callback.onSuccess();
-                                callback = null;
-                            }
+                    public void onAdDismissed(@NonNull InMobiInterstitial ad) {
+                        Log.d("Parth", "Inmobi Inter ad Close.");
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
                         }
+                    }
 
-                        @Override
-                        public void onAdLoadSucceeded(@NonNull InMobiInterstitial inMobiInterstitial, @NonNull AdMetaInfo adMetaInfo) {
-                            super.onAdLoadSucceeded(inMobiInterstitial, adMetaInfo);
-                            Log.d("Parth", "inmobi Inter ad Loaded.");
-                            Inmobi_inter = inMobiInterstitial;
-                            isInmobiInterLoaded = true;
-                        }
+                    @Override
+                    public void onAdLoadSucceeded(@NonNull InMobiInterstitial inMobiInterstitial, @NonNull AdMetaInfo adMetaInfo) {
+                        super.onAdLoadSucceeded(inMobiInterstitial, adMetaInfo);
+                        Log.d("Parth", "Inmobi Inter ad Loaded.");
+                        Inmobi_inter = inMobiInterstitial;
+                        isInmobiInterLoaded = true;
+                    }
 
-                        @Override
-                        public void onAdLoadFailed(@NonNull InMobiInterstitial inMobiInterstitial, @NonNull InMobiAdRequestStatus inMobiAdRequestStatus) {
-                            super.onAdLoadFailed(inMobiInterstitial, inMobiAdRequestStatus);
-                            Log.d("Parth", "inmobi Inter ad Failed" + inMobiAdRequestStatus);
-                            inter_Ads();
-                        }
-                    });
-            inMobiInterstitial.load();
-            current_inmobi_IntrId++;
-            if (current_inmobi_IntrId == app_data.get(0).getInmobi_inter_id().size()) {
-                current_inmobi_IntrId = 0;
+                    @Override
+                    public void onAdLoadFailed(@NonNull InMobiInterstitial inMobiInterstitial, @NonNull InMobiAdRequestStatus inMobiAdRequestStatus) {
+                        super.onAdLoadFailed(inMobiInterstitial, inMobiAdRequestStatus);
+                        Log.d("Parth", "Inmobi Inter ad Failed" + inMobiAdRequestStatus);
+                        inter_Ads();
+                    }
+                });
+                inMobiInterstitial.load();
+                current_inmobi_IntrId++;
+                if (current_inmobi_IntrId == app_data.get(0).getInmobi_inter_id().size()) {
+                    current_inmobi_IntrId = 0;
+                }
             }
+
         }
     }
 
@@ -2322,151 +2854,343 @@ public class AdsControl {
         callback = callback2;
         if (app_data != null && app_data.size() > 0) {
             if (app_data.get(0).isAds_show()) {
-                if (isGoogleInterLoaded) {
-                    show_Interstitial_Admob(callback2);
-                } else if (isAdxInterLoaded) {
-                    show_Interstitial_Adx(callback2);
-                } else if (isFBInterLoaded) {
-                    show_Interstitial_FB(callback2);
-                } else if (isApplovinInterLoaded) {
-                    show_Interstitial_Applovin(callback2);
-                } else if (isWortiseInterLoaded) {
-                    show_Interstitial_Wortise(callback2);
-                } else if (isInmobiInterLoaded) {
-                    show_Interstitial_Inmobi(callback2);
-                } else if (isLocalInterLoaded) {
-                    adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
-                    if (adCounter == app_data.get(0).getInterCount()) {
-                        Inter_Count.getInstance(activity).storeClicks(1);
-                        show_Interstitial_local(callback2);
-                    } else {
-                        adCounter = adCounter + 1;
-                        Inter_Count.getInstance(activity).storeClicks(adCounter);
-                        if (callback != null) {
-                            callback.onSuccess();
-                            callback = null;
-                        }
-                    }
-                } else if (isadmob_appopen_Loaded) {
-                    FullScreenContentCallback fullScreenContentCallback = new FullScreenContentCallback() {
-                        @Override
-                        public void onAdDismissedFullScreenContent() {
-                            admob_appOpenAd_inter = null;
-                            if (callback != null) {
-                                callback.onSuccess();
-                                callback = null;
-                            }
-                            appopen_Ads();
-                        }
-
-                        @Override
-                        public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
-                            appopen_Ads();
-                        }
-
-                        @Override
-                        public void onAdShowedFullScreenContent() {
-                        }
-                    };
-                    adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
-                    if (adCounter == app_data.get(0).getInterCount()) {
-                        Inter_Count.getInstance(activity).storeClicks(1);
-                        admob_appOpenAd_inter.setFullScreenContentCallback(fullScreenContentCallback);
-                        admob_appOpenAd_inter.show((Activity) activity);
-                        isadmob_appopen_Loaded = false;
-                    } else {
-                        adCounter = adCounter + 1;
-                        Inter_Count.getInstance(activity).storeClicks(adCounter);
-                        if (callback != null) {
-                            callback.onSuccess();
-                            callback = null;
-                        }
-                    }
-                } else if (isadx_appopen_Loaded) {
-                    FullScreenContentCallback fullScreenContentCallback = new FullScreenContentCallback() {
-                        @Override
-                        public void onAdDismissedFullScreenContent() {
-                            adx_appOpenAd_inter = null;
-                            if (callback != null) {
-                                callback.onSuccess();
-                                callback = null;
-                            }
-                            appopen_Ads();
-                        }
-
-                        @Override
-                        public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
-                            appopen_Ads();
-                        }
-
-                        @Override
-                        public void onAdShowedFullScreenContent() {
-                        }
-                    };
-                    adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
-                    if (adCounter == app_data.get(0).getInterCount()) {
-                        Inter_Count.getInstance(activity).storeClicks(1);
-                        adx_appOpenAd_inter.setFullScreenContentCallback(fullScreenContentCallback);
-                        adx_appOpenAd_inter.show((Activity) activity);
-                        isadx_appopen_Loaded = false;
-                    } else {
-                        adCounter = adCounter + 1;
-                        Inter_Count.getInstance(activity).storeClicks(adCounter);
-                        if (callback != null) {
-                            callback.onSuccess();
-                            callback = null;
-                        }
-                    }
-                } else if (iswortise_appopen_Loaded) {
-                    adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
-                    if (adCounter == app_data.get(0).getInterCount()) {
-                        Inter_Count.getInstance(activity).storeClicks(1);
-                        if (wortise_open.isAvailable()) {
-                            wortise_open.showAd((Activity) activity);
-                            iswortise_appopen_Loaded = false;
-                        }
-                    } else {
-                        adCounter = adCounter + 1;
-                        Inter_Count.getInstance(activity).storeClicks(adCounter);
-                        if (callback != null) {
-                            callback.onSuccess();
-                            callback = null;
-                        }
-                    }
-                } else if (isapplovin_appopen_Loaded) {
-                    adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
-                    if (adCounter == app_data.get(0).getInterCount()) {
-                        Inter_Count.getInstance(activity).storeClicks(1);
-                        if (applovin_appopen.isReady()) {
-                            applovin_appopen.showAd();
+                if (app_data.get(0).isPreload_inter_ads()) {
+                    if (isGoogleInterLoaded) {
+                        adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
+                        if (adCounter == app_data.get(0).getInterCount()) {
+                            Inter_Count.getInstance(activity).storeClicks(1);
+                            ADMOBInterstitialAd.show((Activity) activity);
+                            isGoogleInterLoaded = false;
+                            inter_Ads();
                         } else {
-                            applovin_appopen.loadAd();
+                            adCounter = adCounter + 1;
+                            Inter_Count.getInstance(activity).storeClicks(adCounter);
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
+                            }
+                        }
+                    } else if (isAdxInterLoaded) {
+                        adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
+                        if (adCounter == app_data.get(0).getInterCount()) {
+                            Inter_Count.getInstance(activity).storeClicks(1);
+                            ADXInterstitialAd.show((Activity) activity);
+                            isAdxInterLoaded = false;
+                            inter_Ads();
+                        } else {
+                            adCounter = adCounter + 1;
+                            Inter_Count.getInstance(activity).storeClicks(adCounter);
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
+                            }
+                        }
+                    } else if (isFBInterLoaded) {
+                        adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
+                        if (adCounter == app_data.get(0).getInterCount()) {
+                            Inter_Count.getInstance(activity).storeClicks(1);
+                            FB_interstitialAd.show();
+                            isFBInterLoaded = false;
+                            inter_Ads();
+                        } else {
+                            adCounter = adCounter + 1;
+                            Inter_Count.getInstance(activity).storeClicks(adCounter);
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
+                            }
+                        }
+                    } else if (isApplovinInterLoaded) {
+                        adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
+                        if (adCounter == app_data.get(0).getInterCount()) {
+                            Inter_Count.getInstance(activity).storeClicks(1);
+                            Applovin_maxInterstitialAd.showAd();
+                            isApplovinInterLoaded = false;
+                            inter_Ads();
+                        } else {
+                            adCounter = adCounter + 1;
+                            Inter_Count.getInstance(activity).storeClicks(adCounter);
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
+                            }
+                        }
+                    } else if (isWortiseInterLoaded) {
+                        adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
+                        if (adCounter == app_data.get(0).getInterCount()) {
+                            Inter_Count.getInstance(activity).storeClicks(1);
+                            Wortise_inter.showAd();
+                            isWortiseInterLoaded = false;
+                            inter_Ads();
+                        } else {
+                            adCounter = adCounter + 1;
+                            Inter_Count.getInstance(activity).storeClicks(adCounter);
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
+                            }
+                        }
+                    } else if (isInmobiInterLoaded) {
+                        adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
+                        if (adCounter == app_data.get(0).getInterCount()) {
+                            Inter_Count.getInstance(activity).storeClicks(1);
+                            Inmobi_inter.show();
+                            isInmobiInterLoaded = false;
+                            inter_Ads();
+                        } else {
+                            adCounter = adCounter + 1;
+                            Inter_Count.getInstance(activity).storeClicks(adCounter);
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
+                            }
+                        }
+                    } else if (isLocalInterLoaded) {
+                        adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
+                        if (adCounter == app_data.get(0).getInterCount()) {
+                            Inter_Count.getInstance(activity).storeClicks(1);
+                            show_Interstitial_local(callback2);
+                            isLocalInterLoaded = false;
+                            inter_Ads();
+                        } else {
+                            adCounter = adCounter + 1;
+                            Inter_Count.getInstance(activity).storeClicks(adCounter);
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
+                            }
+                        }
+                    } else if (isadmob_appopen_Loaded) {
+                        FullScreenContentCallback fullScreenContentCallback = new FullScreenContentCallback() {
+                            @Override
+                            public void onAdDismissedFullScreenContent() {
+                                admob_appOpenAd_inter = null;
+                                if (callback != null) {
+                                    callback.onSuccess();
+                                    callback = null;
+                                }
+                            }
+
+                            @Override
+                            public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
+                            }
+
+                            @Override
+                            public void onAdShowedFullScreenContent() {
+                            }
+                        };
+                        adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
+                        if (adCounter == app_data.get(0).getInterCount()) {
+                            Inter_Count.getInstance(activity).storeClicks(1);
+                            admob_appOpenAd_inter.setFullScreenContentCallback(fullScreenContentCallback);
+                            admob_appOpenAd_inter.show((Activity) activity);
+                            Log.d("Parth", "Admob Appopen Show");
+                            isadmob_appopen_Loaded = false;
+                            appopen_Ads();
+                        } else {
+                            adCounter = adCounter + 1;
+                            Inter_Count.getInstance(activity).storeClicks(adCounter);
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
+                            }
+                        }
+                    } else if (isadx_appopen_Loaded) {
+                        FullScreenContentCallback fullScreenContentCallback = new FullScreenContentCallback() {
+                            @Override
+                            public void onAdDismissedFullScreenContent() {
+                                adx_appOpenAd_inter = null;
+                                if (callback != null) {
+                                    callback.onSuccess();
+                                    callback = null;
+                                }
+                            }
+
+                            @Override
+                            public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
+                            }
+
+                            @Override
+                            public void onAdShowedFullScreenContent() {
+                            }
+                        };
+                        adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
+                        if (adCounter == app_data.get(0).getInterCount()) {
+                            Inter_Count.getInstance(activity).storeClicks(1);
+                            adx_appOpenAd_inter.setFullScreenContentCallback(fullScreenContentCallback);
+                            adx_appOpenAd_inter.show((Activity) activity);
+                            Log.d("Parth", "Adx Appopen Show");
+                            isadx_appopen_Loaded = false;
+                            appopen_Ads();
+                        } else {
+                            adCounter = adCounter + 1;
+                            Inter_Count.getInstance(activity).storeClicks(adCounter);
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
+                            }
+                        }
+                    } else if (iswortise_appopen_Loaded) {
+                        adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
+                        if (adCounter == app_data.get(0).getInterCount()) {
+                            Inter_Count.getInstance(activity).storeClicks(1);
+                            if (wortise_open.isAvailable()) {
+                                wortise_open.showAd((Activity) activity);
+                                Log.d("Parth", "Wortise Appopen Show");
+                                iswortise_appopen_Loaded = false;
+                                appopen_Ads();
+                            }
+                        } else {
+                            adCounter = adCounter + 1;
+                            Inter_Count.getInstance(activity).storeClicks(adCounter);
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
+                            }
+                        }
+                    } else if (isapplovin_appopen_Loaded) {
+                        adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
+                        if (adCounter == app_data.get(0).getInterCount()) {
+                            Inter_Count.getInstance(activity).storeClicks(1);
+                            if (applovin_appopen.isReady()) {
+                                applovin_appopen.showAd();
+                                Log.d("Parth", "Applovin Appopen Show");
+                                appopen_Ads();
+                            } else {
+                                applovin_appopen.loadAd();
+                            }
+                        } else {
+                            adCounter = adCounter + 1;
+                            Inter_Count.getInstance(activity).storeClicks(adCounter);
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
+                            }
+                        }
+                    } else if (islocal_appopen_Loaded) {
+                        adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
+                        if (adCounter == app_data.get(0).getInterCount()) {
+                            Inter_Count.getInstance(activity).storeClicks(1);
+                            show_local_Appopen_inter(callback2);
+                            Log.d("Parth", "Local Appopen Show");
+                            islocal_appopen_Loaded = false;
+                            appopen_Ads();
+                        } else {
+                            adCounter = adCounter + 1;
+                            Inter_Count.getInstance(activity).storeClicks(adCounter);
+                            if (callback != null) {
+                                callback.onSuccess();
+                                callback = null;
+                            }
                         }
                     } else {
-                        adCounter = adCounter + 1;
-                        Inter_Count.getInstance(activity).storeClicks(adCounter);
-                        if (callback != null) {
-                            callback.onSuccess();
-                            callback = null;
-                        }
-                    }
-                } else if (islocal_appopen_Loaded) {
-                    adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
-                    if (adCounter == app_data.get(0).getInterCount()) {
-                        Inter_Count.getInstance(activity).storeClicks(1);
-                        show_local_Appopen_inter(callback2);
-                    } else {
-                        adCounter = adCounter + 1;
-                        Inter_Count.getInstance(activity).storeClicks(adCounter);
                         if (callback != null) {
                             callback.onSuccess();
                             callback = null;
                         }
                     }
                 } else {
-                    if (callback != null) {
-                        callback.onSuccess();
-                        callback = null;
+                    adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
+                    if (adCounter == app_data.get(0).getInterCount()) {
+                        Inter_Count.getInstance(activity).storeClicks(1);
+                        if (app_data.get(0).getAd_inter_type().equalsIgnoreCase("appopen")) {
+                            appopen_Ads();
+                        } else {
+                            inter_Ads();
+                        }
+                    } else {
+                        adCounter = adCounter + 1;
+                        Inter_Count.getInstance(activity).storeClicks(adCounter);
+                    }
+                    if (isGoogleInterLoaded) {
+                        ADMOBInterstitialAd.show((Activity) activity);
+                        isGoogleInterLoaded = false;
+                    } else if (isAdxInterLoaded) {
+                        ADXInterstitialAd.show((Activity) activity);
+                        isAdxInterLoaded = false;
+                    } else if (isFBInterLoaded) {
+                        FB_interstitialAd.show();
+                        isFBInterLoaded = false;
+                    } else if (isApplovinInterLoaded) {
+                        Applovin_maxInterstitialAd.showAd();
+                        isApplovinInterLoaded = false;
+                    } else if (isWortiseInterLoaded) {
+                        Wortise_inter.showAd();
+                        isWortiseInterLoaded = false;
+                    } else if (isInmobiInterLoaded) {
+                        Inmobi_inter.show();
+                        isInmobiInterLoaded = false;
+                    } else if (isLocalInterLoaded) {
+                        show_Interstitial_local(callback2);
+                        isLocalInterLoaded = false;
+                    } else if (isadmob_appopen_Loaded) {
+                        FullScreenContentCallback fullScreenContentCallback = new FullScreenContentCallback() {
+                            @Override
+                            public void onAdDismissedFullScreenContent() {
+                                admob_appOpenAd_inter = null;
+                                if (callback != null) {
+                                    callback.onSuccess();
+                                    callback = null;
+                                }
+                            }
+
+                            @Override
+                            public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
+                            }
+
+                            @Override
+                            public void onAdShowedFullScreenContent() {
+                            }
+                        };
+                        admob_appOpenAd_inter.setFullScreenContentCallback(fullScreenContentCallback);
+                        admob_appOpenAd_inter.show((Activity) activity);
+                        Log.d("Parth", "Admob Appopen Show");
+                        isadmob_appopen_Loaded = false;
+                    } else if (isadx_appopen_Loaded) {
+                        FullScreenContentCallback fullScreenContentCallback = new FullScreenContentCallback() {
+                            @Override
+                            public void onAdDismissedFullScreenContent() {
+                                adx_appOpenAd_inter = null;
+                                if (callback != null) {
+                                    callback.onSuccess();
+                                    callback = null;
+                                }
+                            }
+
+                            @Override
+                            public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
+                            }
+
+                            @Override
+                            public void onAdShowedFullScreenContent() {
+                            }
+                        };
+                        adx_appOpenAd_inter.setFullScreenContentCallback(fullScreenContentCallback);
+                        adx_appOpenAd_inter.show((Activity) activity);
+                        Log.d("Parth", "Adx Appopen Show");
+                        isadx_appopen_Loaded = false;
+                    } else if (iswortise_appopen_Loaded) {
+                        if (wortise_open.isAvailable()) {
+                            wortise_open.showAd((Activity) activity);
+                            Log.d("Parth", "Wortise Appopen Show");
+                            iswortise_appopen_Loaded = false;
+                        }
+                    } else if (isapplovin_appopen_Loaded) {
+                        if (applovin_appopen.isReady()) {
+                            applovin_appopen.showAd();
+                            Log.d("Parth", "Applovin Appopen Show");
+                        } else {
+                            applovin_appopen.loadAd();
+                        }
+                    } else if (islocal_appopen_Loaded) {
+                        show_local_Appopen_inter(callback2);
+                        Log.d("Parth", "Local Appopen Show");
+                        islocal_appopen_Loaded = false;
+                    } else {
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
+                        }
                     }
                 }
             } else {
@@ -2474,162 +3198,6 @@ public class AdsControl {
                     callback.onSuccess();
                     callback = null;
                 }
-            }
-        }
-    }
-
-    // Admob Mode
-    void show_Interstitial_Admob(getDataListner Callback2) {
-        callback = Callback2;
-        if (isGoogleInterLoaded) {
-            adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
-            if (adCounter == app_data.get(0).getInterCount() && ADMOBInterstitialAd != null) {
-                Inter_Count.getInstance(activity).storeClicks(1);
-                ADMOBInterstitialAd.show((Activity) activity);
-                isGoogleInterLoaded = false;
-                inter_Ads();
-            } else {
-                adCounter = adCounter + 1;
-                Inter_Count.getInstance(activity).storeClicks(adCounter);
-                if (callback != null) {
-                    callback.onSuccess();
-                    callback = null;
-                }
-            }
-        } else {
-            if (callback != null) {
-                callback.onSuccess();
-                callback = null;
-            }
-        }
-    }
-
-    // Adx Mode
-    void show_Interstitial_Adx(getDataListner myCallback2) {
-        callback = myCallback2;
-        if (isAdxInterLoaded) {
-            adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
-            if (adCounter == app_data.get(0).getInterCount() && ADXInterstitialAd != null) {
-                Inter_Count.getInstance(activity).storeClicks(1);
-                ADXInterstitialAd.show((Activity) activity);
-                isAdxInterLoaded = false;
-                inter_Ads();
-            } else {
-                adCounter = adCounter + 1;
-                Inter_Count.getInstance(activity).storeClicks(adCounter);
-                if (callback != null) {
-                    callback.onSuccess();
-                    callback = null;
-                }
-            }
-        } else {
-            if (callback != null) {
-                callback.onSuccess();
-                callback = null;
-            }
-        }
-    }
-
-    // FB Mode
-    void show_Interstitial_FB(getDataListner myCallback2) {
-        callback = myCallback2;
-        if (isFBInterLoaded) {
-            adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
-            if (adCounter == app_data.get(0).getInterCount() && FB_interstitialAd != null) {
-                Inter_Count.getInstance(activity).storeClicks(1);
-                FB_interstitialAd.show();
-                isFBInterLoaded = false;
-                inter_Ads();
-            } else {
-                adCounter = adCounter + 1;
-                Inter_Count.getInstance(activity).storeClicks(adCounter);
-                if (callback != null) {
-                    callback.onSuccess();
-                    callback = null;
-                }
-            }
-        } else {
-            if (callback != null) {
-                callback.onSuccess();
-                callback = null;
-            }
-        }
-    }
-
-    // Applovin Mode
-    void show_Interstitial_Applovin(getDataListner myCallback2) {
-        callback = myCallback2;
-        if (isApplovinInterLoaded) {
-            adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
-            if (adCounter == app_data.get(0).getInterCount() && Applovin_maxInterstitialAd != null) {
-                Inter_Count.getInstance(activity).storeClicks(1);
-                Applovin_maxInterstitialAd.showAd();
-                isApplovinInterLoaded = false;
-                inter_Ads();
-            } else {
-                adCounter = adCounter + 1;
-                Inter_Count.getInstance(activity).storeClicks(adCounter);
-                if (callback != null) {
-                    callback.onSuccess();
-                    callback = null;
-                }
-            }
-        } else {
-            if (callback != null) {
-                callback.onSuccess();
-                callback = null;
-            }
-        }
-    }
-
-    // Wortise Mode
-    void show_Interstitial_Wortise(getDataListner myCallback2) {
-        callback = myCallback2;
-        if (isWortiseInterLoaded) {
-            adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
-            if (adCounter == app_data.get(0).getInterCount() && Wortise_inter != null) {
-                Inter_Count.getInstance(activity).storeClicks(1);
-                Wortise_inter.showAd();
-                isWortiseInterLoaded = false;
-                inter_Ads();
-            } else {
-                adCounter = adCounter + 1;
-                Inter_Count.getInstance(activity).storeClicks(adCounter);
-                if (callback != null) {
-                    callback.onSuccess();
-                    callback = null;
-                }
-            }
-        } else {
-            if (callback != null) {
-                callback.onSuccess();
-                callback = null;
-            }
-        }
-    }
-
-    // Inmobi Mode
-    void show_Interstitial_Inmobi(getDataListner myCallback2) {
-        callback = myCallback2;
-        if (isInmobiInterLoaded) {
-            adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
-            if (adCounter == app_data.get(0).getInterCount() && Inmobi_inter != null) {
-                Inter_Count.getInstance(activity).storeClicks(1);
-                Inmobi_inter.show();
-                isInmobiInterLoaded = false;
-                inter_Ads();
-            } else {
-                adCounter = adCounter + 1;
-                Inter_Count.getInstance(activity).storeClicks(adCounter);
-                if (callback != null) {
-                    callback.onSuccess();
-                    callback = null;
-                }
-            }
-        } else {
-            if (callback != null) {
-                callback.onSuccess();
-                callback = null;
             }
         }
     }
@@ -2700,8 +3268,6 @@ public class AdsControl {
                 }
             });
             dialog.show();
-            isLocalInterLoaded = false;
-            inter_Ads();
         }
     }
 
@@ -2788,6 +3354,7 @@ public class AdsControl {
                     Log.d("Parth", "Adx Open Ad show");
                     appOpenAd.show((Activity) activity);
                 }
+
                 public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
                     super.onAdFailedToLoad(loadAdError);
                     Log.e("Parth", "Admob Open Failed" + loadAdError.getMessage());
@@ -3013,21 +3580,24 @@ public class AdsControl {
             if (isadmob_appopen_Loaded) {
                 return;
             }
-            AppOpenAd.AppOpenAdLoadCallback loadCallback = new AppOpenAd.AppOpenAdLoadCallback() {
-                public void onAdLoaded(@NonNull AppOpenAd appOpenAd) {
-                    super.onAdLoaded(appOpenAd);
-                    Log.d("Parth", "Admob Open Ad loaded");
-                    admob_appOpenAd_inter = appOpenAd;
-                    isadmob_appopen_Loaded = true;
-                }
+            String placementId = app_data.get(0).getAdmobAppopenid();
+            if (!placementId.equalsIgnoreCase("")) {
+                AppOpenAd.AppOpenAdLoadCallback loadCallback = new AppOpenAd.AppOpenAdLoadCallback() {
+                    public void onAdLoaded(@NonNull AppOpenAd appOpenAd) {
+                        super.onAdLoaded(appOpenAd);
+                        Log.d("Parth", "Admob Open Ad loaded");
+                        admob_appOpenAd_inter = appOpenAd;
+                        isadmob_appopen_Loaded = true;
+                    }
 
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    super.onAdFailedToLoad(loadAdError);
-                    Log.e("Parth", "Admob Open Failed" + loadAdError.getMessage());
-                    appopen_Ads();
-                }
-            };
-            AppOpenAd.load(activity, app_data.get(0).getAdmobAppopenid(), getAdRequest(), loadCallback);
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        super.onAdFailedToLoad(loadAdError);
+                        Log.e("Parth", "Admob Open Failed" + loadAdError.getMessage());
+                        appopen_Ads();
+                    }
+                };
+                AppOpenAd.load(activity, placementId, getAdRequest(), loadCallback);
+            }
         }
     }
 
@@ -3037,21 +3607,24 @@ public class AdsControl {
             if (isadx_appopen_Loaded) {
                 return;
             }
-            AppOpenAd.AppOpenAdLoadCallback loadCallback = new AppOpenAd.AppOpenAdLoadCallback() {
-                public void onAdLoaded(@NonNull AppOpenAd appOpenAd) {
-                    super.onAdLoaded(appOpenAd);
-                    Log.d("Parth", "Adx Open Ad loaded");
-                    adx_appOpenAd_inter = appOpenAd;
-                    isadx_appopen_Loaded = true;
-                }
+            String placementId = app_data.get(0).getAdxAppopenId();
+            if (!placementId.equalsIgnoreCase("")) {
+                AppOpenAd.AppOpenAdLoadCallback loadCallback = new AppOpenAd.AppOpenAdLoadCallback() {
+                    public void onAdLoaded(@NonNull AppOpenAd appOpenAd) {
+                        super.onAdLoaded(appOpenAd);
+                        Log.d("Parth", "Adx Open Ad loaded");
+                        adx_appOpenAd_inter = appOpenAd;
+                        isadx_appopen_Loaded = true;
+                    }
 
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    super.onAdFailedToLoad(loadAdError);
-                    Log.e("Parth", "Adx Open Failed" + loadAdError.getMessage());
-                    appopen_Ads();
-                }
-            };
-            AppOpenAd.load(activity, app_data.get(0).getAdxAppopenId(), adManagerAdRequest(), loadCallback);
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        super.onAdFailedToLoad(loadAdError);
+                        Log.e("Parth", "Adx Open Failed" + loadAdError.getMessage());
+                        appopen_Ads();
+                    }
+                };
+                AppOpenAd.load(activity, placementId, adManagerAdRequest(), loadCallback);
+            }
         }
     }
 
@@ -3061,40 +3634,43 @@ public class AdsControl {
             if (iswortise_appopen_Loaded) {
                 return;
             }
-            final com.wortise.ads.appopen.AppOpenAd wortise_open_ad = new com.wortise.ads.appopen.AppOpenAd(activity, app_data.get(0).getWortiseAppopenId());
-            wortise_open_ad.loadAd();
-            wortise_open_ad.setListener(new com.wortise.ads.appopen.AppOpenAd.Listener() {
-                @Override
-                public void onAppOpenShown(@NonNull com.wortise.ads.appopen.AppOpenAd appOpenAd) {
-                }
-
-                @Override
-                public void onAppOpenLoaded(@NonNull com.wortise.ads.appopen.AppOpenAd appOpenAd) {
-                    Log.d("Parth", "Wortise Open Ad loaded");
-                    wortise_open = wortise_open_ad;
-                    iswortise_appopen_Loaded = true;
-                }
-
-                @Override
-                public void onAppOpenFailed(@NonNull com.wortise.ads.appopen.AppOpenAd appOpenAd, @NonNull com.wortise.ads.AdError adError) {
-                    appopen_Ads();
-                }
-
-                @Override
-                public void onAppOpenDismissed(@NonNull com.wortise.ads.appopen.AppOpenAd appOpenAd) {
-                    Log.d("Parth", "Wortise Open Ad Close");
-                    if (callback != null) {
-                        callback.onSuccess();
-                        callback = null;
+            String placementId = app_data.get(0).getWortiseAppopenId();
+            if (!placementId.equalsIgnoreCase("")) {
+                final com.wortise.ads.appopen.AppOpenAd wortise_open_ad = new com.wortise.ads.appopen.AppOpenAd(activity, placementId);
+                wortise_open_ad.loadAd();
+                wortise_open_ad.setListener(new com.wortise.ads.appopen.AppOpenAd.Listener() {
+                    @Override
+                    public void onAppOpenShown(@NonNull com.wortise.ads.appopen.AppOpenAd appOpenAd) {
                     }
-                    iswortise_appopen_Loaded = false;
-                    appopen_Ads();
-                }
 
-                @Override
-                public void onAppOpenClicked(@NonNull com.wortise.ads.appopen.AppOpenAd appOpenAd) {
-                }
-            });
+                    @Override
+                    public void onAppOpenLoaded(@NonNull com.wortise.ads.appopen.AppOpenAd appOpenAd) {
+                        Log.d("Parth", "Wortise Open Ad loaded");
+                        wortise_open = wortise_open_ad;
+                        iswortise_appopen_Loaded = true;
+                    }
+
+                    @Override
+                    public void onAppOpenFailed(@NonNull com.wortise.ads.appopen.AppOpenAd appOpenAd, @NonNull com.wortise.ads.AdError adError) {
+                        Log.d("Parth", "Wortise Open Ad Failed" + adError);
+                        appopen_Ads();
+                    }
+
+                    @Override
+                    public void onAppOpenDismissed(@NonNull com.wortise.ads.appopen.AppOpenAd appOpenAd) {
+                        Log.d("Parth", "Wortise Open Ad Close");
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
+                        }
+                        iswortise_appopen_Loaded = false;
+                    }
+
+                    @Override
+                    public void onAppOpenClicked(@NonNull com.wortise.ads.appopen.AppOpenAd appOpenAd) {
+                    }
+                });
+            }
         }
     }
 
@@ -3104,45 +3680,48 @@ public class AdsControl {
             if (isapplovin_appopen_Loaded) {
                 return;
             }
-            final MaxAppOpenAd applovin_appOpenAd = new MaxAppOpenAd(app_data.get(0).getApplovin_appopen_id(), activity);
-            applovin_appOpenAd.loadAd();
-            applovin_appOpenAd.setListener(new MaxAdListener() {
-                @Override
-                public void onAdLoaded(MaxAd maxAd) {
-                    applovin_appopen = applovin_appOpenAd;
-                    isapplovin_appopen_Loaded = true;
-                }
-
-                @Override
-                public void onAdDisplayed(MaxAd maxAd) {
-                }
-
-                @Override
-                public void onAdHidden(MaxAd maxAd) {
-                    Log.d("Parth", "Applovin Splash Close Open Ad");
-                    if (callback != null) {
-                        callback.onSuccess();
-                        callback = null;
+            String placementId = app_data.get(0).getApplovin_appopen_id();
+            if (!placementId.equalsIgnoreCase("")) {
+                final MaxAppOpenAd applovin_appOpenAd = new MaxAppOpenAd(placementId, activity);
+                applovin_appOpenAd.loadAd();
+                applovin_appOpenAd.setListener(new MaxAdListener() {
+                    @Override
+                    public void onAdLoaded(MaxAd maxAd) {
+                        Log.d("Parth", "Applovin appopen Loaded");
+                        applovin_appopen = applovin_appOpenAd;
+                        isapplovin_appopen_Loaded = true;
                     }
-                    isapplovin_appopen_Loaded = false;
-                    appopen_Ads();
-                }
 
-                @Override
-                public void onAdClicked(MaxAd maxAd) {
-                }
+                    @Override
+                    public void onAdDisplayed(MaxAd maxAd) {
+                    }
 
-                @Override
-                public void onAdLoadFailed(String s, MaxError maxError) {
-                    Log.e("Parth", "Applovin Failed Open Ad" + maxError.getMessage());
-                    appopen_Ads();
+                    @Override
+                    public void onAdHidden(MaxAd maxAd) {
+                        Log.d("Parth", "Applovin Appopen Close");
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
+                        }
+                        isapplovin_appopen_Loaded = false;
+                    }
 
-                }
+                    @Override
+                    public void onAdClicked(MaxAd maxAd) {
+                    }
 
-                @Override
-                public void onAdDisplayFailed(MaxAd maxAd, MaxError maxError) {
-                }
-            });
+                    @Override
+                    public void onAdLoadFailed(String s, MaxError maxError) {
+                        Log.e("Parth", "Applovin Failed Open Ad" + maxError.getMessage());
+                        appopen_Ads();
+
+                    }
+
+                    @Override
+                    public void onAdDisplayFailed(MaxAd maxAd, MaxError maxError) {
+                    }
+                });
+            }
         }
     }
 
@@ -3214,8 +3793,6 @@ public class AdsControl {
                 }
             });
             dialog.show();
-            islocal_appopen_Loaded = false;
-            appopen_Ads();
         }
     }
 
@@ -3223,189 +3800,216 @@ public class AdsControl {
     void show_splash_inter(getDataListner callback3) {
         callback = callback3;
         if (app_data != null && app_data.size() > 0) {
-            // Admob
-            String placementId = app_data.get(0).getAdmob_splash_interid();
-            final AdRequest adRequest = new AdRequest.Builder().build();
-            InterstitialAd.load(activity, placementId, adRequest, new InterstitialAdLoadCallback() {
-                @Override
-                public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
-                    super.onAdLoaded(interstitialAd);
-                    interstitialAd.show((Activity) activity);
-                    interstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
-                        @Override
-                        public void onAdDismissedFullScreenContent() {
-                            Log.d("Parth", "Admob Inter Close");
-                            if (callback != null) {
-                                callback.onSuccess();
-                                callback = null;
+            String admob_splash_inter = app_data.get(0).getAdmob_splash_interid();
+            String adx_splash_inter = app_data.get(0).getAdx_splash_inter_id();
+            String fb_splash_inter = app_data.get(0).getFb_splash_inter_id();
+            String applovin_splash_inter = app_data.get(0).getApplovin_splash_interid();
+            String wortise_splash_inter = app_data.get(0).getWortise_splash_inter_id();
+            if (!admob_splash_inter.equalsIgnoreCase("")) {
+                final AdRequest adRequest = new AdRequest.Builder().build();
+                InterstitialAd.load(activity, admob_splash_inter, adRequest, new InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                        super.onAdLoaded(interstitialAd);
+                        interstitialAd.show((Activity) activity);
+                        interstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                            @Override
+                            public void onAdDismissedFullScreenContent() {
+                                Log.d("Parth", "Admob Inter Close");
+                                if (callback != null) {
+                                    callback.onSuccess();
+                                    callback = null;
+                                }
                             }
-                        }
 
-                        @Override
-                        public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
-                            Log.d("Parth", "Admob Inter failed to show" + adError.getMessage());
-                            if (callback != null) {
-                                callback.onSuccess();
-                                callback = null;
+                            @Override
+                            public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
+                                Log.d("Parth", "Admob Inter failed to show" + adError.getMessage());
+                                if (callback != null) {
+                                    callback.onSuccess();
+                                    callback = null;
+                                }
                             }
+
+                            @Override
+                            public void onAdShowedFullScreenContent() {
+                                Log.d("Parth", "Admob Inter Show");
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        super.onAdFailedToLoad(loadAdError);
+                        Log.d("Parth", "Admob Inter Failed " + loadAdError);
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
                         }
+                    }
+                });
+            } else if (!adx_splash_inter.equalsIgnoreCase("")) {
+                @SuppressLint("VisibleForTests") final AdManagerAdRequest adRequest = new AdManagerAdRequest.Builder().build();
+                AdManagerInterstitialAd.load(activity, adx_splash_inter, adRequest, new AdManagerInterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(@NonNull AdManagerInterstitialAd adManagerInterstitialAd) {
+                        super.onAdLoaded(adManagerInterstitialAd);
+                        adManagerInterstitialAd.show((Activity) activity);
+                        adManagerInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                            @Override
+                            public void onAdDismissedFullScreenContent() {
+                                Log.d("Parth", "Admob Inter Close");
+                                if (callback != null) {
+                                    callback.onSuccess();
+                                    callback = null;
+                                }
+                            }
 
-                        @Override
-                        public void onAdShowedFullScreenContent() {
+                            @Override
+                            public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
+                                Log.d("Parth", "Admob Inter failed to show" + adError.getMessage());
+                                if (callback != null) {
+                                    callback.onSuccess();
+                                    callback = null;
+                                }
+                            }
+
+                            @Override
+                            public void onAdShowedFullScreenContent() {
+                                Log.d("Parth", "Adx Inter Show");
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                        super.onAdFailedToLoad(loadAdError);
+                        Log.d("Parth", "Adx Inter Failed " + loadAdError);
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
                         }
-                    });
-                }
+                    }
+                });
+            } else if (!fb_splash_inter.equalsIgnoreCase("")) {
+                final com.facebook.ads.InterstitialAd FB_interstitial = new com.facebook.ads.InterstitialAd(activity, fb_splash_inter);
+                InterstitialAdListener interstitialAdListener = new InterstitialAdListener() {
+                    @Override
+                    public void onInterstitialDisplayed(Ad ad) {
+                        Log.d("Parth", "Fb Inter Show");
+                    }
 
-                @Override
-                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    super.onAdFailedToLoad(loadAdError);
-                    // Adx
-                    String placementId = app_data.get(0).getAdx_splash_inter_id();
-                    @SuppressLint("VisibleForTests") final AdManagerAdRequest adRequest = new AdManagerAdRequest.Builder().build();
-                    AdManagerInterstitialAd.load(activity, placementId, adRequest, new AdManagerInterstitialAdLoadCallback() {
-                        @Override
-                        public void onAdLoaded(@NonNull AdManagerInterstitialAd adManagerInterstitialAd) {
-                            super.onAdLoaded(adManagerInterstitialAd);
-                            adManagerInterstitialAd.show((Activity) activity);
-                            adManagerInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
-                                @Override
-                                public void onAdDismissedFullScreenContent() {
-                                    Log.d("Parth", "Admob Inter Close");
-                                    if (callback != null) {
-                                        callback.onSuccess();
-                                        callback = null;
-                                    }
-                                }
-
-                                @Override
-                                public void onAdFailedToShowFullScreenContent(@NonNull com.google.android.gms.ads.AdError adError) {
-                                    Log.d("Parth", "Admob Inter failed to show" + adError.getMessage());
-                                    if (callback != null) {
-                                        callback.onSuccess();
-                                        callback = null;
-                                    }
-                                }
-
-                                @Override
-                                public void onAdShowedFullScreenContent() {
-                                }
-                            });
+                    @Override
+                    public void onInterstitialDismissed(Ad ad) {
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
                         }
+                    }
 
-                        @Override
-                        public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                            super.onAdFailedToLoad(loadAdError);
-                            // Fb
-                            final com.facebook.ads.InterstitialAd FB_interstitial = new com.facebook.ads.InterstitialAd(activity, app_data.get(0).getFb_splash_inter_id());
-                            InterstitialAdListener interstitialAdListener = new InterstitialAdListener() {
-                                @Override
-                                public void onInterstitialDisplayed(Ad ad) {
-                                }
-
-                                @Override
-                                public void onInterstitialDismissed(Ad ad) {
-                                    if (callback != null) {
-                                        callback.onSuccess();
-                                        callback = null;
-                                    }
-                                }
-
-                                @Override
-                                public void onError(Ad ad, AdError adError) {
-                                    // Applovin
-                                    final MaxInterstitialAd interstitialAdmax = new MaxInterstitialAd(app_data.get(0).getApplovin_splash_interid(), (Activity) activity);
-                                    interstitialAdmax.setListener(new MaxAdListener() {
-                                        @Override
-                                        public void onAdLoaded(MaxAd ad) {
-                                            Log.d("Parth", "Applovin Inter Loaded");
-                                            interstitialAdmax.showAd();
-                                        }
-
-                                        @Override
-                                        public void onAdDisplayed(MaxAd ad) {
-                                        }
-
-                                        @Override
-                                        public void onAdHidden(MaxAd ad) {
-                                            Log.d("Parth", "Applovin Inter Close");
-                                            if (callback != null) {
-                                                callback.onSuccess();
-                                                callback = null;
-                                            }
-                                        }
-
-                                        @Override
-                                        public void onAdClicked(MaxAd ad) {
-                                        }
-
-                                        @Override
-                                        public void onAdLoadFailed(String adUnitId, MaxError error) {
-                                            Log.d("Parth", "Applovin Inter Failed");
-                                            // Wortise
-                                            final com.wortise.ads.interstitial.InterstitialAd Wortise_inter_ad = new com.wortise.ads.interstitial.InterstitialAd(activity, app_data.get(0).getWortise_splash_inter_id());
-                                            Wortise_inter_ad.loadAd();
-                                            Wortise_inter_ad.setListener(new com.wortise.ads.interstitial.InterstitialAd.Listener() {
-                                                @Override
-                                                public void onInterstitialClicked(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
-
-                                                }
-
-                                                @Override
-                                                public void onInterstitialDismissed(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
-                                                    if (callback != null) {
-                                                        callback.onSuccess();
-                                                        callback = null;
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onInterstitialFailed(@NonNull com.wortise.ads.interstitial.InterstitialAd ad, @NonNull com.wortise.ads.AdError error) {
-                                                    Log.d("Parth", "Wortise Inter Failed to Load: " + error);
-                                                    if (callback != null) {
-                                                        callback.onSuccess();
-                                                        callback = null;
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onInterstitialLoaded(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
-                                                    Log.d("Parth", "Wortise Inter ad Loaded.");
-                                                    Wortise_inter_ad.showAd();
-                                                }
-
-                                                @Override
-                                                public void onInterstitialShown(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
-                                                }
-                                            });
-                                        }
-
-                                        @Override
-                                        public void onAdDisplayFailed(MaxAd ad, MaxError error) {
-                                        }
-                                    });
-                                    interstitialAdmax.loadAd();
-                                }
-
-                                @Override
-                                public void onAdLoaded(Ad ad) {
-                                    FB_interstitial.show();
-                                }
-
-                                @Override
-                                public void onAdClicked(Ad ad) {
-
-                                }
-
-                                @Override
-                                public void onLoggingImpression(Ad ad) {
-
-                                }
-                            };
-                            FB_interstitial.loadAd(FB_interstitial.buildLoadAdConfig().withAdListener(interstitialAdListener).build());
+                    @Override
+                    public void onError(Ad ad, AdError adError) {
+                        Log.d("Parth", "Fb Inter Failed " + adError);
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
                         }
-                    });
-                }
-            });
+                    }
+
+                    @Override
+                    public void onAdLoaded(Ad ad) {
+                        FB_interstitial.show();
+                    }
+
+                    @Override
+                    public void onAdClicked(Ad ad) {
+
+                    }
+
+                    @Override
+                    public void onLoggingImpression(Ad ad) {
+                    }
+                };
+                FB_interstitial.loadAd(FB_interstitial.buildLoadAdConfig().withAdListener(interstitialAdListener).build());
+            } else if (!applovin_splash_inter.equalsIgnoreCase("")) {
+                final MaxInterstitialAd interstitialAdmax = new MaxInterstitialAd(applovin_splash_inter, (Activity) activity);
+                interstitialAdmax.setListener(new MaxAdListener() {
+                    @Override
+                    public void onAdLoaded(MaxAd ad) {
+                        Log.d("Parth", "Applovin Inter Loaded");
+                        interstitialAdmax.showAd();
+                    }
+
+                    @Override
+                    public void onAdDisplayed(MaxAd ad) {
+                        Log.d("Parth", "Applovin Inter Show");
+                    }
+
+                    @Override
+                    public void onAdHidden(MaxAd ad) {
+                        Log.d("Parth", "Applovin Inter Close");
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
+                        }
+                    }
+
+                    @Override
+                    public void onAdClicked(MaxAd ad) {
+                    }
+
+                    @Override
+                    public void onAdLoadFailed(String adUnitId, MaxError error) {
+                        Log.d("Parth", "Applovin Inter Failed " + error);
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
+                        }
+                    }
+
+                    @Override
+                    public void onAdDisplayFailed(MaxAd ad, MaxError error) {
+                    }
+                });
+                interstitialAdmax.loadAd();
+            } else if (!wortise_splash_inter.equalsIgnoreCase("")) {
+                final com.wortise.ads.interstitial.InterstitialAd Wortise_inter_ad = new com.wortise.ads.interstitial.InterstitialAd(activity, app_data.get(0).getWortise_splash_inter_id());
+                Wortise_inter_ad.loadAd();
+                Wortise_inter_ad.setListener(new com.wortise.ads.interstitial.InterstitialAd.Listener() {
+                    @Override
+                    public void onInterstitialClicked(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
+
+                    }
+
+                    @Override
+                    public void onInterstitialDismissed(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
+                        }
+                    }
+
+                    @Override
+                    public void onInterstitialFailed(@NonNull com.wortise.ads.interstitial.InterstitialAd ad, @NonNull com.wortise.ads.AdError error) {
+                        Log.d("Parth", "Wortise Inter Failed to Load: " + error);
+                        if (callback != null) {
+                            callback.onSuccess();
+                            callback = null;
+                        }
+                    }
+
+                    @Override
+                    public void onInterstitialLoaded(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
+                        Log.d("Parth", "Wortise Inter ad Loaded.");
+                        Wortise_inter_ad.showAd();
+                    }
+
+                    @Override
+                    public void onInterstitialShown(@NonNull com.wortise.ads.interstitial.InterstitialAd ad) {
+                        Log.d("Parth", "Wortise Inter Show");
+                    }
+                });
+            }
         }
     }
 }

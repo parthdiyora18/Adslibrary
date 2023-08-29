@@ -107,19 +107,16 @@ public class Data {
     private List<String> wortiseNativeId;
     @SerializedName("inmobi_banner_id")
     @Expose
-    private List<String> inmobi_banner_id;
+    private List<Long> inmobi_banner_id;
     @SerializedName("inmobi_inter_id")
     @Expose
-    private List<String> inmobi_inter_id;
+    private List<Long> inmobi_inter_id;
     @SerializedName("new_app_name")
     @Expose
     private String new_app_name;
     @SerializedName("new_app_icon")
     @Expose
     private String new_app_icon;
-    @SerializedName("new_app_banner_ad")
-    @Expose
-    private String new_app_banner_ad;
     @SerializedName("new_app_banner")
     @Expose
     private String new_app_banner;
@@ -135,6 +132,15 @@ public class Data {
     @SerializedName("ads_show")
     @Expose
     private boolean ads_show;
+    @SerializedName("preload_inter_ads")
+    @Expose
+    private boolean preload_inter_ads;
+    @SerializedName("preload_native_ads")
+    @Expose
+    private boolean preload_native_ads;
+    @SerializedName("preload_banner_ads")
+    @Expose
+    private boolean preload_banner_ads;
     @SerializedName("tap_to_start_mode")
     @Expose
     private String tap_to_start_mode;
@@ -460,19 +466,19 @@ public class Data {
         this.wortiseNativeId = wortiseNativeId;
     }
 
-    public List<String> getInmobi_banner_id() {
+    public List<Long> getInmobi_banner_id() {
         return inmobi_banner_id;
     }
 
-    public void setInmobi_banner_id(List<String> inmobi_banner_id) {
+    public void setInmobi_banner_id(List<Long> inmobi_banner_id) {
         this.inmobi_banner_id = inmobi_banner_id;
     }
 
-    public List<String> getInmobi_inter_id() {
+    public List<Long> getInmobi_inter_id() {
         return inmobi_inter_id;
     }
 
-    public void setInmobi_inter_id(List<String> inmobi_inter_id) {
+    public void setInmobi_inter_id(List<Long> inmobi_inter_id) {
         this.inmobi_inter_id = inmobi_inter_id;
     }
 
@@ -490,14 +496,6 @@ public class Data {
 
     public void setNew_app_icon(String new_app_icon) {
         this.new_app_icon = new_app_icon;
-    }
-
-    public String getNew_app_banner_ad() {
-        return new_app_banner_ad;
-    }
-
-    public void setNew_app_banner_ad(String new_app_banner_ad) {
-        this.new_app_banner_ad = new_app_banner_ad;
     }
 
     public String getNew_app_banner() {
@@ -538,6 +536,30 @@ public class Data {
 
     public void setAds_show(boolean ads_show) {
         this.ads_show = ads_show;
+    }
+
+    public boolean isPreload_inter_ads() {
+        return preload_inter_ads;
+    }
+
+    public void setPreload_inter_ads(boolean preload_inter_ads) {
+        this.preload_inter_ads = preload_inter_ads;
+    }
+
+    public boolean isPreload_native_ads() {
+        return preload_native_ads;
+    }
+
+    public void setPreload_native_ads(boolean preload_native_ads) {
+        this.preload_native_ads = preload_native_ads;
+    }
+
+    public boolean isPreload_banner_ads() {
+        return preload_banner_ads;
+    }
+
+    public void setPreload_banner_ads(boolean preload_banner_ads) {
+        this.preload_banner_ads = preload_banner_ads;
     }
 
     public String getTap_to_start_mode() {

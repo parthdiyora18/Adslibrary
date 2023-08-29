@@ -21,6 +21,9 @@
         tools:replace="android:icon"
         tools:targetApi="31">
         <activity
+            android:name=".Thrd_Activity"
+            android:exported="false" />
+        <activity
             android:name=".Secound_Activity"
             android:exported="false" />
         <activity
@@ -28,6 +31,7 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

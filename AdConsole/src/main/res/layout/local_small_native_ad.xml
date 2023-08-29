@@ -8,22 +8,17 @@
     android:background="@drawable/round_bg">
 
     <RelativeLayout
-        android:id="@+id/background"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/_110sdp"
         android:layout_gravity="center"
-        android:layout_margin="5dp"
+        android:layout_margin="3dp"
         android:background="?attr/selectableItemBackground">
 
         <ImageView
             android:id="@+id/ad_app_icon"
             android:layout_width="150dp"
-            android:layout_height="130dp"
+            android:layout_height="135dp"
             android:layout_centerVertical="true"
-            android:layout_marginStart="1dp"
-            android:layout_marginTop="1dp"
-            android:layout_marginEnd="1dp"
-            android:layout_marginBottom="1dp"
             android:scaleType="fitXY" />
 
         <LinearLayout

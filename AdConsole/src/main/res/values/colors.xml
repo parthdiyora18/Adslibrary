@@ -4,11 +4,8 @@
     <!--    <color name="background_color">#400054F2</color>-->
     <color name="background_color">#2A2C3B</color>
 
-    <color name="colorAccent">#1E4175</color>
     <color name="colorPrimary">#1E4175</color>
-    <color name="colorPrimaryDark">#1E4175</color>
 
     //new color
-    <color name="Blue_300">#1E4175</color>
     <color name="black">#FF000000</color>
 </resources>
