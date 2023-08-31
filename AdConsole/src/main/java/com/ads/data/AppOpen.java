@@ -127,7 +127,6 @@ public class AppOpen implements LifecycleObserver, Application.ActivityLifecycle
             continuee.setOnClickListener(v -> ad_dialog.dismiss());
         }, 2500);
         this.ad_dialog.setCanceledOnTouchOutside(false);
-        this.ad_dialog.setCancelable(false);
         Objects.requireNonNull(this.ad_dialog.getWindow()).setSoftInputMode(3);
         this.ad_dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
         this.ad_dialog.getWindow().setBackgroundDrawable(new ColorDrawable(0));

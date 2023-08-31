@@ -8,4 +8,7 @@
 
     //new color
     <color name="black">#FF000000</color>
+    <color name="gray_more_light">#33e5e5e5</color>
+    <color name="gray_text">#293d51</color>
+    <color name="transparent">#00ffffff</color>
 </resources>
