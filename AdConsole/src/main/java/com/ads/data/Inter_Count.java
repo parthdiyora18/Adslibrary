@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 public class Inter_Count {
-    private SharedPreferences sharedPrefs;
+    SharedPreferences sharedPrefs;
     private static final String APP_PREFS = "adcount";
     private static Inter_Count instance;
 

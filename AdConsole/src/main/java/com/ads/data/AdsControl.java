@@ -92,92 +92,92 @@ public class AdsControl {
     @SuppressLint("StaticFieldLeak")
     static Context activity;
     // Banner
-    public static boolean isGoogleBannerLoaded;
-    public static boolean isAdxBannerLoaded;
-    public static boolean isFBBannerLoaded;
-    public static boolean isApplovinBannerLoaded;
-    public static boolean isWortiseBannerLoaded;
-    public static boolean isInmobiBannerLoaded;
-    public static AdView googleBannerAd;
-    public static AdManagerAdView adxBannerAd;
-    public static com.facebook.ads.AdView fbadView;
+    boolean isGoogleBannerLoaded;
+    boolean isAdxBannerLoaded;
+    boolean isFBBannerLoaded;
+    boolean isApplovinBannerLoaded;
+    boolean isWortiseBannerLoaded;
+    boolean isInmobiBannerLoaded;
+    AdView googleBannerAd;
+    AdManagerAdView adxBannerAd;
+    com.facebook.ads.AdView fbadView;
     @SuppressLint("StaticFieldLeak")
-    public static MaxAdView applovin_banner_ad;
-    public static BannerAd wBannerAd;
-    public static InMobiBanner InmobiBannerAd;
+    MaxAdView applovin_banner_ad;
+    BannerAd wBannerAd;
+    InMobiBanner InmobiBannerAd;
 
     // Mediam Ragtangal
-    public static boolean isAdmob_Mediam_Ragtangal_Loaded;
-    public static boolean isAdx_Mediam_Ragtangal_Loaded;
-    public static boolean isFB_Mediam_Ragtangal_Loaded;
-    public static boolean isApplovin_Mediam_Ragtangal_Loaded;
-    public static boolean isWortise_medium_ragtangal_Loaded;
-    public static AdView admobMediam_Ragtangal;
-    public static AdManagerAdView adxMediam_Ragtangal;
-    public static com.facebook.ads.AdView fb_Ragtangal_adView;
+    boolean isAdmob_Mediam_Ragtangal_Loaded;
+    boolean isAdx_Mediam_Ragtangal_Loaded;
+    boolean isFB_Mediam_Ragtangal_Loaded;
+    boolean isApplovin_Mediam_Ragtangal_Loaded;
+    boolean isWortise_medium_ragtangal_Loaded;
+    AdView admobMediam_Ragtangal;
+    AdManagerAdView adxMediam_Ragtangal;
+    com.facebook.ads.AdView fb_Ragtangal_adView;
     @SuppressLint("StaticFieldLeak")
-    public static MaxAdView applovin_Medium_Ragtangal_adview;
-    public static BannerAd w_medium_ragtangal;
+    MaxAdView applovin_Medium_Ragtangal_adview;
+    BannerAd w_medium_ragtangal;
 
     // Native Ad
-    public static boolean isadmob_native_Loaded;
-    public static boolean isadx_native_Loaded;
-    public static boolean isFB_Native_Loaded;
-    public static boolean isApplovin_Native_Loaded;
-    public static boolean isWortise_Native_Loaded;
-    public static boolean isLocal_Native_Loaded;
-    public static NativeAd Admob_native_Ad;
-    public static NativeAd Adx_native_Ad;
-    public static com.facebook.ads.NativeAd fb_native_Ad;
-    public static MaxAd Applovin_native_ad;
+    boolean isadmob_native_Loaded;
+    boolean isadx_native_Loaded;
+    boolean isFB_Native_Loaded;
+    boolean isApplovin_Native_Loaded;
+    boolean isWortise_Native_Loaded;
+    boolean isLocal_Native_Loaded;
+    NativeAd Admob_native_Ad;
+    NativeAd Adx_native_Ad;
+    com.facebook.ads.NativeAd fb_native_Ad;
+    MaxAd Applovin_native_ad;
     @SuppressLint("StaticFieldLeak")
-    public static MaxNativeAdView applovin_maxnativeadview;
-    public static NativeAd wortise_native_Ad;
+    MaxNativeAdView applovin_maxnativeadview;
+    NativeAd wortise_native_Ad;
     @SuppressLint("StaticFieldLeak")
-    public static GoogleNativeAd wortise_google_native_Ad;
+    GoogleNativeAd wortise_google_native_Ad;
 
     // Small Native Ad
-    public static boolean isAdmob_small_native_Loaded;
-    public static boolean isadx_small_native_Loaded;
-    public static boolean isFb_small_native_Loaded;
-    public static boolean isapplovin_small_native_Loaded;
-    public static boolean isWortise_small_Native_Loaded;
-    public static boolean isLocal_small_Native_Loaded;
-    public static NativeAd Admob_small_native_Ad;
-    public static NativeAd Adx_small_native_Ad;
-    public static NativeBannerAd fb_small_native_Ad;
-    public static MaxAd Applovin_small_native_Ad;
+    boolean isAdmob_small_native_Loaded;
+    boolean isadx_small_native_Loaded;
+    boolean isFb_small_native_Loaded;
+    boolean isapplovin_small_native_Loaded;
+    boolean isWortise_small_Native_Loaded;
+    boolean isLocal_small_Native_Loaded;
+    NativeAd Admob_small_native_Ad;
+    NativeAd Adx_small_native_Ad;
+    NativeBannerAd fb_small_native_Ad;
+    MaxAd Applovin_small_native_Ad;
     @SuppressLint("StaticFieldLeak")
-    public static MaxNativeAdView applovin_small_native_Ad;
-    public static NativeAd wortise_small_native_Ad;
+    MaxNativeAdView applovin_small_native_Ad;
+    NativeAd wortise_small_native_Ad;
     @SuppressLint("StaticFieldLeak")
-    public static GoogleNativeAd wortise_google_small_native_Ad;
+    GoogleNativeAd wortise_google_small_native_Ad;
 
     // Small Naitive Banner Ad
-    public static boolean isadmob_small_native_banner_Loaded;
-    public static boolean isadx_small_native_banner_Loaded;
-    public static boolean isFB_small_native_banner_Loaded;
-    public static boolean isApplovin_small_native_banner_Loaded;
-    public static boolean isWortise_small_Native_banner_Loaded;
-    public static boolean isLocal_small_Native_banner_Loaded;
-    public static NativeAd Admob_small_native_banner_Ad;
-    public static NativeAd Adx_small_native_banner_Ad;
-    public static NativeBannerAd fb_small_native_banner_Ad;
-    public static MaxAd Applovin_small_native_banner_Ad;
+    boolean isadmob_small_native_banner_Loaded;
+    boolean isadx_small_native_banner_Loaded;
+    boolean isFB_small_native_banner_Loaded;
+    boolean isApplovin_small_native_banner_Loaded;
+    boolean isWortise_small_Native_banner_Loaded;
+    boolean isLocal_small_Native_banner_Loaded;
+    NativeAd Admob_small_native_banner_Ad;
+    NativeAd Adx_small_native_banner_Ad;
+    NativeBannerAd fb_small_native_banner_Ad;
+    MaxAd Applovin_small_native_banner_Ad;
     @SuppressLint("StaticFieldLeak")
-    public static MaxNativeAdView applovin_small_native_banner_Ad;
-    public static NativeAd wortise_small_native_banner_Ad;
+    MaxNativeAdView applovin_small_native_banner_Ad;
+    NativeAd wortise_small_native_banner_Ad;
     @SuppressLint("StaticFieldLeak")
-    public static GoogleNativeAd wortise_small_google_native_banner_Ad;
+    GoogleNativeAd wortise_small_google_native_banner_Ad;
 
     // Inter
-    private boolean isGoogleInterLoaded;
-    private boolean isAdxInterLoaded;
-    private boolean isFBInterLoaded;
-    private boolean isApplovinInterLoaded;
-    private boolean isWortiseInterLoaded;
-    private boolean isInmobiInterLoaded;
-    private boolean isLocalInterLoaded;
+    boolean isGoogleInterLoaded;
+    boolean isAdxInterLoaded;
+    boolean isFBInterLoaded;
+    boolean isApplovinInterLoaded;
+    boolean isWortiseInterLoaded;
+    boolean isInmobiInterLoaded;
+    boolean isLocalInterLoaded;
     InterstitialAd ADMOBInterstitialAd;
     AdManagerInterstitialAd ADXInterstitialAd;
     com.facebook.ads.InterstitialAd FB_interstitialAd;
@@ -186,11 +186,11 @@ public class AdsControl {
     InMobiInterstitial Inmobi_inter;
 
     // Appopen
-    public static boolean isadmob_appopen_Loaded;
-    public static boolean isadx_appopen_Loaded;
-    public static boolean iswortise_appopen_Loaded;
-    public static boolean isapplovin_appopen_Loaded;
-    public static boolean islocal_appopen_Loaded;
+    boolean isadmob_appopen_Loaded;
+    boolean isadx_appopen_Loaded;
+    boolean iswortise_appopen_Loaded;
+    boolean isapplovin_appopen_Loaded;
+    boolean islocal_appopen_Loaded;
     com.wortise.ads.appopen.AppOpenAd wortise_open;
     MaxAppOpenAd applovin_appopen;
     AppOpenAd admob_appOpenAd_inter;
@@ -198,7 +198,7 @@ public class AdsControl {
     AppOpenAd admob_appOpenAd;
     AppOpenAd adx_appOpenAd;
 
-    private int adCounter;
+    int adCounter;
     SharedPreferences prefs;
 
     public AdsControl(Context context) {
@@ -434,7 +434,7 @@ public class AdsControl {
     }
 
     private void Next_Call(getDataListner myCallback) {
-        new Handler().postDelayed(myCallback::onSuccess, 2500);
+        myCallback.onSuccess();
     }
 
     //-------------------------------------------------------- Banner Ads -------------------------------------------------------
@@ -774,7 +774,7 @@ public class AdsControl {
                                 ((ViewGroup) googleBannerAd.getParent()).removeView(googleBannerAd);
                             }
                             banner_container.addView(googleBannerAd);
-                            AdsControl.isGoogleBannerLoaded = false;
+                            isGoogleBannerLoaded = false;
                             banner_Ads();
                         } catch (Exception e) {
                             throw new RuntimeException(e);
@@ -786,7 +786,7 @@ public class AdsControl {
                                     ((ViewGroup) adxBannerAd.getParent()).removeView(adxBannerAd);
                                 }
                                 banner_container.addView(adxBannerAd);
-                                AdsControl.isAdxBannerLoaded = false;
+                                isAdxBannerLoaded = false;
                                 banner_Ads();
                             } catch (Exception e) {
                                 throw new RuntimeException(e);
@@ -800,7 +800,7 @@ public class AdsControl {
                                 ((ViewGroup) fbadView.getParent()).removeView(fbadView);
                             }
                             banner_container.addView(fbadView);
-                            AdsControl.isFBBannerLoaded = false;
+                            isFBBannerLoaded = false;
                             banner_Ads();
                         } catch (Exception e) {
                             throw new RuntimeException(e);
@@ -811,7 +811,7 @@ public class AdsControl {
                                 ((ViewGroup) applovin_banner_ad.getParent()).removeView(applovin_banner_ad);
                             }
                             banner_container.addView(applovin_banner_ad);
-                            AdsControl.isApplovinBannerLoaded = false;
+                            isApplovinBannerLoaded = false;
                             banner_Ads();
                         } catch (Exception e) {
                             throw new RuntimeException(e);
@@ -822,7 +822,7 @@ public class AdsControl {
                                 ((ViewGroup) wBannerAd.getParent()).removeView(wBannerAd);
                             }
                             banner_container.addView(wBannerAd);
-                            AdsControl.isWortiseBannerLoaded = false;
+                            isWortiseBannerLoaded = false;
                             banner_Ads();
                         } catch (Exception e) {
                             throw new RuntimeException(e);
@@ -833,7 +833,7 @@ public class AdsControl {
                                 ((ViewGroup) InmobiBannerAd.getParent()).removeView(InmobiBannerAd);
                             }
                             banner_container.addView(InmobiBannerAd);
-                            AdsControl.isInmobiBannerLoaded = false;
+                            isInmobiBannerLoaded = false;
                             banner_Ads();
                         } catch (Exception e) {
                             throw new RuntimeException(e);
@@ -841,73 +841,70 @@ public class AdsControl {
                     }
                 } else {
                     banner_Ads();
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (isGoogleBannerLoaded) {
+                    new Handler().postDelayed(() -> {
+                        if (isGoogleBannerLoaded) {
+                            try {
+                                if (googleBannerAd.getParent() != null) {
+                                    ((ViewGroup) googleBannerAd.getParent()).removeView(googleBannerAd);
+                                }
+                                banner_container.addView(googleBannerAd);
+                                isGoogleBannerLoaded = false;
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        } else if (isAdxBannerLoaded) {
+                            try {
                                 try {
-                                    if (googleBannerAd.getParent() != null) {
-                                        ((ViewGroup) googleBannerAd.getParent()).removeView(googleBannerAd);
+                                    if (adxBannerAd.getParent() != null) {
+                                        ((ViewGroup) adxBannerAd.getParent()).removeView(adxBannerAd);
                                     }
-                                    banner_container.addView(googleBannerAd);
-                                    AdsControl.isGoogleBannerLoaded = false;
+                                    banner_container.addView(adxBannerAd);
+                                    isAdxBannerLoaded = false;
                                 } catch (Exception e) {
                                     throw new RuntimeException(e);
                                 }
-                            } else if (isAdxBannerLoaded) {
-                                try {
-                                    try {
-                                        if (adxBannerAd.getParent() != null) {
-                                            ((ViewGroup) adxBannerAd.getParent()).removeView(adxBannerAd);
-                                        }
-                                        banner_container.addView(adxBannerAd);
-                                        AdsControl.isAdxBannerLoaded = false;
-                                    } catch (Exception e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                } catch (Exception e) {
-                                    throw new RuntimeException(e);
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        } else if (isFBBannerLoaded) {
+                            try {
+                                if (fbadView.getParent() != null) {
+                                    ((ViewGroup) fbadView.getParent()).removeView(fbadView);
                                 }
-                            } else if (isFBBannerLoaded) {
-                                try {
-                                    if (fbadView.getParent() != null) {
-                                        ((ViewGroup) fbadView.getParent()).removeView(fbadView);
-                                    }
-                                    banner_container.addView(fbadView);
-                                    AdsControl.isFBBannerLoaded = false;
-                                } catch (Exception e) {
-                                    throw new RuntimeException(e);
+                                banner_container.addView(fbadView);
+                                isFBBannerLoaded = false;
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        } else if (isApplovinBannerLoaded) {
+                            try {
+                                if (applovin_banner_ad.getParent() != null) {
+                                    ((ViewGroup) applovin_banner_ad.getParent()).removeView(applovin_banner_ad);
                                 }
-                            } else if (isApplovinBannerLoaded) {
-                                try {
-                                    if (applovin_banner_ad.getParent() != null) {
-                                        ((ViewGroup) applovin_banner_ad.getParent()).removeView(applovin_banner_ad);
-                                    }
-                                    banner_container.addView(applovin_banner_ad);
-                                    AdsControl.isApplovinBannerLoaded = false;
-                                } catch (Exception e) {
-                                    throw new RuntimeException(e);
+                                banner_container.addView(applovin_banner_ad);
+                                isApplovinBannerLoaded = false;
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        } else if (isWortiseBannerLoaded) {
+                            try {
+                                if (wBannerAd.getParent() != null) {
+                                    ((ViewGroup) wBannerAd.getParent()).removeView(wBannerAd);
                                 }
-                            } else if (isWortiseBannerLoaded) {
-                                try {
-                                    if (wBannerAd.getParent() != null) {
-                                        ((ViewGroup) wBannerAd.getParent()).removeView(wBannerAd);
-                                    }
-                                    banner_container.addView(wBannerAd);
-                                    AdsControl.isWortiseBannerLoaded = false;
-                                } catch (Exception e) {
-                                    throw new RuntimeException(e);
+                                banner_container.addView(wBannerAd);
+                                isWortiseBannerLoaded = false;
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        } else if (isInmobiBannerLoaded) {
+                            try {
+                                if (InmobiBannerAd.getParent() != null) {
+                                    ((ViewGroup) InmobiBannerAd.getParent()).removeView(InmobiBannerAd);
                                 }
-                            } else if (isInmobiBannerLoaded) {
-                                try {
-                                    if (InmobiBannerAd.getParent() != null) {
-                                        ((ViewGroup) InmobiBannerAd.getParent()).removeView(InmobiBannerAd);
-                                    }
-                                    banner_container.addView(InmobiBannerAd);
-                                    AdsControl.isInmobiBannerLoaded = false;
-                                } catch (Exception e) {
-                                    throw new RuntimeException(e);
-                                }
+                                banner_container.addView(InmobiBannerAd);
+                                isInmobiBannerLoaded = false;
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
                             }
                         }
                     }, 3000);
@@ -1223,19 +1220,19 @@ public class AdsControl {
             if (app_data.get(0).isAds_show()) {
                 if (app_data.get(0).isPreload_native_ads()) {
                     if (isadmob_small_native_banner_Loaded) {
-                        new NativeAds(activity).Admob_Small_Native_Banner_Ad(AdsControl.Admob_small_native_banner_Ad, native_banner_ad);
+                        new NativeAds(activity).Admob_Small_Native_Banner_Ad(Admob_small_native_banner_Ad, native_banner_ad);
                         Log.d("Parth", "Admob Native Banner ad show");
-                        AdsControl.isadmob_small_native_banner_Loaded = false;
+                        isadmob_small_native_banner_Loaded = false;
                         small_native_banner_Ads();
                     } else if (isadx_small_native_banner_Loaded) {
-                        new NativeAds(activity).Admob_Small_Native_Banner_Ad(AdsControl.Adx_small_native_banner_Ad, native_banner_ad);
+                        new NativeAds(activity).Admob_Small_Native_Banner_Ad(Adx_small_native_banner_Ad, native_banner_ad);
                         Log.d("Parth", "Adx Native Banner ad show");
-                        AdsControl.isadx_small_native_banner_Loaded = false;
+                        isadx_small_native_banner_Loaded = false;
                         small_native_banner_Ads();
                     } else if (isFB_small_native_banner_Loaded) {
-                        new NativeAds(activity).FB_Smalle_Native_Banner(AdsControl.fb_small_native_banner_Ad, native_banner_ad);
+                        new NativeAds(activity).FB_Smalle_Native_Banner(fb_small_native_banner_Ad, native_banner_ad);
                         Log.d("Parth", "FB Native Banner ad show");
-                        AdsControl.isFB_small_native_banner_Loaded = false;
+                        isFB_small_native_banner_Loaded = false;
                         small_native_banner_Ads();
                     } else if (isApplovin_small_native_banner_Loaded) {
                         if (Applovin_small_native_banner_Ad != null) {
@@ -1244,12 +1241,12 @@ public class AdsControl {
                         native_banner_ad.removeAllViews();
                         native_banner_ad.addView(applovin_small_native_banner_Ad);
                         Log.d("Parth", "Applovin Native Banner ad show");
-                        AdsControl.isApplovin_small_native_banner_Loaded = false;
+                        isApplovin_small_native_banner_Loaded = false;
                         small_native_banner_Ads();
                     } else if (isWortise_small_Native_banner_Loaded) {
-                        new NativeAds(activity).Admob_Small_Native_Banner_Ad(AdsControl.wortise_small_native_banner_Ad, native_banner_ad);
+                        new NativeAds(activity).Admob_Small_Native_Banner_Ad(wortise_small_native_banner_Ad, native_banner_ad);
                         Log.d("Parth", "Wortise Native Banner ad show");
-                        AdsControl.isWortise_small_Native_banner_Loaded = false;
+                        isWortise_small_Native_banner_Loaded = false;
                         small_native_banner_Ads();
                     } else if (isLocal_small_Native_banner_Loaded) {
                         @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_small_native_banner, null);
@@ -1257,24 +1254,24 @@ public class AdsControl {
                         native_banner_ad.addView(viewGroup);
                         show_local_native_banner_ad(native_banner_ad);
                         Log.d("Parth", "Local Native Banner ad show");
-                        AdsControl.isLocal_small_Native_banner_Loaded = false;
+                        isLocal_small_Native_banner_Loaded = false;
                         small_native_banner_Ads();
                     }
                 } else {
                     small_native_banner_Ads();
                     new Handler().postDelayed(() -> {
                         if (isadmob_small_native_banner_Loaded) {
-                            new NativeAds(activity).Admob_Small_Native_Banner_Ad(AdsControl.Admob_small_native_banner_Ad, native_banner_ad);
+                            new NativeAds(activity).Admob_Small_Native_Banner_Ad(Admob_small_native_banner_Ad, native_banner_ad);
                             Log.d("Parth", "Admob Native Banner ad show");
-                            AdsControl.isadmob_small_native_banner_Loaded = false;
+                            isadmob_small_native_banner_Loaded = false;
                         } else if (isadx_small_native_banner_Loaded) {
-                            new NativeAds(activity).Admob_Small_Native_Banner_Ad(AdsControl.Adx_small_native_banner_Ad, native_banner_ad);
+                            new NativeAds(activity).Admob_Small_Native_Banner_Ad(Adx_small_native_banner_Ad, native_banner_ad);
                             Log.d("Parth", "Adx Native Banner ad show");
-                            AdsControl.isadx_small_native_banner_Loaded = false;
+                            isadx_small_native_banner_Loaded = false;
                         } else if (isFB_small_native_banner_Loaded) {
-                            new NativeAds(activity).FB_Smalle_Native_Banner(AdsControl.fb_small_native_banner_Ad, native_banner_ad);
+                            new NativeAds(activity).FB_Smalle_Native_Banner(fb_small_native_banner_Ad, native_banner_ad);
                             Log.d("Parth", "FB Native Banner ad show");
-                            AdsControl.isFB_small_native_banner_Loaded = false;
+                            isFB_small_native_banner_Loaded = false;
                         } else if (isApplovin_small_native_banner_Loaded) {
                             if (Applovin_small_native_banner_Ad != null) {
                                 native_banner_ad.removeAllViews();
@@ -1282,18 +1279,18 @@ public class AdsControl {
                             native_banner_ad.removeAllViews();
                             native_banner_ad.addView(applovin_small_native_banner_Ad);
                             Log.d("Parth", "Applovin Native Banner ad show");
-                            AdsControl.isApplovin_small_native_banner_Loaded = false;
+                            isApplovin_small_native_banner_Loaded = false;
                         } else if (isWortise_small_Native_banner_Loaded) {
-                            new NativeAds(activity).Admob_Small_Native_Banner_Ad(AdsControl.wortise_small_native_banner_Ad, native_banner_ad);
+                            new NativeAds(activity).Admob_Small_Native_Banner_Ad(wortise_small_native_banner_Ad, native_banner_ad);
                             Log.d("Parth", "Wortise Native Banner ad show");
-                            AdsControl.isWortise_small_Native_banner_Loaded = false;
+                            isWortise_small_Native_banner_Loaded = false;
                         } else if (isLocal_small_Native_banner_Loaded) {
                             @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_small_native_banner, null);
                             native_banner_ad.removeAllViews();
                             native_banner_ad.addView(viewGroup);
                             show_local_native_banner_ad(native_banner_ad);
                             Log.d("Parth", "Local Native Banner ad show");
-                            AdsControl.isLocal_small_Native_banner_Loaded = false;
+                            isLocal_small_Native_banner_Loaded = false;
                         }
                     }, 3000);
                 }
@@ -1606,19 +1603,19 @@ public class AdsControl {
             if (app_data.get(0).isAds_show()) {
                 if (app_data.get(0).isPreload_native_ads()) {
                     if (isAdmob_small_native_Loaded) {
-                        new NativeAds(activity).Admob_Small_Native_Ad(AdsControl.Admob_small_native_Ad, native_banner_ad);
+                        new NativeAds(activity).Admob_Small_Native_Ad(Admob_small_native_Ad, native_banner_ad);
                         Log.d("Parth", "Admob Small Native ad show");
-                        AdsControl.isAdmob_small_native_Loaded = false;
+                        isAdmob_small_native_Loaded = false;
                         small_native_Ads();
                     } else if (isadx_small_native_Loaded) {
-                        new NativeAds(activity).Admob_Small_Native_Ad(AdsControl.Adx_small_native_Ad, native_banner_ad);
+                        new NativeAds(activity).Admob_Small_Native_Ad(Adx_small_native_Ad, native_banner_ad);
                         Log.d("Parth", "Adx Small Native ad show");
-                        AdsControl.isadx_small_native_Loaded = false;
+                        isadx_small_native_Loaded = false;
                         small_native_Ads();
                     } else if (isFb_small_native_Loaded) {
-                        new NativeAds(activity).FB_Smalle_Native(AdsControl.fb_small_native_Ad, native_banner_ad);
+                        new NativeAds(activity).FB_Smalle_Native(fb_small_native_Ad, native_banner_ad);
                         Log.d("Parth", "FB Small Native ad show");
-                        AdsControl.isFb_small_native_Loaded = false;
+                        isFb_small_native_Loaded = false;
                         small_native_Ads();
                     } else if (isapplovin_small_native_Loaded) {
                         if (Applovin_small_native_Ad != null) {
@@ -1627,12 +1624,12 @@ public class AdsControl {
                         native_banner_ad.removeAllViews();
                         native_banner_ad.addView(applovin_small_native_Ad);
                         Log.d("Parth", "Applovin Small Native ad show");
-                        AdsControl.isapplovin_small_native_Loaded = false;
+                        isapplovin_small_native_Loaded = false;
                         small_native_Ads();
                     } else if (isWortise_small_Native_Loaded) {
-                        new NativeAds(activity).Admob_Small_Native_Ad(AdsControl.wortise_small_native_Ad, native_banner_ad);
+                        new NativeAds(activity).Admob_Small_Native_Ad(wortise_small_native_Ad, native_banner_ad);
                         Log.d("Parth", "Wortise Small Native ad show");
-                        AdsControl.isWortise_small_Native_Loaded = false;
+                        isWortise_small_Native_Loaded = false;
                         small_native_Ads();
                     } else if (isLocal_small_Native_Loaded) {
                         @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_small_native_ad, null);
@@ -1640,46 +1637,43 @@ public class AdsControl {
                         native_banner_ad.removeAllViews();
                         native_banner_ad.addView(viewGroup);
                         Log.d("Parth", "Local Small Native ad show");
-                        AdsControl.isLocal_small_Native_Loaded = false;
+                        isLocal_small_Native_Loaded = false;
                         small_native_Ads();
                     }
                 } else {
                     small_native_Ads();
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (isAdmob_small_native_Loaded) {
-                                new NativeAds(activity).Admob_Small_Native_Ad(AdsControl.Admob_small_native_Ad, native_banner_ad);
-                                Log.d("Parth", "Admob Small Native ad show");
-                                AdsControl.isAdmob_small_native_Loaded = false;
-                            } else if (isadx_small_native_Loaded) {
-                                new NativeAds(activity).Admob_Small_Native_Ad(AdsControl.Adx_small_native_Ad, native_banner_ad);
-                                Log.d("Parth", "Adx Small Native ad show");
-                                AdsControl.isadx_small_native_Loaded = false;
-                            } else if (isFb_small_native_Loaded) {
-                                new NativeAds(activity).FB_Smalle_Native(AdsControl.fb_small_native_Ad, native_banner_ad);
-                                Log.d("Parth", "FB Small Native ad show");
-                                AdsControl.isFb_small_native_Loaded = false;
-                            } else if (isapplovin_small_native_Loaded) {
-                                if (Applovin_small_native_Ad != null) {
-                                    native_banner_ad.removeAllViews();
-                                }
+                    new Handler().postDelayed(() -> {
+                        if (isAdmob_small_native_Loaded) {
+                            new NativeAds(activity).Admob_Small_Native_Ad(Admob_small_native_Ad, native_banner_ad);
+                            Log.d("Parth", "Admob Small Native ad show");
+                            isAdmob_small_native_Loaded = false;
+                        } else if (isadx_small_native_Loaded) {
+                            new NativeAds(activity).Admob_Small_Native_Ad(Adx_small_native_Ad, native_banner_ad);
+                            Log.d("Parth", "Adx Small Native ad show");
+                            isadx_small_native_Loaded = false;
+                        } else if (isFb_small_native_Loaded) {
+                            new NativeAds(activity).FB_Smalle_Native(fb_small_native_Ad, native_banner_ad);
+                            Log.d("Parth", "FB Small Native ad show");
+                            isFb_small_native_Loaded = false;
+                        } else if (isapplovin_small_native_Loaded) {
+                            if (Applovin_small_native_Ad != null) {
                                 native_banner_ad.removeAllViews();
-                                native_banner_ad.addView(applovin_small_native_Ad);
-                                Log.d("Parth", "Applovin Small Native ad show");
-                                AdsControl.isapplovin_small_native_Loaded = false;
-                            } else if (isWortise_small_Native_Loaded) {
-                                new NativeAds(activity).Admob_Small_Native_Ad(AdsControl.wortise_small_native_Ad, native_banner_ad);
-                                Log.d("Parth", "Wortise Small Native ad show");
-                                AdsControl.isWortise_small_Native_Loaded = false;
-                            } else if (isLocal_small_Native_Loaded) {
-                                @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_small_native_ad, null);
-                                show_local_small_native(viewGroup);
-                                native_banner_ad.removeAllViews();
-                                native_banner_ad.addView(viewGroup);
-                                Log.d("Parth", "Local Small Native ad show");
-                                AdsControl.isLocal_small_Native_Loaded = false;
                             }
+                            native_banner_ad.removeAllViews();
+                            native_banner_ad.addView(applovin_small_native_Ad);
+                            Log.d("Parth", "Applovin Small Native ad show");
+                            isapplovin_small_native_Loaded = false;
+                        } else if (isWortise_small_Native_Loaded) {
+                            new NativeAds(activity).Admob_Small_Native_Ad(wortise_small_native_Ad, native_banner_ad);
+                            Log.d("Parth", "Wortise Small Native ad show");
+                            isWortise_small_Native_Loaded = false;
+                        } else if (isLocal_small_Native_Loaded) {
+                            @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_small_native_ad, null);
+                            show_local_small_native(viewGroup);
+                            native_banner_ad.removeAllViews();
+                            native_banner_ad.addView(viewGroup);
+                            Log.d("Parth", "Local Small Native ad show");
+                            isLocal_small_Native_Loaded = false;
                         }
                     }, 3000);
                 }
@@ -1959,7 +1953,7 @@ public class AdsControl {
     @SuppressLint("SetTextI18n")
     void show_local_native(ViewGroup banner_container) {
         if (app_data != null && app_data.size() > 0) {
-            if (AdsControl.isLocal_Native_Loaded) {
+            if (isLocal_Native_Loaded) {
                 RelativeLayout custm_native = banner_container.findViewById(R.id.custm_native_ad);
                 ImageView app_icon_native = banner_container.findViewById(R.id.ad_app_icon);
                 TextView app_name_native = banner_container.findViewById(R.id.ad_headline);
@@ -2267,19 +2261,19 @@ public class AdsControl {
             if (app_data.get(0).isAds_show()) {
                 if (app_data.get(0).isPreload_native_ads()) {
                     if (isadmob_native_Loaded) {
-                        new NativeAds(activity).Admob_NativeAd(AdsControl.Admob_native_Ad, native_ad);
+                        new NativeAds(activity).Admob_NativeAd(Admob_native_Ad, native_ad);
                         Log.d("Parth", "Admob Native ad show");
-                        AdsControl.isadmob_native_Loaded = false;
+                        isadmob_native_Loaded = false;
                         native_Ads();
                     } else if (isadx_native_Loaded) {
-                        new NativeAds(activity).Admob_NativeAd(AdsControl.Adx_native_Ad, native_ad);
+                        new NativeAds(activity).Admob_NativeAd(Adx_native_Ad, native_ad);
                         Log.d("Parth", "Adx Native ad show");
-                        AdsControl.isadx_native_Loaded = false;
+                        isadx_native_Loaded = false;
                         native_Ads();
                     } else if (isFB_Native_Loaded) {
-                        new NativeAds(activity).FB_Native(AdsControl.fb_native_Ad, native_ad);
+                        new NativeAds(activity).FB_Native(fb_native_Ad, native_ad);
                         Log.d("Parth", "FB Native ad show");
-                        AdsControl.isFB_Native_Loaded = false;
+                        isFB_Native_Loaded = false;
                         native_Ads();
                     } else if (isApplovin_Native_Loaded) {
                         if (Applovin_native_ad != null) {
@@ -2288,12 +2282,12 @@ public class AdsControl {
                         native_ad.removeAllViews();
                         native_ad.addView(applovin_maxnativeadview);
                         Log.d("Parth", "Applovin Native ad show");
-                        AdsControl.isApplovin_Native_Loaded = false;
+                        isApplovin_Native_Loaded = false;
                         native_Ads();
                     } else if (isWortise_Native_Loaded) {
-                        new NativeAds(activity).Admob_NativeAd(AdsControl.wortise_native_Ad, native_ad);
+                        new NativeAds(activity).Admob_NativeAd(wortise_native_Ad, native_ad);
                         Log.d("Parth", "Wortise Native ad show");
-                        AdsControl.isWortise_Native_Loaded = false;
+                        isWortise_Native_Loaded = false;
                         native_Ads();
                     } else if (isLocal_Native_Loaded) {
                         @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_native_ad, null);
@@ -2301,7 +2295,7 @@ public class AdsControl {
                         native_ad.removeAllViews();
                         native_ad.addView(viewGroup);
                         Log.d("Parth", "Local Native ad show");
-                        AdsControl.isLocal_Native_Loaded = false;
+                        isLocal_Native_Loaded = false;
                         native_Ads();
                     } else if (isAdmob_Mediam_Ragtangal_Loaded) {
                         try {
@@ -2309,7 +2303,7 @@ public class AdsControl {
                                 ((ViewGroup) admobMediam_Ragtangal.getParent()).removeView(admobMediam_Ragtangal);
                             }
                             native_ad.addView(admobMediam_Ragtangal);
-                            AdsControl.isAdmob_Mediam_Ragtangal_Loaded = false;
+                            isAdmob_Mediam_Ragtangal_Loaded = false;
                             medium_rect_Ads();
                         } catch (Exception e) {
                             throw new RuntimeException(e);
@@ -2320,7 +2314,7 @@ public class AdsControl {
                                 ((ViewGroup) adxMediam_Ragtangal.getParent()).removeView(adxMediam_Ragtangal);
                             }
                             native_ad.addView(adxMediam_Ragtangal);
-                            AdsControl.isAdx_Mediam_Ragtangal_Loaded = false;
+                            isAdx_Mediam_Ragtangal_Loaded = false;
                             medium_rect_Ads();
                         } catch (Exception e) {
                             throw new RuntimeException(e);
@@ -2331,7 +2325,7 @@ public class AdsControl {
                                 ((ViewGroup) fb_Ragtangal_adView.getParent()).removeView(fb_Ragtangal_adView);
                             }
                             native_ad.addView(fb_Ragtangal_adView);
-                            AdsControl.isFB_Mediam_Ragtangal_Loaded = false;
+                            isFB_Mediam_Ragtangal_Loaded = false;
                             medium_rect_Ads();
                         } catch (Exception e) {
                             throw new RuntimeException(e);
@@ -2342,7 +2336,7 @@ public class AdsControl {
                                 ((ViewGroup) applovin_Medium_Ragtangal_adview.getParent()).removeView(applovin_Medium_Ragtangal_adview);
                             }
                             native_ad.addView(applovin_Medium_Ragtangal_adview);
-                            AdsControl.isApplovin_Mediam_Ragtangal_Loaded = false;
+                            isApplovin_Mediam_Ragtangal_Loaded = false;
                             medium_rect_Ads();
                         } catch (Exception e) {
                             throw new RuntimeException(e);
@@ -2353,7 +2347,7 @@ public class AdsControl {
                                 ((ViewGroup) w_medium_ragtangal.getParent()).removeView(w_medium_ragtangal);
                             }
                             native_ad.addView(w_medium_ragtangal);
-                            AdsControl.isWortise_medium_ragtangal_Loaded = false;
+                            isWortise_medium_ragtangal_Loaded = false;
                             medium_rect_Ads();
                         } catch (Exception e) {
                             throw new RuntimeException(e);
@@ -2365,90 +2359,87 @@ public class AdsControl {
                     } else {
                         native_Ads();
                     }
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (isadmob_native_Loaded) {
-                                new NativeAds(activity).Admob_NativeAd(AdsControl.Admob_native_Ad, native_ad);
-                                Log.d("Parth", "Admob Native ad show");
-                                AdsControl.isadmob_native_Loaded = false;
-                            } else if (isadx_native_Loaded) {
-                                new NativeAds(activity).Admob_NativeAd(AdsControl.Adx_native_Ad, native_ad);
-                                Log.d("Parth", "Adx Native ad show");
-                                AdsControl.isadx_native_Loaded = false;
-                            } else if (isFB_Native_Loaded) {
-                                new NativeAds(activity).FB_Native(AdsControl.fb_native_Ad, native_ad);
-                                Log.d("Parth", "FB Native ad show");
-                                AdsControl.isFB_Native_Loaded = false;
-                            } else if (isApplovin_Native_Loaded) {
-                                if (Applovin_native_ad != null) {
-                                    native_ad.removeAllViews();
-                                }
+                    new Handler().postDelayed(() -> {
+                        if (isadmob_native_Loaded) {
+                            new NativeAds(activity).Admob_NativeAd(Admob_native_Ad, native_ad);
+                            Log.d("Parth", "Admob Native ad show");
+                            isadmob_native_Loaded = false;
+                        } else if (isadx_native_Loaded) {
+                            new NativeAds(activity).Admob_NativeAd(Adx_native_Ad, native_ad);
+                            Log.d("Parth", "Adx Native ad show");
+                            isadx_native_Loaded = false;
+                        } else if (isFB_Native_Loaded) {
+                            new NativeAds(activity).FB_Native(fb_native_Ad, native_ad);
+                            Log.d("Parth", "FB Native ad show");
+                            isFB_Native_Loaded = false;
+                        } else if (isApplovin_Native_Loaded) {
+                            if (Applovin_native_ad != null) {
                                 native_ad.removeAllViews();
-                                native_ad.addView(applovin_maxnativeadview);
-                                Log.d("Parth", "Applovin Native ad show");
-                                AdsControl.isApplovin_Native_Loaded = false;
-                            } else if (isWortise_Native_Loaded) {
-                                new NativeAds(activity).Admob_NativeAd(AdsControl.wortise_native_Ad, native_ad);
-                                Log.d("Parth", "Wortise Native ad show");
-                                AdsControl.isWortise_Native_Loaded = false;
-                            } else if (isLocal_Native_Loaded) {
-                                @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_native_ad, null);
-                                show_local_native(viewGroup);
-                                native_ad.removeAllViews();
-                                native_ad.addView(viewGroup);
-                                Log.d("Parth", "Local Native ad show");
-                                AdsControl.isLocal_Native_Loaded = false;
-                            } else if (isAdmob_Mediam_Ragtangal_Loaded) {
-                                try {
-                                    if (admobMediam_Ragtangal.getParent() != null) {
-                                        ((ViewGroup) admobMediam_Ragtangal.getParent()).removeView(admobMediam_Ragtangal);
-                                    }
-                                    native_ad.addView(admobMediam_Ragtangal);
-                                    AdsControl.isAdmob_Mediam_Ragtangal_Loaded = false;
-                                } catch (Exception e) {
-                                    throw new RuntimeException(e);
+                            }
+                            native_ad.removeAllViews();
+                            native_ad.addView(applovin_maxnativeadview);
+                            Log.d("Parth", "Applovin Native ad show");
+                            isApplovin_Native_Loaded = false;
+                        } else if (isWortise_Native_Loaded) {
+                            new NativeAds(activity).Admob_NativeAd(wortise_native_Ad, native_ad);
+                            Log.d("Parth", "Wortise Native ad show");
+                            isWortise_Native_Loaded = false;
+                        } else if (isLocal_Native_Loaded) {
+                            @SuppressLint("InflateParams") ViewGroup viewGroup = (ViewGroup) LayoutInflater.from(activity).inflate(R.layout.local_native_ad, null);
+                            show_local_native(viewGroup);
+                            native_ad.removeAllViews();
+                            native_ad.addView(viewGroup);
+                            Log.d("Parth", "Local Native ad show");
+                            isLocal_Native_Loaded = false;
+                        } else if (isAdmob_Mediam_Ragtangal_Loaded) {
+                            try {
+                                if (admobMediam_Ragtangal.getParent() != null) {
+                                    ((ViewGroup) admobMediam_Ragtangal.getParent()).removeView(admobMediam_Ragtangal);
                                 }
-                            } else if (isAdx_Mediam_Ragtangal_Loaded) {
-                                try {
-                                    if (adxMediam_Ragtangal.getParent() != null) {
-                                        ((ViewGroup) adxMediam_Ragtangal.getParent()).removeView(adxMediam_Ragtangal);
-                                    }
-                                    native_ad.addView(adxMediam_Ragtangal);
-                                    AdsControl.isAdx_Mediam_Ragtangal_Loaded = false;
-                                } catch (Exception e) {
-                                    throw new RuntimeException(e);
+                                native_ad.addView(admobMediam_Ragtangal);
+                                isAdmob_Mediam_Ragtangal_Loaded = false;
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        } else if (isAdx_Mediam_Ragtangal_Loaded) {
+                            try {
+                                if (adxMediam_Ragtangal.getParent() != null) {
+                                    ((ViewGroup) adxMediam_Ragtangal.getParent()).removeView(adxMediam_Ragtangal);
                                 }
-                            } else if (isFB_Mediam_Ragtangal_Loaded) {
-                                try {
-                                    if (fb_Ragtangal_adView.getParent() != null) {
-                                        ((ViewGroup) fb_Ragtangal_adView.getParent()).removeView(fb_Ragtangal_adView);
-                                    }
-                                    native_ad.addView(fb_Ragtangal_adView);
-                                    AdsControl.isFB_Mediam_Ragtangal_Loaded = false;
-                                } catch (Exception e) {
-                                    throw new RuntimeException(e);
+                                native_ad.addView(adxMediam_Ragtangal);
+                                isAdx_Mediam_Ragtangal_Loaded = false;
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        } else if (isFB_Mediam_Ragtangal_Loaded) {
+                            try {
+                                if (fb_Ragtangal_adView.getParent() != null) {
+                                    ((ViewGroup) fb_Ragtangal_adView.getParent()).removeView(fb_Ragtangal_adView);
                                 }
-                            } else if (isApplovin_Mediam_Ragtangal_Loaded) {
-                                try {
-                                    if (applovin_Medium_Ragtangal_adview.getParent() != null) {
-                                        ((ViewGroup) applovin_Medium_Ragtangal_adview.getParent()).removeView(applovin_Medium_Ragtangal_adview);
-                                    }
-                                    native_ad.addView(applovin_Medium_Ragtangal_adview);
-                                    AdsControl.isApplovin_Mediam_Ragtangal_Loaded = false;
-                                } catch (Exception e) {
-                                    throw new RuntimeException(e);
+                                native_ad.addView(fb_Ragtangal_adView);
+                                isFB_Mediam_Ragtangal_Loaded = false;
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        } else if (isApplovin_Mediam_Ragtangal_Loaded) {
+                            try {
+                                if (applovin_Medium_Ragtangal_adview.getParent() != null) {
+                                    ((ViewGroup) applovin_Medium_Ragtangal_adview.getParent()).removeView(applovin_Medium_Ragtangal_adview);
                                 }
-                            } else if (isWortise_medium_ragtangal_Loaded) {
-                                try {
-                                    if (w_medium_ragtangal.getParent() != null) {
-                                        ((ViewGroup) w_medium_ragtangal.getParent()).removeView(w_medium_ragtangal);
-                                    }
-                                    native_ad.addView(w_medium_ragtangal);
-                                    AdsControl.isWortise_medium_ragtangal_Loaded = false;
-                                } catch (Exception e) {
-                                    throw new RuntimeException(e);
+                                native_ad.addView(applovin_Medium_Ragtangal_adview);
+                                isApplovin_Mediam_Ragtangal_Loaded = false;
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
+                            }
+                        } else if (isWortise_medium_ragtangal_Loaded) {
+                            try {
+                                if (w_medium_ragtangal.getParent() != null) {
+                                    ((ViewGroup) w_medium_ragtangal.getParent()).removeView(w_medium_ragtangal);
                                 }
+                                native_ad.addView(w_medium_ragtangal);
+                                isWortise_medium_ragtangal_Loaded = false;
+                            } catch (Exception e) {
+                                throw new RuntimeException(e);
                             }
                         }
                     }, 3000);
@@ -2461,7 +2452,7 @@ public class AdsControl {
     static getDataListner callback;
     int ad_inter_network = 0;
     Dialog ad_inter_dialog;
-    public static int ad_dialog_time_in_second = 2;
+    public static long ad_dialog_time_in_second = 2;
 
     // TODO: 7/31/2023  Preload Inter Ads
     public void inter_Ads() {
@@ -2872,12 +2863,12 @@ public class AdsControl {
                         adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
                         if (adCounter == app_data.get(0).getInterCount()) {
                             Inter_Count.getInstance(activity).storeClicks(1);
-                            if (app_data.get(0).isApp_inter_dialog_how()) {
+                            if (app_data.get(0).isApp_inter_dialog_show()) {
                                 ad_inter_dialog.show();
-                                new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
+                                new CountDownTimer(ad_dialog_time_in_second * 1000L, 10) {
                                     @Override
                                     public void onTick(long millisUntilFinished) {
-                                        double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                     }
 
                                     @Override
@@ -2905,12 +2896,12 @@ public class AdsControl {
                         adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
                         if (adCounter == app_data.get(0).getInterCount()) {
                             Inter_Count.getInstance(activity).storeClicks(1);
-                            if (app_data.get(0).isApp_inter_dialog_how()) {
+                            if (app_data.get(0).isApp_inter_dialog_show()) {
                                 ad_inter_dialog.show();
                                 new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                     @Override
                                     public void onTick(long millisUntilFinished) {
-                                        double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                     }
 
                                     @Override
@@ -2938,12 +2929,12 @@ public class AdsControl {
                         adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
                         if (adCounter == app_data.get(0).getInterCount()) {
                             Inter_Count.getInstance(activity).storeClicks(1);
-                            if (app_data.get(0).isApp_inter_dialog_how()) {
+                            if (app_data.get(0).isApp_inter_dialog_show()) {
                                 ad_inter_dialog.show();
                                 new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                     @Override
                                     public void onTick(long millisUntilFinished) {
-                                        double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                     }
 
                                     @Override
@@ -2971,12 +2962,12 @@ public class AdsControl {
                         adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
                         if (adCounter == app_data.get(0).getInterCount()) {
                             Inter_Count.getInstance(activity).storeClicks(1);
-                            if (app_data.get(0).isApp_inter_dialog_how()) {
+                            if (app_data.get(0).isApp_inter_dialog_show()) {
                                 ad_inter_dialog.show();
                                 new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                     @Override
                                     public void onTick(long millisUntilFinished) {
-                                        double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                     }
 
                                     @Override
@@ -3004,12 +2995,12 @@ public class AdsControl {
                         adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
                         if (adCounter == app_data.get(0).getInterCount()) {
                             Inter_Count.getInstance(activity).storeClicks(1);
-                            if (app_data.get(0).isApp_inter_dialog_how()) {
+                            if (app_data.get(0).isApp_inter_dialog_show()) {
                                 ad_inter_dialog.show();
                                 new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                     @Override
                                     public void onTick(long millisUntilFinished) {
-                                        double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                     }
 
                                     @Override
@@ -3037,12 +3028,12 @@ public class AdsControl {
                         adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
                         if (adCounter == app_data.get(0).getInterCount()) {
                             Inter_Count.getInstance(activity).storeClicks(1);
-                            if (app_data.get(0).isApp_inter_dialog_how()) {
+                            if (app_data.get(0).isApp_inter_dialog_show()) {
                                 ad_inter_dialog.show();
                                 new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                     @Override
                                     public void onTick(long millisUntilFinished) {
-                                        double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                     }
 
                                     @Override
@@ -3070,12 +3061,12 @@ public class AdsControl {
                         adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
                         if (adCounter == app_data.get(0).getInterCount()) {
                             Inter_Count.getInstance(activity).storeClicks(1);
-                            if (app_data.get(0).isApp_inter_dialog_how()) {
+                            if (app_data.get(0).isApp_inter_dialog_show()) {
                                 ad_inter_dialog.show();
                                 new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                     @Override
                                     public void onTick(long millisUntilFinished) {
-                                        double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                     }
 
                                     @Override
@@ -3121,12 +3112,12 @@ public class AdsControl {
                         adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
                         if (adCounter == app_data.get(0).getInterCount()) {
                             Inter_Count.getInstance(activity).storeClicks(1);
-                            if (app_data.get(0).isApp_inter_dialog_how()) {
+                            if (app_data.get(0).isApp_inter_dialog_show()) {
                                 ad_inter_dialog.show();
                                 new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                     @Override
                                     public void onTick(long millisUntilFinished) {
-                                        double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                     }
 
                                     @Override
@@ -3176,12 +3167,12 @@ public class AdsControl {
                         adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
                         if (adCounter == app_data.get(0).getInterCount()) {
                             Inter_Count.getInstance(activity).storeClicks(1);
-                            if (app_data.get(0).isApp_inter_dialog_how()) {
+                            if (app_data.get(0).isApp_inter_dialog_show()) {
                                 ad_inter_dialog.show();
                                 new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                     @Override
                                     public void onTick(long millisUntilFinished) {
-                                        double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                     }
 
                                     @Override
@@ -3213,12 +3204,12 @@ public class AdsControl {
                         adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
                         if (adCounter == app_data.get(0).getInterCount()) {
                             Inter_Count.getInstance(activity).storeClicks(1);
-                            if (app_data.get(0).isApp_inter_dialog_how()) {
+                            if (app_data.get(0).isApp_inter_dialog_show()) {
                                 ad_inter_dialog.show();
                                 new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                     @Override
                                     public void onTick(long millisUntilFinished) {
-                                        double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                     }
 
                                     @Override
@@ -3252,12 +3243,12 @@ public class AdsControl {
                         adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
                         if (adCounter == app_data.get(0).getInterCount()) {
                             Inter_Count.getInstance(activity).storeClicks(1);
-                            if (app_data.get(0).isApp_inter_dialog_how()) {
+                            if (app_data.get(0).isApp_inter_dialog_show()) {
                                 ad_inter_dialog.show();
                                 new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                     @Override
                                     public void onTick(long millisUntilFinished) {
-                                        double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                     }
 
                                     @Override
@@ -3267,8 +3258,6 @@ public class AdsControl {
                                             applovin_appopen.showAd();
                                             Log.d("Parth", "Applovin Appopen Show");
                                             appopen_Ads();
-                                        } else {
-                                            applovin_appopen.loadAd();
                                         }
                                     }
                                 }.start();
@@ -3277,8 +3266,6 @@ public class AdsControl {
                                     applovin_appopen.showAd();
                                     Log.d("Parth", "Applovin Appopen Show");
                                     appopen_Ads();
-                                } else {
-                                    applovin_appopen.loadAd();
                                 }
                             }
                         } else {
@@ -3293,12 +3280,12 @@ public class AdsControl {
                         adCounter = Inter_Count.getInstance(activity).getNumberOfClicks();
                         if (adCounter == app_data.get(0).getInterCount()) {
                             Inter_Count.getInstance(activity).storeClicks(1);
-                            if (app_data.get(0).isApp_inter_dialog_how()) {
+                            if (app_data.get(0).isApp_inter_dialog_show()) {
                                 ad_inter_dialog.show();
                                 new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                     @Override
                                     public void onTick(long millisUntilFinished) {
-                                        double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                     }
 
                                     @Override
@@ -3344,12 +3331,12 @@ public class AdsControl {
                         Inter_Count.getInstance(activity).storeClicks(adCounter);
                     }
                     if (isGoogleInterLoaded) {
-                        if (app_data.get(0).isApp_inter_dialog_how()) {
+                        if (app_data.get(0).isApp_inter_dialog_show()) {
                             ad_inter_dialog.show();
                             new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                 @Override
                                 public void onTick(long millisUntilFinished) {
-                                    double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                 }
 
                                 @Override
@@ -3364,12 +3351,12 @@ public class AdsControl {
                             isGoogleInterLoaded = false;
                         }
                     } else if (isAdxInterLoaded) {
-                        if (app_data.get(0).isApp_inter_dialog_how()) {
+                        if (app_data.get(0).isApp_inter_dialog_show()) {
                             ad_inter_dialog.show();
                             new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                 @Override
                                 public void onTick(long millisUntilFinished) {
-                                    double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                 }
 
                                 @Override
@@ -3384,12 +3371,12 @@ public class AdsControl {
                             isAdxInterLoaded = false;
                         }
                     } else if (isFBInterLoaded) {
-                        if (app_data.get(0).isApp_inter_dialog_how()) {
+                        if (app_data.get(0).isApp_inter_dialog_show()) {
                             ad_inter_dialog.show();
                             new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                 @Override
                                 public void onTick(long millisUntilFinished) {
-                                    double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                 }
 
                                 @Override
@@ -3404,12 +3391,12 @@ public class AdsControl {
                             isFBInterLoaded = false;
                         }
                     } else if (isApplovinInterLoaded) {
-                        if (app_data.get(0).isApp_inter_dialog_how()) {
+                        if (app_data.get(0).isApp_inter_dialog_show()) {
                             ad_inter_dialog.show();
                             new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                 @Override
                                 public void onTick(long millisUntilFinished) {
-                                    double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                 }
 
                                 @Override
@@ -3424,12 +3411,12 @@ public class AdsControl {
                             isApplovinInterLoaded = false;
                         }
                     } else if (isWortiseInterLoaded) {
-                        if (app_data.get(0).isApp_inter_dialog_how()) {
+                        if (app_data.get(0).isApp_inter_dialog_show()) {
                             ad_inter_dialog.show();
                             new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                 @Override
                                 public void onTick(long millisUntilFinished) {
-                                    double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                 }
 
                                 @Override
@@ -3444,12 +3431,12 @@ public class AdsControl {
                             isWortiseInterLoaded = false;
                         }
                     } else if (isInmobiInterLoaded) {
-                        if (app_data.get(0).isApp_inter_dialog_how()) {
+                        if (app_data.get(0).isApp_inter_dialog_show()) {
                             ad_inter_dialog.show();
                             new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                 @Override
                                 public void onTick(long millisUntilFinished) {
-                                    double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                 }
 
                                 @Override
@@ -3464,12 +3451,12 @@ public class AdsControl {
                             isInmobiInterLoaded = false;
                         }
                     } else if (isLocalInterLoaded) {
-                        if (app_data.get(0).isApp_inter_dialog_how()) {
+                        if (app_data.get(0).isApp_inter_dialog_show()) {
                             ad_inter_dialog.show();
                             new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                 @Override
                                 public void onTick(long millisUntilFinished) {
-                                    double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                 }
 
                                 @Override
@@ -3502,12 +3489,12 @@ public class AdsControl {
                             public void onAdShowedFullScreenContent() {
                             }
                         };
-                        if (app_data.get(0).isApp_inter_dialog_how()) {
+                        if (app_data.get(0).isApp_inter_dialog_show()) {
                             ad_inter_dialog.show();
                             new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                 @Override
                                 public void onTick(long millisUntilFinished) {
-                                    double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                 }
 
                                 @Override
@@ -3544,12 +3531,12 @@ public class AdsControl {
                             public void onAdShowedFullScreenContent() {
                             }
                         };
-                        if (app_data.get(0).isApp_inter_dialog_how()) {
+                        if (app_data.get(0).isApp_inter_dialog_show()) {
                             ad_inter_dialog.show();
                             new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                 @Override
                                 public void onTick(long millisUntilFinished) {
-                                    double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                 }
 
                                 @Override
@@ -3568,12 +3555,12 @@ public class AdsControl {
                             isadx_appopen_Loaded = false;
                         }
                     } else if (iswortise_appopen_Loaded) {
-                        if (app_data.get(0).isApp_inter_dialog_how()) {
+                        if (app_data.get(0).isApp_inter_dialog_show()) {
                             ad_inter_dialog.show();
                             new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                 @Override
                                 public void onTick(long millisUntilFinished) {
-                                    double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                 }
 
                                 @Override
@@ -3594,12 +3581,12 @@ public class AdsControl {
                             }
                         }
                     } else if (isapplovin_appopen_Loaded) {
-                        if (app_data.get(0).isApp_inter_dialog_how()) {
+                        if (app_data.get(0).isApp_inter_dialog_show()) {
                             ad_inter_dialog.show();
                             new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                 @Override
                                 public void onTick(long millisUntilFinished) {
-                                    double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                 }
 
                                 @Override
@@ -3608,8 +3595,6 @@ public class AdsControl {
                                     if (applovin_appopen.isReady()) {
                                         applovin_appopen.showAd();
                                         Log.d("Parth", "Applovin Appopen Show");
-                                    } else {
-                                        applovin_appopen.loadAd();
                                     }
                                 }
                             }.start();
@@ -3617,17 +3602,15 @@ public class AdsControl {
                             if (applovin_appopen.isReady()) {
                                 applovin_appopen.showAd();
                                 Log.d("Parth", "Applovin Appopen Show");
-                            } else {
-                                applovin_appopen.loadAd();
                             }
                         }
                     } else if (islocal_appopen_Loaded) {
-                        if (app_data.get(0).isApp_inter_dialog_how()) {
+                        if (app_data.get(0).isApp_inter_dialog_show()) {
                             ad_inter_dialog.show();
                             new CountDownTimer(ad_dialog_time_in_second * 1000, 10) {
                                 @Override
                                 public void onTick(long millisUntilFinished) {
-                                    double time = (millisUntilFinished / 10) / ad_dialog_time_in_second;
+
                                 }
 
                                 @Override

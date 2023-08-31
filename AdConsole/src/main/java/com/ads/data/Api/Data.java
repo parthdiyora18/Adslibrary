@@ -141,9 +141,9 @@ public class Data {
     @SerializedName("preload_banner_ads")
     @Expose
     private boolean preload_banner_ads;
-    @SerializedName("app_inter_dialog_how")
+    @SerializedName("app_inter_dialog_show")
     @Expose
-    private boolean app_inter_dialog_how;
+    private boolean app_inter_dialog_show;
     @SerializedName("tap_to_start_mode")
     @Expose
     private String tap_to_start_mode;
@@ -565,12 +565,12 @@ public class Data {
         this.preload_banner_ads = preload_banner_ads;
     }
 
-    public boolean isApp_inter_dialog_how() {
-        return app_inter_dialog_how;
+    public boolean isApp_inter_dialog_show() {
+        return app_inter_dialog_show;
     }
 
-    public void setApp_inter_dialog_how(boolean app_inter_dialog_how) {
-        this.app_inter_dialog_how = app_inter_dialog_how;
+    public void setApp_inter_dialog_show(boolean app_inter_dialog_show) {
+        this.app_inter_dialog_show = app_inter_dialog_show;
     }
 
     public String getTap_to_start_mode() {

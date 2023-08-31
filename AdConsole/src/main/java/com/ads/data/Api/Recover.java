@@ -16,12 +16,15 @@ public class Recover {
     public Integer getSuccess() {
         return success;
     }
+
     public void setSuccess(Integer success) {
         this.success = success;
     }
+
     public List<Data> getData() {
         return data;
     }
+
     public void setData(List<Data> data) {
         this.data = data;
     }
